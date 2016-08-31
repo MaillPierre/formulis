@@ -1,0 +1,459 @@
+@CHARSET "UTF-8";
+
+.root {
+	justify-content:center;
+}
+
+.mainPage {
+	padding-top: 40px;
+}
+
+.weblis-navbar-text {
+/*     display: inline-block !important; */
+/*     vertical-align: middle; */
+    text-align: center;
+    list-style-type: none;
+    margin-right: 3px;
+}
+
+.weblis-max-width {
+	width: 100%;
+}
+
+.weblis-suggestion-table {
+	margin-bottom: 0px;
+}
+
+.weblis-suggestion-frame {
+	list-style: none;
+	background-color: #fff;
+	box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+	padding: 5px 0;
+	margin: 2px 0 0;
+	border-radius: 6px;
+}
+
+.header {
+    display: inline;
+/*     text-align: left; */
+/*     vertical-align: bottom; */
+/*     padding: 5px; */
+	font-weight: bold;
+/* 	border: 1px solid #ddd; */
+/* 	border-bottom-width: 2px; */
+/* 	border-top: 0; */
+}
+
+.indent {
+	margin-left: 20px;
+    display: inline;
+}
+
+.space {
+	margin-left: 7px;
+    display: inline;
+}
+
+.focused {
+/*     background-color:#fcaf3e; */
+	font-size: 1.5em;
+    display: inline;
+}
+
+.focus {
+	display: inline;
+}
+
+.display {
+/* 	display: inline; */
+}
+
+.simpleform {
+	display: inline-block;
+	vertical-align: middle;
+}
+ 
+.fluidHorizontalContainer {
+  display: table;
+  width: 100%;
+}
+ 
+.fluidHorizontalBody {
+	display: inline-block;
+	width: 100%;
+}
+
+.weblis-navbar-textbox {
+	margin-top: 5px;
+	margin-bottom: 0px;
+	vertical-align: middle;
+}
+
+.pair {
+	display: inline;
+}
+
+.pairline {
+/* 	display: inline; */
+	width: 100%;
+}
+
+.brackets {
+	display: inline;
+}
+
+.variable {
+	font-style: italic;
+	padding-right: 10px;
+}
+
+.primitive {
+	font-style: italic;
+	padding-right: 10px;
+	display: inline;
+}
+
+.entity {
+    color:darkblue;
+	padding-right: 10px;
+    display: inline;
+}
+
+.class {
+    color:darkorange;
+	padding-right: 10px;
+    display: inline;
+}
+
+.property {
+    color:darkviolet;
+	padding-right: 10px;
+    display: inline;
+}
+
+.listNumber {
+	padding-right: 10px;
+    display: inline;
+}
+
+.keyword {
+	font-weight: bold;
+	padding-right: 10px;
+    display: inline;
+}
+
+.functor {
+    color:darkcyan;
+    display: inline;
+}
+
+.datatype {
+    color:darkorange;
+    display: inline;
+}
+
+.plainLiteral, .typedLiteral {
+    color:darkgreen;
+	padding-right: 10px;
+    display: inline;
+}
+
+.insert {
+	display:inline;
+}
+
+.specialSuggestion {
+	color: black;
+	font-weight: bold;
+	text-align: center;
+}
+
+.debug1 {
+	background-color: red;
+	border-style: solid;
+}
+
+.debug2 {
+	background-color: green;
+	border-style: solid;
+}
+
+.debug3 {
+	background-color: blue;
+	border-style: solid;
+}
+
+.no-gutter .container-fluid {
+    padding-right:0;
+    padding-left:0;
+}
+
+/* .controls { */
+/* 	background-color: #CCFFFF; */
+/* 	border-radius: 10px; */
+/* 	align-content: stretch; */
+/* } */
+
+/* .insertButtonPanel { */
+/* 	border-radius: 10px; */
+/* 	align-content: stretch; */
+/* } */
+
+/* .gwt-PushButton { */
+/* 	border-radius: 3px; */
+/* } */
+
+/* .row-fluid [class*="span"] { */
+/*     vertical-align: middle; */
+/* } */
+
+.gwt-PushButton-up {
+	color: #ffffff;
+	background-color: #000000;
+}
+
+.gwt-PushButton-up-disabled {
+	color: #babdb6;
+	background-color: #d3d7cf;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
+	border-radius: 3px;
+    border-color: black;
+    border-style: solid;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab:hover {
+	background-color: #d3d7cf;
+}
+.gwt-MenuBar {
+  cursor: default;
+}
+.gwt-MenuBar .gwt-MenuItem {
+  cursor: default;
+  font-family: Arial Unicode MS, Arial, sans-serif;
+}
+.gwt-MenuBar .gwt-MenuItem-selected {
+  background: #E3E8F3;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItem {
+  padding: 5px 10px;
+  vertical-align: bottom;
+  color: #000;
+  font-weight: bold;
+}
+.gwt-MenuBar-horizontal .gwt-MenuItemSeparator {
+  width: 1px;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  border-left: 1px solid #ccc;
+  background: white;
+}
+.gwt-MenuBar-horizontal .gwt-MenuItemSeparator .menuSeparatorInner {
+  width: 1px;
+  height: 1px;
+  background: white;
+}
+.gwt-MenuBar-vertical {
+  margin-top: 0px;
+  margin-left: 0px;
+  background: white;
+}
+.gwt-MenuBar-vertical table {
+  border-collapse: collapse;
+}
+.gwt-MenuBar-vertical .gwt-MenuItem {
+  padding: 2px 1px 2px 1px;
+}
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator {
+  padding: 2px 0px;
+}
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator .menuSeparatorInner {
+  height: 1px;
+  padding: 0px;
+  border: 0px;
+  border-top: 1px solid #ccc;
+  overflow: hidden;
+}
+.gwt-MenuBar-vertical .subMenuIcon {
+  padding-right: 4px;
+}
+.gwt-MenuBar-vertical .subMenuIcon-selected {
+  background: #E3E8F3;
+}
+.gwt-MenuBarPopup {
+  margin: 0px 0px 0px 3px;
+}
+.gwt-MenuBarPopup .menuPopupTopLeftInner {
+  width: 5px;
+  height: 5px;
+  zoom: 1;
+}
+.gwt-MenuBarPopup .menuPopupTopRightInner {
+  width: 8px;
+  height: 5px;
+  zoom: 1;
+}
+.gwt-MenuBarPopup .menuPopupBottomLeftInner {
+  width: 5px;
+  height: 8px;
+  zoom: 1;
+}
+.gwt-MenuBarPopup .menuPopupBottomRightInner {
+  width: 8px;
+  height: 8px;
+  zoom: 1;
+}
+
+* html .gwt-MenuBarPopup .menuPopupTopLeftInner {
+  width: 5px;
+  height: 5px;
+  overflow: hidden;
+}
+* html .gwt-MenuBarPopup .menuPopupTopRightInner {
+  width: 8px;
+  height: 5px;
+  overflow: hidden;
+}
+* html .gwt-MenuBarPopup .menuPopupBottomLeftInner {
+  width: 5px;
+  height: 8px;
+  overflow: hidden;
+}
+* html .gwt-MenuBarPopup .menuPopupBottomRightInner {
+  width: 8px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.gwt-DatePicker {
+  border: 1px solid #ccc;
+  border-top:1px solid #999;
+  cursor: default;
+}
+
+.gwt-DatePicker td,
+.datePickerMonthSelector td:focus {
+  outline: none;
+}
+
+.datePickerMonthSelector td:focus {
+  outline: none;
+}
+
+.datePickerDays {
+  width: 100%;
+  background: white;
+}
+
+.datePickerDay,
+.datePickerWeekdayLabel,
+.datePickerWeekendLabel {
+  font-size: 85%;
+  text-align: center;
+  padding: 4px;
+  outline: none;
+  font-weight:bold;
+  color:#333;
+  border-right: 1px solid #EDEDED;
+  border-bottom: 1px solid #EDEDED;
+}
+
+.datePickerWeekdayLabel,
+.datePickerWeekendLabel {
+  background: #fff;
+  padding: 0px 4px 2px;
+  cursor: default;
+  color:#666;
+  font-size:70%;
+  font-weight:normal;
+}
+
+.datePickerDay {
+  padding: 4px 7px;
+  cursor: hand;
+  cursor: pointer;
+}
+
+.datePickerDayIsWeekend {
+  background: #f7f7f7;
+}
+
+.datePickerDayIsFiller {
+  color: #999;
+  font-weight:normal;
+}
+
+.datePickerDayIsValue {
+  background: #d7dfe8;
+}
+
+.datePickerDayIsDisabled {
+  color: #AAAAAA;
+  font-style: italic;
+}
+
+.datePickerDayIsHighlighted {
+  background: #F0E68C;
+}
+
+.datePickerDayIsValueAndHighlighted {
+  background: #d7dfe8;
+}
+
+.datePickerDayIsToday {
+  padding: 3px;
+  color: #fff;
+/*   background: url(images/hborder.png) repeat-x 0px -2607px; */
+	background-color: #d9d9d9;
+}
+
+.datePickerMonthSelector {
+  width: 100%;
+  padding: 1px 0 5px 0;
+  background: #fff;
+}
+
+.datePickerPreviousButton,
+.datePickerNextButton,
+.datePickerPreviousYearButton,
+.datePickerNextYearButton {
+  font-size: 120%;
+  line-height: 1em;
+  color: #3a6aad;
+  cursor: hand;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0px 4px;
+  outline: none;
+}
+
+td.datePickerMonth,
+td.datePickerYear {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 100%;
+  font-weight: bold;
+  color: #333;
+}
+
+.gwt-DateBox {
+  padding: 5px 4px;
+  border: 1px solid #ccc;
+  border-top: 1px solid #999;
+  font-size: 100%;
+}
+
+.gwt-DateBox input {
+  width: 8em;
+}
+
+.dateBoxFormatError {
+  background: #ffcccc;
+}
+
+.dateBoxPopup {
+}

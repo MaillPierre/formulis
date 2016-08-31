@@ -1,0 +1,277 @@
+package com.irisa.formulis.view.form.suggest;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.control.Controller;
+import com.irisa.formulis.model.suggestions.Increment;
+import com.irisa.formulis.model.suggestions.Increment.KIND;
+import com.irisa.formulis.view.AbstractFormulisWidget;
+import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.event.CompletionAskedEvent;
+import com.irisa.formulis.view.event.MoreCompletionsEvent;
+import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
+import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
+import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
+import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
+import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.FormEventCallback;
+import com.irisa.formulis.view.form.FormRelationLineWidget;
+
+public class CustomSuggestionWidget extends AbstractFormulisWidget 
+	implements ValueChangeHandler<String>, HasCompletionAskedHandler, HasMoreCompletionsHandler, HasSuggestionSelectionHandler, FocusHandler, KeyDownHandler {
+
+	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
+	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
+	protected LinkedList<SuggestionSelectionHandler> suggestionSelectionHandlers = new LinkedList<SuggestionSelectionHandler>();
+	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
+	
+	private TextBox element = new TextBox();
+	private CustomSuggestionOracle oracle = new CustomSuggestionOracle();
+	private CustomSuggestionPopover popover;
+	private static int limit = 10;
+	
+	private boolean moreCompletionMode = false;
+	
+	public enum CALLBACK_MODE {
+		SET,
+		ADD
+	};
+	
+	public CustomSuggestionWidget(FormRelationLineWidget par) {
+		super(null, par );
+		initWidget(element);
+		
+		element.addFocusHandler(this);
+		element.addValueChangeHandler(this);
+		element.addKeyDownHandler(this);
+		element.addClickHandler(this);
+		element.setWidth("100%");
+		element.getElement().setPropertyString("autocomplete", "off");
+		
+		popover = new CustomSuggestionPopover(this);
+	}
+	
+	public static int getLimit() {
+		return limit;
+	}
+	
+	public static void setLimit(int l) {
+		limit = l;
+	}
+	
+	public boolean isMoreCompletionMode() {
+		return moreCompletionMode;
+	}
+
+	public void setMoreCompletionMode(boolean moreCompletionMode) {
+		this.moreCompletionMode = moreCompletionMode;
+		this.popover.setMoreCompletionsMode(moreCompletionMode);
+	}
+	
+	public void setPlaceholder(String placeholder) {
+		element.getElement().setPropertyString("placeholder", placeholder);
+	}
+	
+	@Override
+	public FormRelationLineWidget getParentWidget() {
+		return (FormRelationLineWidget) super.getParentWidget();
+	}
+	
+	public String getValue() {
+		return this.element.getValue();
+	}
+	
+	public void addSuggestionToOracle(Increment inc) {
+		if(inc.getKind() == KIND.ENTITY || inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.CLASS || inc.getKind() == KIND.SOMETHING) {
+			this.oracle.add(new CustomSuggestion(inc));
+		}
+	}
+	
+	public void addAllSuggestionToOracle(Collection<Increment> c) {
+		Iterator<Increment> itSugg = c.iterator();
+		while(itSugg.hasNext()) {
+			Increment inc = itSugg.next();
+			this.addSuggestionToOracle(inc);
+		}
+	}
+	
+	public void setOracleSuggestions(Collection<Increment> c) {
+		LinkedList<CustomSuggestion> suggs = new LinkedList<CustomSuggestion>();
+		Iterator<Increment> itInc = c.iterator();
+		while(itInc.hasNext()) {
+			Increment inc = itInc.next();
+			if(inc.getKind() == KIND.ENTITY || inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.CLASS || inc.getKind() == KIND.SOMETHING) {
+				suggs.add(new CustomSuggestion(inc));
+			}
+		}
+		this.oracle.setSuggestions(suggs);
+	}
+
+	@Override
+	public void onClick(ClickEvent event) {
+		fireClickWidgetEvent(new ClickWidgetEvent(this, new SuggestionCallback(this)));
+	}
+	
+	public void refreshSuggestions() {
+		this.popover.setContent(this.oracle.matchingIncrement(this.getValue(), limit));
+		this.popover.refreshSuggestion();
+	}
+	
+	public void showSuggestions() {
+		this.refreshSuggestions();
+		popover.show();
+	}
+	
+	@Override
+	public void onValueChange(ValueChangeEvent<String> event) {
+		fireCompletionAskedEvent();
+	}
+	
+	@Override
+	public void addCompletionAskedHandler(CompletionAskedHandler handler) {
+		this.completionAskedHandlers.add(handler);
+	}
+	
+	@Override
+	public void fireCompletionAskedEvent() {
+		CompletionAskedEvent event = new CompletionAskedEvent(this, new SuggestionCallback(this, CALLBACK_MODE.SET));
+		fireCompletionAskedEvent(event);
+	}
+
+	@Override
+	public void fireCompletionAskedEvent(CompletionAskedEvent event) {
+		Iterator<CompletionAskedHandler> itHand = this.completionAskedHandlers.iterator();
+		while(itHand.hasNext()) {
+			CompletionAskedHandler hand = itHand.next();
+			hand.onCompletionAsked(event);
+		}
+	}
+
+	@Override
+	public void addMoreCompletionsHandler(MoreCompletionsHandler handler) {
+		this.moreCompletionsHandlers.add(handler);
+	}
+
+	@Override
+	public void fireMoreCompletionsEvent(MoreCompletionsEvent event) {
+		Iterator<MoreCompletionsHandler> itHand = this.moreCompletionsHandlers.iterator();
+		while(itHand.hasNext()) {
+			MoreCompletionsHandler hand = itHand.next();
+			hand.onMoreCompletions(event);
+		}
+	}
+
+	@Override
+	public void fireMoreCompletionsEvent(SuggestionCallback cb) {
+		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, cb));
+	}
+
+	public void fireMoreCompletionsEvent() {
+		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, new SuggestionCallback(this, CALLBACK_MODE.ADD)));
+	}
+
+	@Override
+	public void addSuggestionSelectionHandler(SuggestionSelectionHandler handler) {
+		suggestionSelectionHandlers.add(handler);
+	}
+
+	public void suggestionSelected(CustomSuggestion suggest) {
+		this.fireSuggestionSelection(new SuggestionSelectionEvent(suggest));
+	}
+
+	@Override
+	public void fireSuggestionSelection(SuggestionSelectionEvent event) {
+		Iterator<SuggestionSelectionHandler> itHand = this.suggestionSelectionHandlers.iterator();
+		while(itHand.hasNext()) {
+			SuggestionSelectionHandler hand = itHand.next();
+			hand.onSelection(event);
+		}
+	}
+
+	/**
+	 * Retransmet l'event à son widget parent
+	 */
+	public void fireElementCreationEvent() {
+		this.getParentWidget().fireElementCreationEvent();
+	}
+
+	@Override
+	public void onFocus(FocusEvent event) {
+		if(this.isMoreCompletionMode()) {
+			popover.refreshSuggestion();
+		} else {
+			fireCompletionAskedEvent();
+		}
+	}
+
+	@Override
+	public void onKeyDown(KeyDownEvent event) {
+		ControlUtils.debugMessage("CustomSuggestionWidget keyPressed " + event);
+		if(event.isDownArrow()) {
+			this.popover.focus();
+		} if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			if(element.getText() != "") {
+				
+			}
+		}
+	}
+
+	public class SuggestionCallback implements FormEventCallback {
+		
+		private CustomSuggestionWidget source;
+		private CALLBACK_MODE callMode = CALLBACK_MODE.SET;
+		
+		public SuggestionCallback(CustomSuggestionWidget src) {
+			this.source = src;
+		}
+		
+		public SuggestionCallback(CustomSuggestionWidget src, CALLBACK_MODE mode) {
+			this.source = src;
+			this.callMode = mode;
+		}
+
+		@Override
+		public void call(Controller control) {
+			if(this.callMode == CALLBACK_MODE.ADD) {
+				callAdd(control.getPlace().getSuggestions().getEntitySuggestions());
+			} else if(this.callMode == CALLBACK_MODE.SET) {
+				callSet(control.getPlace().getSuggestions().getEntitySuggestions());
+			}
+		}
+		
+		public void callSet(Collection<Increment> c) {
+			source.oracle.clear();
+			Iterator<Increment> itInc = c.iterator();
+			while(itInc.hasNext()) {
+				Increment inc = itInc.next();
+				source.oracle.add(new CustomSuggestion(inc));
+			}
+			source.popover.setContent(source.oracle.matchingIncrement(getValue(), limit));
+		}
+		
+		public void callAdd(Collection<Increment> c) {
+			Iterator<Increment> itInc = c.iterator();
+			while(itInc.hasNext()) {
+				Increment inc = itInc.next();
+				source.oracle.add(new CustomSuggestion(inc));
+			}
+			source.popover.setContent(source.oracle.matchingIncrement(getValue(), limit));
+		}
+	}
+
+}
