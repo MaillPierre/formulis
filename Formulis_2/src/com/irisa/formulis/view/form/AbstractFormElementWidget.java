@@ -13,39 +13,30 @@ import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
-import com.irisa.formulis.view.event.TypeLineSetEvent;
+//import com.irisa.formulis.view.event.TypeLineSetEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
-import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasLineSelectionHandler;
-import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.HasRelationCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasRemoveLineHandler;
-import com.irisa.formulis.view.event.interfaces.HasStatementChangeHandler;
-import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
+import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
+import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
+//import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
-import com.irisa.formulis.view.event.interfaces.TypeLineSetHandler;
+//import com.irisa.formulis.view.event.interfaces.TypeLineSetHandler;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
 
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
-		implements HasCompletionAskedHandler, CompletionAskedHandler, ElementCreationHandler, 
-		HasElementCreationHandler, HasLineSelectionHandler, LineSelectionHandler, HasMoreCompletionsHandler, MoreCompletionsHandler/*, HasNestedFormHandler, NestedFormHandler*/, HasRemoveLineHandler, 
-		RemoveLineHandler, HasStatementChangeHandler, StatementChangeHandler, TypeLineSetHandler, HasTypeLineSetHandler, RelationCreationHandler, HasRelationCreationHandler {
+		implements FormEventChainHandler, HasFormEventChainHandlers {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
-//	protected LinkedList<NestedFormHandler> nestedFormHandlers = new LinkedList<NestedFormHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
-	protected LinkedList<TypeLineSetHandler> typeLineSetHandlers = new LinkedList<TypeLineSetHandler>();
 	protected boolean profileMode = false;
 
 	public AbstractFormElementWidget(FormElement d, AbstractFormulisWidget fParent) {
@@ -274,31 +265,31 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		}
 	}
 
-	@Override
-	public void onTypeLineSet(TypeLineSetEvent event) {
-		fireTypeLineSetEvent(event);
-	}
-
-	@Override
-	public void addTypeLineSetHandler(TypeLineSetHandler handler) {
-		this.typeLineSetHandlers.add(handler);
-	}
-
-	@Override
-	public void fireTypeLineSetEvent(TypeLineSetEvent event) {
-		Iterator<TypeLineSetHandler> itHand = this.typeLineSetHandlers.iterator();
-		while(itHand.hasNext()) {
-			TypeLineSetHandler hand = itHand.next();
-			hand.onTypeLineSet(event);
-		}
-	}
-
-	@Override
-	public void fireTypeLineSetEvent() {
-		if(this instanceof FormWidget) {
-			fireTypeLineSetEvent(new TypeLineSetEvent((FormWidget) this));
-		}
-	}
+//	@Override
+//	public void onTypeLineSet(TypeLineSetEvent event) {
+//		fireTypeLineSetEvent(event);
+//	}
+//
+//	@Override
+//	public void addTypeLineSetHandler(TypeLineSetHandler handler) {
+//		this.typeLineSetHandlers.add(handler);
+//	}
+//
+//	@Override
+//	public void fireTypeLineSetEvent(TypeLineSetEvent event) {
+//		Iterator<TypeLineSetHandler> itHand = this.typeLineSetHandlers.iterator();
+//		while(itHand.hasNext()) {
+//			TypeLineSetHandler hand = itHand.next();
+//			hand.onTypeLineSet(event);
+//		}
+//	}
+//
+//	@Override
+//	public void fireTypeLineSetEvent() {
+//		if(this instanceof FormWidget) {
+//			fireTypeLineSetEvent(new TypeLineSetEvent((FormWidget) this));
+//		}
+//	}
 	
 	public abstract ProfileElement toProfileElement();
 

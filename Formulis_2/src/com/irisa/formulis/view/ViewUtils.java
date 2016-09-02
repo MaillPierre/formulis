@@ -13,6 +13,8 @@ import com.irisa.formulis.model.form.FormComponent;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.view.custom.SimpleFormWidget;
+import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
+import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 
 public class ViewUtils {
 
@@ -213,9 +215,9 @@ public class ViewUtils {
 		return new SimpleFormWidget(elem.getTag(), toSimpleHtml(elem), elem);
 	}
 
-	//	public void serverErrorMessage(String message) {
-	//		
-	//	}
+	public static <H extends FormEventChainHandler, E extends HasFormEventChainHandlers> void connectFormEventChain(E emitter, H handler) {
+		
+	}
 
 
 }

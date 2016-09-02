@@ -47,6 +47,7 @@ import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
+import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
@@ -64,8 +65,7 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
  *
  */
 
-public final class Controller implements EntryPoint, ClickHandler, CompletionAskedHandler, ElementCreationHandler, LineSelectionHandler, MoreCompletionsHandler/*, NestedFormHandler*/, RelationCreationHandler, 
-RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLineSetHandler, ValueChangeHandler<Integer> {
+public final class Controller implements EntryPoint, ClickHandler, FormEventChainHandler, StatementFocusChangeHandler/*, TypeLineSetHandler*/, ValueChangeHandler<Integer> {
 
 	private HashMap<String, Store> storeMapByName = new HashMap<String, Store>();
 	private HashMap<String, Store> storeMapByLabel = new HashMap<String, Store>();
@@ -1904,15 +1904,14 @@ RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLine
 			dataSource.setVariableElement(newDataForm);
 			widSource.setVariableElement(newFormWid);
 			newFormWid.addClickWidgetEventHandler(widSource);
-			newFormWid.addCompletionAskedHandler(widSource);
-			newFormWid.addElementCreationHandler(widSource);
-			newFormWid.addLineSelectionHandler(widSource);
-			newFormWid.addMoreCompletionsHandler(widSource);
-//			newFormWid.addNestedFormHandler(widSource);
-			newFormWid.addRelationCreationHandler(widSource);
-			newFormWid.addRemoveLineHandler(widSource);
-			newFormWid.addStatementChangeHandler(widSource);
-			newFormWid.addTypeLineSetHandler(widSource);
+//			newFormWid.addCompletionAskedHandler(widSource);
+//			newFormWid.addElementCreationHandler(widSource);
+//			newFormWid.addLineSelectionHandler(widSource);
+//			newFormWid.addMoreCompletionsHandler(widSource);
+//			newFormWid.addRelationCreationHandler(widSource);
+//			newFormWid.addRemoveLineHandler(widSource);
+//			newFormWid.addStatementChangeHandler(widSource);
+			ViewUtils.connectFormEventChain(newFormWid, widSource);
 
 			String queryLineLispql = lispqlStatementQuery(dataSource);
 			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));
@@ -1936,13 +1935,13 @@ RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLine
 		incrementNumberOfActions();
 	}
 
-	@Override
-	public void onTypeLineSet(TypeLineSetEvent event) {
-		String queryString = lispqlStatementQuery(event.getSource().getData());
-		this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(event.getSource(), event.getSource().getCallback()));
-
-		incrementNumberOfActions();
-	}
+//	@Override
+//	public void onTypeLineSet(TypeLineSetEvent event) {
+//		String queryString = lispqlStatementQuery(event.getSource().getData());
+//		this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(event.getSource(), event.getSource().getCallback()));
+//
+//		incrementNumberOfActions();
+//	}
 
 	//	public void onCompletionReady(ElementSuggestionWidget source) {
 	//		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
@@ -2044,7 +2043,10 @@ RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLine
 					|| (widSource.getData().getTypeLine() != null && widSource.getData().getTypeLine().isAnonymous())) {
 				if(classLines.size() == 1 ) {
 					widSource.getData().setTypeLine(classLines.iterator().next(), true);
-					widSource.fireTypeLineSetEvent();
+					String queryString = lispqlStatementQuery(widSource.getData());
+					this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
+
+					incrementNumberOfActions();
 				} else {
 					
 					int nbLines = classLines.size();

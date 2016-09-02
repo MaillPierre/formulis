@@ -22,6 +22,7 @@ import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
+import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
@@ -181,15 +182,14 @@ public class FormWidget extends AbstractFormElementWidget {
 	public void addLine(FormLineWidget line) {
 		linesCol.add(line);
 		linesWidgets.addLast(line);
-		line.addCompletionAskedHandler(this);
-		line.addElementCreationHandler(this);
-		line.addLineSelectionHandler(this);
-		line.addMoreCompletionsHandler(this);
-//		line.addNestedFormHandler(this);
-		line.addRelationCreationHandler(this);
-		line.addRemoveLineHandler(this);
-		line.addStatementChangeHandler(this);
-		line.addTypeLineSetHandler(this);
+		ViewUtils.connectFormEventChain(line, this);
+//		line.addCompletionAskedHandler(this);
+//		line.addElementCreationHandler(this);
+//		line.addLineSelectionHandler(this);
+//		line.addMoreCompletionsHandler(this);
+//		line.addRelationCreationHandler(this);
+//		line.addRemoveLineHandler(this);
+//		line.addStatementChangeHandler(this);
 	}
 
 	public void setData(Form form) {

@@ -61,7 +61,7 @@ public class MainPage extends Composite {
 		formWidget.addRemoveLineHandler(control);
 		formWidget.addRelationCreationHandler(control);
 		formWidget.addStatementChangeHandler(control);
-		formWidget.addTypeLineSetHandler(control);
+//		formWidget.addTypeLineSetHandler(control);
 	}
 
 }

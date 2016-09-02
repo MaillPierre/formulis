@@ -13,6 +13,7 @@ import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FormulisWidgetFactory;
+import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
@@ -158,14 +159,14 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			nWid.addClickWidgetEventHandler(this);
 			if(nWid instanceof AbstractFormElementWidget) {
 				AbstractFormElementWidget nFormElem = (AbstractFormElementWidget) nWid;
-				nFormElem.addCompletionAskedHandler(this);
-				nFormElem.addElementCreationHandler(this);
-				nFormElem.addLineSelectionHandler(this);
-//				nFormElem.addNestedFormHandler(this);
-				nFormElem.addMoreCompletionsHandler(this);
-				nFormElem.addRelationCreationHandler(this);
-				nFormElem.addRemoveLineHandler(this);
-				nFormElem.addStatementChangeHandler(this);
+//				nFormElem.addCompletionAskedHandler(this);
+//				nFormElem.addElementCreationHandler(this);
+//				nFormElem.addLineSelectionHandler(this);
+//				nFormElem.addMoreCompletionsHandler(this);
+//				nFormElem.addRelationCreationHandler(this);
+//				nFormElem.addRemoveLineHandler(this);
+//				nFormElem.addStatementChangeHandler(this);
+				ViewUtils.connectFormEventChain(nFormElem, this);
 				if(nFormElem.getData() instanceof FormComponent) { // Ligne ou Form (théoriquement seulement Form possible)
 					FormComponent formCompo = (FormComponent) nFormElem.getData();
 					formCompo.setParent(this.getData());
