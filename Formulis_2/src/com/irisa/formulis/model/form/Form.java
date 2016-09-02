@@ -157,7 +157,7 @@ public class Form extends FormComponent {
 		} 
 
 		// Ligne de type
-		if(this.typeLine != null && ! this.typeLine.isAnonymous()) {
+		if(! this.isAnonymous()) {
 			if(isFinalRequest) {
 				result += "<" + typeLine.getElementUri() + "> ";
 			}
@@ -284,6 +284,9 @@ public class Form extends FormComponent {
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof Form) {
+			if(((Form) o).isAnonymous() && this.isAnonymous()) {
+				return this.formLines.equals(((Form) o).formLines); 
+			}
 			return this.formLines.equals(((Form) o).formLines) && this.typeLine.equals(((Form) o).typeLine);
 		}
 		return super.equals(o);

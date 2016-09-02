@@ -185,7 +185,7 @@ public class FormWidget extends AbstractFormElementWidget {
 		line.addElementCreationHandler(this);
 		line.addLineSelectionHandler(this);
 		line.addMoreCompletionsHandler(this);
-		line.addNestedFormHandler(this);
+//		line.addNestedFormHandler(this);
 		line.addRelationCreationHandler(this);
 		line.addRemoveLineHandler(this);
 		line.addStatementChangeHandler(this);

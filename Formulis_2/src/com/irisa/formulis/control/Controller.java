@@ -64,7 +64,7 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
  *
  */
 
-public final class Controller implements EntryPoint, ClickHandler, CompletionAskedHandler, ElementCreationHandler, LineSelectionHandler, MoreCompletionsHandler, NestedFormHandler, RelationCreationHandler, 
+public final class Controller implements EntryPoint, ClickHandler, CompletionAskedHandler, ElementCreationHandler, LineSelectionHandler, MoreCompletionsHandler/*, NestedFormHandler*/, RelationCreationHandler, 
 RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLineSetHandler, ValueChangeHandler<Integer> {
 
 	private HashMap<String, Store> storeMapByName = new HashMap<String, Store>();
@@ -1870,19 +1870,19 @@ RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLine
 		incrementNumberOfActions();
 	}
 
-	@Override
-	public void onNestedForm(NestedFormEvent event) {
-		// NOUVEAU FORMULAIRE IMBRIQUE
-		// Crée un nouveau formulaire, demande un changement de statement puis un chargement du formulaire
-		ControlUtils.debugMessage("onNestedForm");
-		FormLineWidget widSource = ((FormLineWidget)event.getSource());
-		FormLine dataSource = widSource.getFormLine();
-		Form newDataForm = new Form(dataSource);
-		FormWidget newFormWid = new FormWidget(newDataForm, widSource);
-		widSource.setVariableElement(newFormWid);
-		String queryLineLispql = lispqlStatementQuery(dataSource);
-		sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));
-	}
+//	@Override
+//	public void onNestedForm(NestedFormEvent event) {
+//		// NOUVEAU FORMULAIRE IMBRIQUE
+//		// Crée un nouveau formulaire, demande un changement de statement puis un chargement du formulaire
+//		ControlUtils.debugMessage("onNestedForm");
+//		FormLineWidget widSource = ((FormLineWidget)event.getSource());
+//		FormLine dataSource = widSource.getFormLine();
+//		Form newDataForm = new Form(dataSource);
+//		FormWidget newFormWid = new FormWidget(newDataForm, widSource);
+//		widSource.setVariableElement(newFormWid);
+//		String queryLineLispql = lispqlStatementQuery(dataSource);
+//		sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));
+//	}
 
 	/**
 	 * Evenement de demande de création d'élément provenant d'un widget de ligne de relation (FormRelationLineWidget)
@@ -1908,7 +1908,7 @@ RemoveLineHandler, StatementChangeHandler, StatementFocusChangeHandler, TypeLine
 			newFormWid.addElementCreationHandler(widSource);
 			newFormWid.addLineSelectionHandler(widSource);
 			newFormWid.addMoreCompletionsHandler(widSource);
-			newFormWid.addNestedFormHandler(widSource);
+//			newFormWid.addNestedFormHandler(widSource);
 			newFormWid.addRelationCreationHandler(widSource);
 			newFormWid.addRemoveLineHandler(widSource);
 			newFormWid.addStatementChangeHandler(widSource);

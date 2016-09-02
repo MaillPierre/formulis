@@ -57,7 +57,7 @@ public class MainPage extends Composite {
 		formWidget.addElementCreationHandler(control);
 		formWidget.addLineSelectionHandler(control);
 		formWidget.addMoreCompletionsHandler(control);
-		formWidget.addNestedFormHandler(control);
+//		formWidget.addNestedFormHandler(control);
 		formWidget.addRemoveLineHandler(control);
 		formWidget.addRelationCreationHandler(control);
 		formWidget.addStatementChangeHandler(control);

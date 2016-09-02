@@ -50,7 +50,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 					newForm.addCompletionAskedHandler(this);
 					newForm.addElementCreationHandler(this);
 					newForm.addLineSelectionHandler(this);
-					newForm.addNestedFormHandler(this);
+//					newForm.addNestedFormHandler(this);
 					newForm.addMoreCompletionsHandler(this);
 					newForm.addRelationCreationHandler(this);
 					newForm.addRemoveLineHandler(this);
@@ -161,7 +161,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 				nFormElem.addCompletionAskedHandler(this);
 				nFormElem.addElementCreationHandler(this);
 				nFormElem.addLineSelectionHandler(this);
-				nFormElem.addNestedFormHandler(this);
+//				nFormElem.addNestedFormHandler(this);
 				nFormElem.addMoreCompletionsHandler(this);
 				nFormElem.addRelationCreationHandler(this);
 				nFormElem.addRemoveLineHandler(this);

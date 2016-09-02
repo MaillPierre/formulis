@@ -188,7 +188,6 @@ public class Parser {
 					if(columnNode.getNodeName().equals("column")) {
 						NamedNodeMap attrList = columnNode.getAttributes();
 						String name = attrList.getNamedItem("name").getNodeValue();
-						ControlUtils.debugMessage("Column Name " + attrList.getNamedItem("name").getNodeValue() + " ==> " + name);
 						ORDER order = AnswersHeader.orderFromString(attrList.getNamedItem("order").getNodeValue());
 						String pattern = attrList.getNamedItem("pattern").getNodeValue();
 						AGGREGATION aggreg = AnswersHeader.aggregationFromString(attrList.getNamedItem("aggreg").getNodeValue());

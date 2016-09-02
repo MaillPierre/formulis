@@ -10,7 +10,6 @@ import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
-import com.irisa.formulis.view.event.NestedFormEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
@@ -21,14 +20,12 @@ import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasLineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.HasNestedFormHandler;
 import com.irisa.formulis.view.event.interfaces.HasRelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasRemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.HasStatementChangeHandler;
 import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.NestedFormHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
@@ -37,14 +34,14 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
 
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		implements HasCompletionAskedHandler, CompletionAskedHandler, ElementCreationHandler, 
-		HasElementCreationHandler, HasLineSelectionHandler, LineSelectionHandler, HasMoreCompletionsHandler, MoreCompletionsHandler, HasNestedFormHandler, NestedFormHandler, HasRemoveLineHandler, 
+		HasElementCreationHandler, HasLineSelectionHandler, LineSelectionHandler, HasMoreCompletionsHandler, MoreCompletionsHandler/*, HasNestedFormHandler, NestedFormHandler*/, HasRemoveLineHandler, 
 		RemoveLineHandler, HasStatementChangeHandler, StatementChangeHandler, TypeLineSetHandler, HasTypeLineSetHandler, RelationCreationHandler, HasRelationCreationHandler {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
-	protected LinkedList<NestedFormHandler> nestedFormHandlers = new LinkedList<NestedFormHandler>();
+//	protected LinkedList<NestedFormHandler> nestedFormHandlers = new LinkedList<NestedFormHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
@@ -175,30 +172,30 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		fireLineSelectionEvent(event);
 	}
 
-	@Override
-	public void addNestedFormHandler(NestedFormHandler handler) {
-		this.nestedFormHandlers.add(handler);
-	}
-
-	@Override
-	public void fireNestedFormEvent() {
-		NestedFormEvent event = new NestedFormEvent(this);
-		fireNestedFormEvent(event);
-	}
-
-	@Override
-	public void fireNestedFormEvent(NestedFormEvent event) {
-		Iterator<NestedFormHandler> itHand = this.nestedFormHandlers.iterator();
-		while(itHand.hasNext()) {
-			NestedFormHandler hand = itHand.next();
-			hand.onNestedForm(event);
-		}
-	}
-
-	@Override
-	public void onNestedForm(NestedFormEvent event) {
-		this.fireNestedFormEvent(event);
-	}
+//	@Override
+//	public void addNestedFormHandler(NestedFormHandler handler) {
+//		this.nestedFormHandlers.add(handler);
+//	}
+//
+//	@Override
+//	public void fireNestedFormEvent() {
+//		NestedFormEvent event = new NestedFormEvent(this);
+//		fireNestedFormEvent(event);
+//	}
+//
+//	@Override
+//	public void fireNestedFormEvent(NestedFormEvent event) {
+//		Iterator<NestedFormHandler> itHand = this.nestedFormHandlers.iterator();
+//		while(itHand.hasNext()) {
+//			NestedFormHandler hand = itHand.next();
+//			hand.onNestedForm(event);
+//		}
+//	}
+//
+//	@Override
+//	public void onNestedForm(NestedFormEvent event) {
+//		this.fireNestedFormEvent(event);
+//	}
 
 	@Override
 	public void addMoreCompletionsHandler(MoreCompletionsHandler handler) {
