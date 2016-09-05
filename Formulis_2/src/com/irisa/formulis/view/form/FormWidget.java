@@ -94,12 +94,12 @@ public class FormWidget extends AbstractFormElementWidget {
 		reload();
 	}
 	
-	public Callback getCallback() {
-		return new Callback(this);
+	public FormCallback getCallback() {
+		return new FormCallback(this);
 	}
 	
-	public Callback getCallback(FORM_CALLBACK_MODE mode) {
-		return new Callback(this, mode);
+	public FormCallback getCallback(FORM_CALLBACK_MODE mode) {
+		return new FormCallback(this, mode);
 	}
 	
 	public void putRelationCreationButton(){
@@ -118,20 +118,22 @@ public class FormWidget extends AbstractFormElementWidget {
 	}
 	
 	public void reload() {
-		if(getData() != null/* && ! getData().isFinished()*/) {
+		if(getData() != null && ! getData().isEmpty()/* && ! getData().isFinished()*/) {
 			Form formData = getData();
+			ControlUtils.debugMessage("FormWidget.reload " + formData);
 			clear();
 
-			if(formData.getTypeLine() != null && ! formData.getTypeLine().isAnonymous() ) {
-				FormClassLineWidget typeLineWid = new FormClassLineWidget( formData.getTypeLine(), this);
-				typeLineWid.setLineState(LINE_STATE.FINISHED);
-				typeLineWid.showLabelBox();
-				addLine(typeLineWid);
-			}
+//			if(! formData.isAnonymous() ) {
+//				FormClassLineWidget typeLineWid = new FormClassLineWidget( formData.getTypeLines().peekFirst(), this);
+//				typeLineWid.setLineState(LINE_STATE.FINISHED);
+//				typeLineWid.showLabelBox();
+//				addLine(typeLineWid);
+//			}
 						
 			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
 			while(itFo.hasNext()) {
 				FormLineWidget line = itFo.next();
+				ControlUtils.debugMessage("FormWidget reload : " +line.getData());
 				addLine(line);
 			}
 			newRelationButton.setVisible(true);
@@ -146,21 +148,24 @@ public class FormWidget extends AbstractFormElementWidget {
 	protected LinkedList<FormLineWidget> formLinesToWidget() {
 		LinkedList<FormLineWidget> result = new LinkedList<FormLineWidget>();
 		
-		LinkedList<FormLine> lines = new LinkedList<FormLine>(this.getData().getLines());
-		Collections.sort(lines, new FormLineComparator());
-		
-		Iterator<FormLine> itFo = lines.iterator();
-		while(itFo.hasNext()) {
-			FormLine line = itFo.next();
-			if( line instanceof FormRelationLine) {
-				FormRelationLineWidget nRelLine = new FormRelationLineWidget((FormRelationLine) line, this);
-				nRelLine.setProfileMode(this.profileMode);
-				result.add(nRelLine);
-			} else if(line instanceof FormClassLine) {
-				FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
-				nClassLine.setProfileMode(this.profileMode);
-				result.add(nClassLine);
+		Iterator<FormClassLine> itClassL = getData().typeLinesIterator();
+		while(itClassL.hasNext()) {
+			FormLine line = itClassL.next();
+			FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
+			nClassLine.setProfileMode(this.profileMode);
+			result.add(nClassLine);
+			if(this.getData().getTypeLines().size() == 1) {
+				nClassLine.setLineState(LINE_STATE.FINISHED);
+				nClassLine.showLabelBox();
 			}
+		}
+		
+		Iterator<FormRelationLine> itRelL = getData().relationLinesIterator();
+		while(itRelL.hasNext()) {
+			FormLine line = itRelL.next();
+			FormRelationLineWidget nRelLine = new FormRelationLineWidget((FormRelationLine) line, this);
+			nRelLine.setProfileMode(this.profileMode);
+			result.add(nRelLine);
 		}
 		
 		return result;
@@ -216,17 +221,17 @@ public class FormWidget extends AbstractFormElementWidget {
 		if(this.isSelectedForProfile()) {
 			ProfileForm result = new ProfileForm();
 			
-			if(this.getData().getTypeLine() != null) {
-				result.setTypeLine(this.getData().getTypeLine().toProfileClassLine());
-			}
-			
-			Iterator<FormLineWidget> itLine = this.linesWidgets.iterator();
-			while(itLine.hasNext()) {
-				FormLineWidget line = itLine.next();
-				if(line.toProfileElement() != null) {
-					result.addLine(line.toProfileLine());
-				}
-			}
+//			if(this.getData().getTypeLine() != null) {
+//				result.setTypeLine(this.getData().getTypeLine().toProfileClassLine());
+//			}
+//			
+//			Iterator<FormLineWidget> itLine = this.linesWidgets.iterator();
+//			while(itLine.hasNext()) {
+//				FormLineWidget line = itLine.next();
+//				if(line.toProfileElement() != null) {
+//					result.addLine(line.toProfileLine());
+//				}
+//			}
 			
 			return result;
 		}
@@ -271,16 +276,16 @@ public class FormWidget extends AbstractFormElementWidget {
 		}
 	}
 	
-	public class Callback implements FormEventCallback {
+	public class FormCallback implements FormEventCallback {
 
 		private FormWidget source;
 		private FORM_CALLBACK_MODE callbackMode = FORM_CALLBACK_MODE.LOAD ;
 		
-		public Callback(FormWidget src) {
+		public FormCallback(FormWidget src) {
 			source = src;
 		}
 		
-		public Callback(FormWidget src, FORM_CALLBACK_MODE mode) {
+		public FormCallback(FormWidget src, FORM_CALLBACK_MODE mode) {
 			source = src;
 			callbackMode = mode;
 		}

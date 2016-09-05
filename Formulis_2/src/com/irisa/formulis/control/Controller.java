@@ -98,8 +98,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return this;
 	}
 
-	public void setServer(String adress)
-	{
+	public void setServer(String adress) {
 		serverAdress = adress;
 	}
 
@@ -703,14 +702,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		ControlUtils.debugMessage("FIN getPlaceHome");
 	}
 
-	public void getPlaceStatement(String statString) {
+	public void sewelisGetPlaceStatement(String statString) {
 		sewelisGetPlaceStatement(statString, null);
 	}
 
 	/**
 	 * 
 	 * @param statString statement LispQL
-	 * @param followUp Event a emettre en cas de succès
 	 */
 	public Place sewelisGetPlaceStatementAlone(String statString) {
 		ControlUtils.debugMessage("getPlaceStatementAlone( " + statString + " ) " );
@@ -776,13 +774,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 				@Override
 				public Place getPlace() {
-//					while(this.resultPlace == null) {
-//						try {
-//							this.wait();
-//						} catch (InterruptedException e) {
-//							Utils.exceptionMessage(e);
-//						}
-//					}
 					return resultPlace;
 				}
 			};
@@ -866,7 +857,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	/**
 	 * @param statString statement LispQL
-	 * @param callback Event a emettre en cas de succès
 	 */
 	private void sewelisRunStatement(String statString) {
 		ControlUtils.debugMessage("runStatement (" + statString + ") ");
@@ -1370,8 +1360,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private void finish() {
 		ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
 		Date nowDate = new Date();
-		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getTypeLine().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
-		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getTypeLine().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getTypeLines().getFirst().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getTypeLines().getFirst().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
 		numberOfActions = 0;
 		
 		sewelisRunStatement("get " + this.form.toLispql(true) + "");
@@ -1419,7 +1409,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void sewelisChangeFocus(String focusId, final FormEvent followUp) {
-		//		mainPage.addDebugMessage("changeFocus " + f.toString());
+		ControlUtils.debugMessage("changeFocus " + focusId + " " + followUp.getClass());
 		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&placeId=" + place.getId(); 
@@ -1540,7 +1530,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Form result = new Form(l);
 
 		if(l != null) {
-			getPlaceStatement(this.lispqlStatementQuery(l));
+			sewelisGetPlaceStatement(this.lispqlStatementQuery(l));
 		}
 
 		return result;
@@ -1661,9 +1651,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	private LinkedList<? extends FormLine> extractFinishedLines(Form f) {
 		LinkedList<FormLine> result = new LinkedList<FormLine>();
-		Iterator<FormLine> itL = f.linesIterator();
-		while(itL.hasNext()) {
-			FormLine line = itL.next();
+		if(! f.isAnonymous()) {
+			result.add(f.getTypeLines().getFirst());
+		}
+		Iterator<FormRelationLine> itRelL = f.relationLinesIterator();
+		while(itRelL.hasNext()) {
+			FormLine line = itRelL.next();
 			
 			if(line.isFinished()) {
 				result.add(line);
@@ -1690,7 +1683,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if(f.isFinished()) {
 				result = f;
 			} else {
-				result.setTypeLine(f.getTypeLine());
+				result.setTypeLine(f.getTypeLines().getFirst());
 				result.addAllLines(this.extractFinishedLines(f));
 			}
 		}
@@ -1812,14 +1805,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
 				// si le form n'a pas encore de type
-			} else if(dataSource != dataSourceParent.getTypeLine()) {
-				dataSourceParent.setTypeLine((FormClassLine) dataSource, true);
+			} else if(dataSource != dataSourceParent.getTypeLines().getFirst()) {
+				dataSourceParent.addTypeLine((FormClassLine) dataSource, true);
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
 				// Si la ligne avait déjà un type (retractation)
 			} else {
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
-				dataSourceParent.setTypeLine(null, true);
+				dataSourceParent.addTypeLine(null, true);
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
 				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
 			}
@@ -1849,19 +1842,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onStatementChange(StatementChangeEvent event) {
 		// CHANGEMENT DE STATEMENT
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
-		//		Utils.debugMessage("onStatementChange " + event.getSource().getClass());
+		ControlUtils.debugMessage("onStatementChange " + event.getSource().getClass());
 		if(event.getSource() instanceof FormWidget) {
-			//			FormWidget widSource = (FormWidget)event.getSource();
-			//			Utils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
+			FormWidget widSource = (FormWidget)event.getSource();
+			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
 			event.getCallback().call(this);
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			SuggestionCallback callback = (SuggestionCallback) event.getCallback();
 			if(widSource.isFinished()) {
-				//				Utils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
-				getPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
+				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
+				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
-				//				Utils.debugMessage("onStatementChange CHANGE BY A LINE");
+				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
 				onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
 			}
 		}
@@ -1929,7 +1922,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		FormWidget widSourceParent = widSource.getParentWidget();
 		Form dataSourceParent = widSourceParent.getData();
 
-		dataSourceParent.removeLine(dataSource);
+		dataSourceParent.removeRelationLine(dataSource);
 		widSourceParent.reload();
 
 		incrementNumberOfActions();
@@ -1994,7 +1987,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			
 			FormRelationLine newLine = new FormRelationLine(parentWidSource.getData(), uriObj);
 			newLine.setAsNew(true);
-			parentWidSource.getData().appendLine(newLine);
+			parentWidSource.getData().addLine(newLine);
 			parentWidSource.reload();
  		}
 
@@ -2036,14 +2029,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
 			Collections.sort(relationLines, new FormLineComparator());
+			Collections.sort(classLines, new FormLineComparator());
 			//		LinkedList<FormLine> literalLines = this.getPlaceliteralLines(widSource);
+			widSource.getData().addAllTypeLines(classLines);
 
 
-			if((widSource.getData().getTypeLine() == null && ! classLines.isEmpty()) 
-					|| (widSource.getData().getTypeLine() != null && widSource.getData().getTypeLine().isAnonymous())) {
+			if(widSource.getData().isAnonymous()) {
+				ControlUtils.debugMessage("loadFormContent anonymous Form = " + widSource.getData().toString());
 				if(classLines.size() == 1 ) {
-					widSource.getData().setTypeLine(classLines.iterator().next(), true);
 					String queryString = lispqlStatementQuery(widSource.getData());
+					// Ca ne devrai pas modifier le statement, on chargement le contenu de Place ici
 					this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
 
 					incrementNumberOfActions();
@@ -2060,7 +2055,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					widSource.getData().addAllLines(classLines);
 				}
 			} else {
-				
+				ControlUtils.debugMessage("loadFormContent typed Form");
 				int nbLines = relationLines.size();
 				Iterator<FormRelationLine> itRelLines = relationLines.iterator();
 				while(itRelLines.hasNext()) {
@@ -2083,10 +2078,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
 			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
-			if(widSource.getData().getTypeLine() == null) {
-				widSource.getData().appendAllLines(classLines);
+			if(widSource.getData().getTypeLines().isEmpty()) {
+				widSource.getData().addAllLines(classLines);
 			} else {
-				widSource.getData().appendAllLines(relationLines);
+				widSource.getData().addAllLines(relationLines);
 			}
 			widSource.reload();
 		}
@@ -2108,7 +2103,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
 		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
 
-		return (widSource.getData().getTypeLine() == null 
+		return (widSource.getData().getTypeLines().isEmpty()
 				&& ! classLines.isEmpty()
 				&& (classLines.size() == 1 
 				&& classLines.getFirst() instanceof FormClassLine)

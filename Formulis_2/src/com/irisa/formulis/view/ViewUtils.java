@@ -9,9 +9,11 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.*;
 import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.model.form.Form;
+import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormComponent;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.form.FormLine;
+import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.custom.SimpleFormWidget;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
@@ -181,10 +183,17 @@ public class ViewUtils {
 				if(formCompo.isForm()) {
 					String formTable = "<table class=\"weblis-suggestion-table table table-bordered\"><tbody>";
 					Form formform = (Form) formCompo;
-					Iterator<FormLine> itFormLine = formform.linesIterator();
-					while(itFormLine.hasNext()) {
+					Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
+					while(itTypeFormLine.hasNext()) {
 						formTable += "<tr><td>";
-						FormLine line = itFormLine.next();
+						FormLine line = itTypeFormLine.next();
+						formTable += toSimpleHtml(line).asString();
+						formTable += "</td></tr>";
+					}
+					Iterator<FormRelationLine> itRelFormLine = formform.relationLinesIterator();
+					while(itRelFormLine.hasNext()) {
+						formTable += "<tr><td>";
+						FormLine line = itRelFormLine.next();
 						formTable += toSimpleHtml(line).asString();
 						formTable += "</td></tr>";
 					}
@@ -216,7 +225,13 @@ public class ViewUtils {
 	}
 
 	public static <H extends FormEventChainHandler, E extends HasFormEventChainHandlers> void connectFormEventChain(E emitter, H handler) {
-		
+		emitter.addCompletionAskedHandler(handler);
+		emitter.addElementCreationHandler(handler);
+		emitter.addLineSelectionHandler(handler);
+		emitter.addMoreCompletionsHandler(handler);
+		emitter.addRelationCreationHandler(handler);
+		emitter.addRemoveLineHandler(handler);
+		emitter.addStatementChangeHandler(handler);
 	}
 
 

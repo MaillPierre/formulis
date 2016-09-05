@@ -18,8 +18,10 @@ import com.irisa.formulis.model.basic.URI;
  */
 public class Form extends FormComponent {
 
-	private LinkedList<FormLine> formLines = new LinkedList<FormLine>();
-	private FormClassLine typeLine = null;
+//	private LinkedList<FormLine> formLines = new LinkedList<FormLine>();
+	private LinkedList<FormRelationLine> relationLines = new LinkedList<FormRelationLine>();
+//	private FormClassLine typeLine = null;
+	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
 	private boolean anonymous;
 	
 	private HashMap<URI, LinkedList<FormComponent>> formIndex = new HashMap<URI, LinkedList<FormComponent>>(); // TEST
@@ -30,11 +32,18 @@ public class Form extends FormComponent {
 	
 	public Form(FormComponent par, FormClassLine typeL) {
 		super(par);
-		this.typeLine = typeL;
+		this.typeLines.add(typeL);
 	}
 	
-	public FormClassLine getTypeLine() {
-		return this.typeLine;
+	/**
+	 * A utiliser pour un form avec une seule ligne de type
+	 * @return la seul ligne de type, null sinon
+	 */
+	public FormClassLine getSetTypeLine() {
+		if(this.typeLines.size() == 1) {
+			return this.typeLines.getFirst();
+		}
+		return null;
 	}
 	
 	/**
@@ -42,16 +51,27 @@ public class Form extends FormComponent {
 	 * @param l
 	 */
 	public void setTypeLine(FormClassLine l) {
-		this.setTypeLine(l, true);
+		this.addTypeLine(l, true);
 	}
 	
-	public void setTypeLine(FormClassLine l, boolean clear) {
-		if(l != null && l.getParent() != this) {
-			l.setParent(this);
+	public void addTypeLine(FormClassLine l, boolean clear) {
+		if(! this.typeLines.contains(l)) {
+			if(l != null && l.getParent() != this) {
+				l.setParent(this);
+			}
+			if(clear) {
+				this.typeLines.clear();
+			}
+			this.typeLines.add(l);
 		}
-		this.typeLine = l;
-		if(clear) {
-			this.formLines.clear();
+	}
+	
+	public void addAllTypeLines(Collection<FormClassLine> c) {
+		this.typeLines.clear();
+		Iterator<FormClassLine> itClass = c.iterator();
+		while(itClass.hasNext()) {
+			FormClassLine lineC = itClass.next();
+			addTypeLine(lineC, false);
 		}
 	}
 	
@@ -59,7 +79,11 @@ public class Form extends FormComponent {
 		if(line.getParent() != this) {
 			line.setParent(this);
 		}
-		formLines.addLast(line);
+		if(line instanceof FormRelationLine) {
+			relationLines.add((FormRelationLine) line);
+		} else if (line instanceof FormClassLine) {
+			this.typeLines.add((FormClassLine) line);
+		}
 //		this.formIndex.getOrDefault(line.getFixedElement(), new LinkedList<FormComponent>());
 	}
 
@@ -71,62 +95,79 @@ public class Form extends FormComponent {
 		}
 	}
 	
-	/**
-	 * Ajoute une ligne si elle n'est pas déjà présente dans le formulaire
-	 * @param l ligne à ajouter
-	 */
-	public void appendLine(FormLine l) {
-		if(! this.formLines.contains(l)) {
-			addLine(l);
+//	/**
+//	 * Ajoute une ligne si elle n'est pas déjà présente dans le formulaire
+//	 * @param l ligne à ajouter
+//	 */
+//	public void appendLine(FormLine l) {
+//		if(! this.formLines.contains(l)) {
+//			addLine(l);
+//		}
+//	}
+//	
+//	public void appendAllLines(Collection<? extends FormLine> c) {
+//		Iterator<? extends FormLine> itC = c.iterator();
+//		while(itC.hasNext()) {
+//			FormLine line = itC.next();
+//			this.appendLine(line);
+//		}
+//	}
+	
+	public void repeatRelationLine(FormRelationLine l) {
+		if(relationLines.contains(l)) {
+			int index = relationLines.indexOf(l);
+			FormRelationLine newLine = l.repeatLine();
+			relationLines.add(index+1, newLine);
 		}
 	}
 	
-	public void appendAllLines(Collection<? extends FormLine> c) {
-		Iterator<? extends FormLine> itC = c.iterator();
-		while(itC.hasNext()) {
-			FormLine line = itC.next();
-			this.appendLine(line);
-		}
-	}
-	
-	public void repeatLine(FormLine l) {
-		if(formLines.contains(l)) {
-			int index = formLines.indexOf(l);
-			FormLine newLine = l.repeatLine();
-			formLines.add(index+1, newLine);
-		}
-	}
-	
-	public void removeLine(FormLine l) {
-		if(l != null && this.formLines.contains(l)) {
-			this.formLines.remove(l);
+	public void removeRelationLine(FormLine l) {
+		if(l != null && this.relationLines.contains(l)) {
+			this.relationLines.remove(l);
 			this.formIndex.remove(l.getFixedElement());
 		}
 	}
 	
-	public LinkedList<FormLine> getLines() {
-		return formLines;
+	public void removeClassLine(FormLine l) {
+		if(l != null && this.typeLines.contains(l)) {
+			this.typeLines.remove(l);
+			this.formIndex.remove(l.getFixedElement());
+		}
 	}
 	
-	public Iterator<FormLine> linesIterator() {
-		return this.formLines.iterator();
+	public LinkedList<FormRelationLine> getRelationLines() {
+		return relationLines;
+	}
+	
+	public LinkedList<FormClassLine> getTypeLines() {
+		return typeLines;
+	}
+	
+	public Iterator<FormRelationLine> relationLinesIterator() {
+		return this.relationLines.iterator();
+	}
+	
+	public Iterator<FormClassLine> typeLinesIterator() {
+		return this.typeLines.iterator();
 	}
 	
 	public boolean isEmpty() {
-		return formLines.isEmpty() && (typeLine == null);
+		return relationLines.isEmpty() && (typeLines.isEmpty());
 	}
 	
 	public boolean isAnonymous() {
 //		return anonymous;
-		return this.typeLine == null || this.typeLine.isAnonymous();
+		return this.typeLines.isEmpty() || this.typeLines.size() > 1;
 	}
 
 	public void setAnonymous(boolean anonymous) {
 		this.anonymous = anonymous;
+		this.typeLines.clear();
 	}
 	
 	public void clear() {
-		this.formLines.clear();
+		this.relationLines.clear();
+		this.typeLines.clear();
 		this.formIndex.clear();
 	}
 
@@ -140,28 +181,36 @@ public class Form extends FormComponent {
 		
 		// Filtrage des lignes qui ne sont aps de type ou selectionnées
 		LinkedList<String> otherlines = new LinkedList<String>();
-		Iterator<FormLine> itLines = this.linesIterator();
-		while(itLines.hasNext()) {
-			FormLine line = itLines.next();
-			if(! line.equals(selectedLine) && ! line.equals(typeLine) && line.getVariableElement() != null) {
+		Iterator<FormRelationLine> itRelLines = this.relationLinesIterator();
+		while(itRelLines.hasNext()) {
+			FormLine line = itRelLines.next();
+			if(! line.equals(selectedLine) && ! line.equals(typeLines) && line.getVariableElement() != null) {
 				String lineString =  line.toLispql();
 				otherlines.add(lineString);
 			}
 		}
+		if(! this.typeLines.isEmpty() || this.typeLines.size() > 1) {
+			Iterator<FormRelationLine> itTypeLines = this.relationLinesIterator();
+			while(itTypeLines.hasNext()) {
+				FormLine line = itTypeLines.next();
+				if(! line.equals(selectedLine)) {
+					String lineString =  line.toLispql();
+					otherlines.add(lineString);
+				}
+			}
+		}
 		
 		// Ligne selectionée
-		if(selectedLine != null && formLines.contains(selectedLine)) {
-			if (selectedLine instanceof FormRelationLine) {
+		if(selectedLine != null && relationLines.contains(selectedLine)) {
 				result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
-			} 
 		} 
 
 		// Ligne de type
 		if(! this.isAnonymous()) {
 			if(isFinalRequest) {
-				result += "<" + typeLine.getElementUri() + "> ";
+				result += "<" + typeLines.getFirst().getElementUri() + "> ";
 			}
-			result += "[ " + typeLine.toLispql(isFinalRequest);
+			result += "[ " + typeLines.getFirst().toLispql(isFinalRequest);
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
 			}
@@ -190,7 +239,7 @@ public class Form extends FormComponent {
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();
 				String parentFormString = parentForm.toLispql(parentLine);
-				if((! otherlines.isEmpty()) || typeLine != null) {
+				if((! otherlines.isEmpty()) || typeLines != null) {
 					result += " ; ";
 				}
 				result += parentFormString;
@@ -219,14 +268,24 @@ public class Form extends FormComponent {
 	@Override
 	public String toString() {
 		String result = "";
-		if(typeLine != null && ! anonymous) {
-			result += typeLine + " ; ";
+		if(! this.isAnonymous()) {
+			result += typeLines.getFirst().toLispql() + " ; ";
 		}
-		Iterator<FormLine> itLines = this.linesIterator();
-		while(itLines.hasNext()) {
-			FormLine line = itLines.next();
+		if(! this.typeLines.isEmpty()) {
+			Iterator<FormClassLine> itClassLines = this.typeLinesIterator();
+			while(itClassLines.hasNext()) {
+				FormLine line = itClassLines.next();
+				result += line.toString();
+				if(itClassLines.hasNext()) {
+					result += " ; ";
+				}
+			}
+		}
+		Iterator<FormRelationLine> itRelLines = this.relationLinesIterator();
+		while(itRelLines.hasNext()) {
+			FormLine line = itRelLines.next();
 			result += line.toString();
-			if(itLines.hasNext()) {
+			if(itRelLines.hasNext()) {
 				result += " ; ";
 			}
 		}
@@ -250,13 +309,13 @@ public class Form extends FormComponent {
 
 	@Override
 	protected ProfileElement toProfileElement() {
-		ProfileForm fo = new ProfileForm(this.typeLine.toProfileClassLine());
+		ProfileForm fo =null;// new ProfileForm(this.typeLines.toProfileClassLine());
 		
-		Iterator<FormLine> itLine = this.linesIterator();
-		while(itLine.hasNext()) {
-			FormLine line = itLine.next();
-			fo.addLine((ProfileLine) line.toProfileElement());
-		}
+//		Iterator<FormRelationLine> itLine = this.relationLinesIterator();
+//		while(itLine.hasNext()) {
+//			FormLine line = itLine.next();
+//			fo.addLine((ProfileLine) line.toProfileElement());
+//		}
 		
 		return fo;
 	}
@@ -268,7 +327,7 @@ public class Form extends FormComponent {
 	@Override
 	public boolean isFinished() {
 		boolean result = true;
-		Iterator<? extends FormLine> itC = linesIterator();
+		Iterator<? extends FormLine> itC = relationLinesIterator();
 		while(itC.hasNext()) {
 			FormLine line = itC.next();
 			result = result && line.isFinished();
@@ -285,9 +344,9 @@ public class Form extends FormComponent {
 	public boolean equals(Object o) {
 		if(o instanceof Form) {
 			if(((Form) o).isAnonymous() && this.isAnonymous()) {
-				return this.formLines.equals(((Form) o).formLines); 
+				return this.relationLines.equals(((Form) o).relationLines); 
 			}
-			return this.formLines.equals(((Form) o).formLines) && this.typeLine.equals(((Form) o).typeLine);
+			return this.relationLines.equals(((Form) o).relationLines) && this.typeLines.equals(((Form) o).typeLines);
 		}
 		return super.equals(o);
 	}

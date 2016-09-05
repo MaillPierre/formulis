@@ -5,10 +5,12 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileLine;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormLine;
+import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
@@ -154,15 +156,9 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 
 	@Override
 	public void onClick(ClickEvent event) {
+		ControlUtils.debugMessage("FormClassLine onClick");
 		if(event.getSource() == this.resetElementButton) {
 			setLineState(LINE_STATE.SUGGESTIONS);			
-		} else if(event.getSource() == this.repeatLineButton) {
-			if(this.getParentWidget() != null) {
-				FormWidget parWid = this.getParentWidget();
-				Form parData = parWid.getData();
-				parData.repeatLine(this.getData());
-				parWid.reload();
-			}
 		} else if(event.getSource() == this.removeLineButton) {
 			fireRemoveLineEvent();
 		}

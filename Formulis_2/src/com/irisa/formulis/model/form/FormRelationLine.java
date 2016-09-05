@@ -19,7 +19,7 @@ public class FormRelationLine extends FormLine {
 	}
 
 	@Override
-	public FormLine repeatLine() {
+	public FormRelationLine repeatLine() {
 		return new FormRelationLine(this.getParent() , this.getFixedElement(), this.getVariableElement());
 	}
 	

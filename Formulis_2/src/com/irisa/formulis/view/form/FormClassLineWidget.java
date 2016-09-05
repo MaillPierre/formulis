@@ -148,6 +148,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	
 	@Override
 	public void onClick(ClickEvent event) {
+		ControlUtils.debugMessage("FormClassLine onClick");
 		super.onClick(event);
 		if(event.getSource() == this.newElementButton) {
 			if(! this.getData().getParent().isRoot()) {

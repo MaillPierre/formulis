@@ -200,7 +200,7 @@ public class DataUtils {
 					thingLine = new FormClassLine(parent, ControlUtils.thingUri);
 					thingLine.setAnonymous(true);
 				}
-				result.setTypeLine(thingLine, false);
+				result.addTypeLine(thingLine, false);
 			}
 			
 		} else {

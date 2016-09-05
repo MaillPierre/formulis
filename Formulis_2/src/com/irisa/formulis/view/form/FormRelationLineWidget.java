@@ -1,6 +1,7 @@
 package com.irisa.formulis.view.form;
 
 import com.github.gwtbootstrap.client.ui.Column;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
@@ -19,6 +20,7 @@ import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 
 public class FormRelationLineWidget extends FormLineWidget implements SuggestionSelectionHandler {
@@ -48,14 +50,14 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			if(l.getVariableElement() instanceof Form) {
 				FormWidget newForm = new FormWidget((Form)l.getVariableElement(), this);
 				if(this.parentWid != null && this.parentWid.getClass() == FormWidget.class) {
-					newForm.addCompletionAskedHandler(this);
-					newForm.addElementCreationHandler(this);
-					newForm.addLineSelectionHandler(this);
-//					newForm.addNestedFormHandler(this);
-					newForm.addMoreCompletionsHandler(this);
-					newForm.addRelationCreationHandler(this);
-					newForm.addRemoveLineHandler(this);
-					newForm.addStatementChangeHandler(this);
+					ViewUtils.connectFormEventChain(newForm, this);
+//					newForm.addCompletionAskedHandler(this);
+//					newForm.addElementCreationHandler(this);
+//					newForm.addLineSelectionHandler(this);
+//					newForm.addMoreCompletionsHandler(this);
+//					newForm.addRelationCreationHandler(this);
+//					newForm.addRemoveLineHandler(this);
+//					newForm.addStatementChangeHandler(this);
 				}
 				this.variableElement = newForm;
 			} else { // Soit c'est un élément normal DisplayElement
@@ -174,8 +176,6 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			}
 			nWid.setParentWidget(this);
 			variableElement = nWid;
-//			variableElement.setSize("100%", "100%");
-//			variableElement.setWidth("100%");
 			elementRow.clear();
 			elementRow.add(fixedElement);
 			elementRow.add(variableElement);
@@ -188,7 +188,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 	@Override
 	public void onClickWidgetEvent(ClickWidgetEvent event)  { 
-		//		Utils.debugMessage("RelationLineWidget onClickWidgetEvent CLICK ON LINE " + event.getSource() + " " + event.getSource().getClass() + " " + event.getSource().equals(this.variableElement));
+		ControlUtils.debugMessage("RelationLineWidget onClickWidgetEvent CLICK ON LINE " + event.getSource() + " " + event.getSource().getClass() + " " + event.getSource().equals(this.variableElement));
 		if(event.getSource() == this.fixedElement) {
 			fireLineSelectionEvent();
 		} else if(this.variableElement instanceof CustomSuggestionWidget) {
@@ -205,6 +205,20 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 				setLineState(LINE_STATE.FINISHED);
 			} catch (FormElementConversionException e) {
 				ControlUtils.exceptionMessage(e);
+			}
+		}
+	}
+
+
+	@Override
+	public void onClick(ClickEvent event) {
+		super.onClick(event);
+		if(event.getSource() == this.repeatLineButton) {
+			if(this.getParentWidget() != null) {
+				FormWidget parWid = this.getParentWidget();
+				Form parData = parWid.getData();
+				parData.repeatRelationLine((FormRelationLine) this.getData());
+				parWid.reload();
 			}
 		}
 	}

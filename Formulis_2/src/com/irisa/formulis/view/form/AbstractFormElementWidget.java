@@ -3,6 +3,7 @@ package com.irisa.formulis.view.form;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
@@ -151,6 +152,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireLineSelectionEvent(LineSelectionEvent event) {
+		ControlUtils.debugMessage(this.getClass() + " . fireLineSelection( " + event + " )" );
 		Iterator<LineSelectionHandler> itHand = this.lineSelectionHandlers.iterator();
 		while(itHand.hasNext()) {
 			LineSelectionHandler hand = itHand.next();
@@ -160,33 +162,9 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onLineSelection(LineSelectionEvent event) {
+		ControlUtils.debugMessage(this.getClass() + " . onLineSelection( " + event + " )" );
 		fireLineSelectionEvent(event);
 	}
-
-//	@Override
-//	public void addNestedFormHandler(NestedFormHandler handler) {
-//		this.nestedFormHandlers.add(handler);
-//	}
-//
-//	@Override
-//	public void fireNestedFormEvent() {
-//		NestedFormEvent event = new NestedFormEvent(this);
-//		fireNestedFormEvent(event);
-//	}
-//
-//	@Override
-//	public void fireNestedFormEvent(NestedFormEvent event) {
-//		Iterator<NestedFormHandler> itHand = this.nestedFormHandlers.iterator();
-//		while(itHand.hasNext()) {
-//			NestedFormHandler hand = itHand.next();
-//			hand.onNestedForm(event);
-//		}
-//	}
-//
-//	@Override
-//	public void onNestedForm(NestedFormEvent event) {
-//		this.fireNestedFormEvent(event);
-//	}
 
 	@Override
 	public void addMoreCompletionsHandler(MoreCompletionsHandler handler) {
@@ -264,32 +242,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 			fireRelationCreationEvent(new RelationCreationEvent(this));
 		}
 	}
-
-//	@Override
-//	public void onTypeLineSet(TypeLineSetEvent event) {
-//		fireTypeLineSetEvent(event);
-//	}
-//
-//	@Override
-//	public void addTypeLineSetHandler(TypeLineSetHandler handler) {
-//		this.typeLineSetHandlers.add(handler);
-//	}
-//
-//	@Override
-//	public void fireTypeLineSetEvent(TypeLineSetEvent event) {
-//		Iterator<TypeLineSetHandler> itHand = this.typeLineSetHandlers.iterator();
-//		while(itHand.hasNext()) {
-//			TypeLineSetHandler hand = itHand.next();
-//			hand.onTypeLineSet(event);
-//		}
-//	}
-//
-//	@Override
-//	public void fireTypeLineSetEvent() {
-//		if(this instanceof FormWidget) {
-//			fireTypeLineSetEvent(new TypeLineSetEvent((FormWidget) this));
-//		}
-//	}
 	
 	public abstract ProfileElement toProfileElement();
 

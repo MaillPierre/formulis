@@ -63,7 +63,7 @@ public class ProfileForm extends ProfileLeafElement {
 
 		ControlUtils.debugMessage("Form toForm typeLine " + this.getTypeLine());
 		if(this.getTypeLine() != null) {
-			result.setTypeLine(this.getTypeLine().toClassLine(result), false);
+			result.addTypeLine(this.getTypeLine().toClassLine(result), false);
 		}
 		
 		ControlUtils.debugMessage("Form toForm lines " + this.getLines());
