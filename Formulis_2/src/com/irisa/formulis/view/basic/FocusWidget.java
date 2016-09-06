@@ -14,10 +14,10 @@ import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FormulisWidgetFactory;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
-import com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 import com.irisa.formulis.view.event.interfaces.StatementFocusChangeHandler;
 
-public class FocusWidget extends AbstractFormulisWidget implements  ClickHandler, ClickWidgetEventHandler {
+public class FocusWidget extends AbstractFormulisWidget implements  ClickHandler, ClickWidgetHandler {
 
 	private boolean focused;
 //	private HorizontalPanel element;

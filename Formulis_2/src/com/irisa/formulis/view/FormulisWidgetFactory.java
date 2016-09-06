@@ -10,7 +10,7 @@ import com.irisa.formulis.model.form.FormComponent;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.basic.*;
-import com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 import com.irisa.formulis.view.form.FormClassLineWidget;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.irisa.formulis.view.form.FormWidget;
@@ -21,7 +21,7 @@ public class FormulisWidgetFactory {
 		return getWidget(e, par, null);
 	}
 	
-	public static AbstractFormulisWidget getWidget(BasicElement e, AbstractFormulisWidget par, ClickWidgetEventHandler ch) throws FormElementConversionException {
+	public static AbstractFormulisWidget getWidget(BasicElement e, AbstractFormulisWidget par, ClickWidgetHandler ch) throws FormElementConversionException {
 //		Utils.displayDebugMessage("getWidget( " + e + ")");
 		if(e != null) {
 			if(e instanceof Display) {

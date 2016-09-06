@@ -9,6 +9,7 @@ import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
+import com.irisa.formulis.view.event.FinishFormEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
@@ -17,6 +18,7 @@ import com.irisa.formulis.view.event.StatementChangeEvent;
 //import com.irisa.formulis.view.event.TypeLineSetEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
+import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 //import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
@@ -38,6 +40,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
+	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected boolean profileMode = false;
 
 	public AbstractFormElementWidget(FormElement d, AbstractFormulisWidget fParent) {
@@ -137,6 +140,33 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
+	public void addFinishFormHandler(FinishFormHandler handler) {
+		this.finishFormHandlers.add(handler);
+	}
+
+	@Override
+	public void fireFinishFormEvent() {
+		if(this instanceof FormWidget) {
+			FinishFormEvent event = new FinishFormEvent((FormWidget) this);
+			fireFinishFormEvent(event);
+		}
+	}
+
+	@Override
+	public void fireFinishFormEvent(FinishFormEvent event) {
+		Iterator<FinishFormHandler> itHand = this.finishFormHandlers.iterator();
+		while(itHand.hasNext()) {
+			FinishFormHandler hand = itHand.next();
+			hand.onFinishForm(event);
+		}
+	}
+
+	@Override
+	public void onFinishForm(FinishFormEvent event) {
+		fireFinishFormEvent(event);
+	}
+
+	@Override
 	public void addLineSelectionHandler(LineSelectionHandler handler) {
 		this.lineSelectionHandlers.add(handler);
 	}
@@ -152,7 +182,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireLineSelectionEvent(LineSelectionEvent event) {
-		ControlUtils.debugMessage(this.getClass() + " . fireLineSelection( " + event + " )" );
 		Iterator<LineSelectionHandler> itHand = this.lineSelectionHandlers.iterator();
 		while(itHand.hasNext()) {
 			LineSelectionHandler hand = itHand.next();
@@ -162,7 +191,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onLineSelection(LineSelectionEvent event) {
-		ControlUtils.debugMessage(this.getClass() + " . onLineSelection( " + event + " )" );
 		fireLineSelectionEvent(event);
 	}
 

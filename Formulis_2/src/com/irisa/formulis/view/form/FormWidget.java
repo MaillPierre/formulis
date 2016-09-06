@@ -8,6 +8,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -34,7 +35,7 @@ import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 public class FormWidget extends AbstractFormElementWidget {
 
 	private FluidRow element = new FluidRow();
-	private Column linesCol = new Column(12);
+	private Column linesCol = new Column(11);
 	private LinkedList<FormLineWidget> linesWidgets = new LinkedList<FormLineWidget>();
 
 	private Column controlCol = new Column(1);
@@ -46,6 +47,9 @@ public class FormWidget extends AbstractFormElementWidget {
 	
 	private FluidRow contentRow = new FluidRow();
 	private Column contentCol = new Column(11,contentRow, newRelationRow);
+	
+	private Column finishCol = new Column(1);
+	private Button finishButton = new Button("", IconType.OK);
 	
 	public enum FORM_CALLBACK_MODE {
 		/**
@@ -67,20 +71,20 @@ public class FormWidget extends AbstractFormElementWidget {
 		initWidget(element);
 		
 		element.add(contentCol);
+		element.add(finishCol);
 		element.add(controlCol);
+		element.addStyleName("weblis-form-frame");
 		contentRow.add(linesCol);
+		contentRow.add(finishCol);
+		finishCol.add(finishButton);
 		newRelationButton.addStyleName("weblis-max-width");
 		newRelationRow.add(newRelationButton);
 		relationCreationWid.addRelationCreationHandler(this);
 		controlCol.add(profileCheckbox);
 		
-		newRelationButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ControlUtils.debugMessage("Creation button click");
-				putRelationCreationWidget();
-			}
-		});
+		newRelationButton.addClickHandler(this);
+		
+		finishButton.addClickHandler(this);
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -119,8 +123,6 @@ public class FormWidget extends AbstractFormElementWidget {
 	
 	public void reload() {
 		if(getData() != null && ! getData().isEmpty()/* && ! getData().isFinished()*/) {
-			Form formData = getData();
-			ControlUtils.debugMessage("FormWidget.reload " + formData);
 			clear();
 
 //			if(! formData.isAnonymous() ) {
@@ -133,7 +135,6 @@ public class FormWidget extends AbstractFormElementWidget {
 			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
 			while(itFo.hasNext()) {
 				FormLineWidget line = itFo.next();
-				ControlUtils.debugMessage("FormWidget reload : " +line.getData());
 				addLine(line);
 			}
 			newRelationButton.setVisible(true);
@@ -154,7 +155,7 @@ public class FormWidget extends AbstractFormElementWidget {
 			FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
 			nClassLine.setProfileMode(this.profileMode);
 			result.add(nClassLine);
-			if(this.getData().getTypeLines().size() == 1) {
+			if(this.getData().isTyped()) {
 				nClassLine.setLineState(LINE_STATE.FINISHED);
 				nClassLine.showLabelBox();
 			}
@@ -188,13 +189,6 @@ public class FormWidget extends AbstractFormElementWidget {
 		linesCol.add(line);
 		linesWidgets.addLast(line);
 		ViewUtils.connectFormEventChain(line, this);
-//		line.addCompletionAskedHandler(this);
-//		line.addElementCreationHandler(this);
-//		line.addLineSelectionHandler(this);
-//		line.addMoreCompletionsHandler(this);
-//		line.addRelationCreationHandler(this);
-//		line.addRemoveLineHandler(this);
-//		line.addStatementChangeHandler(this);
 	}
 
 	public void setData(Form form) {
@@ -204,6 +198,12 @@ public class FormWidget extends AbstractFormElementWidget {
 
 	@Override
 	public void onClick(ClickEvent event) {
+		if(event.getSource() == newRelationButton) {
+			ControlUtils.debugMessage("Creation button click");
+			putRelationCreationWidget();
+		} else if(event.getSource() == finishButton) {
+			fireFinishFormEvent();
+		}
 //		fireClickWidgetEvent(new ClickWidgetEvent(this));s
 	}
 	

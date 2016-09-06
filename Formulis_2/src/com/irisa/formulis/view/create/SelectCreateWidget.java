@@ -74,7 +74,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	}
 
 	@Override
-	public void addClickWidgetEventHandler(com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler handler) {
+	public void addClickWidgetEventHandler(com.irisa.formulis.view.event.interfaces.ClickWidgetHandler handler) {
 		super.addClickWidgetEventHandler(handler);
 	}
 

@@ -14,7 +14,7 @@ import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
-import com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
@@ -24,7 +24,7 @@ import com.github.gwtbootstrap.client.ui.IntegerBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 
 public abstract class FormLineWidget extends AbstractFormElementWidget 
-	implements ClickWidgetEventHandler {
+	implements ClickWidgetHandler {
 	
 	protected FluidRow element = new FluidRow();
 	protected FluidRow contentRow = new FluidRow();

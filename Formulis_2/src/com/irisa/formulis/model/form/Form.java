@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 import com.irisa.formulis.control.profile.ProfileLine;
@@ -143,6 +144,10 @@ public class Form extends FormComponent {
 		return typeLines;
 	}
 	
+	public FormClassLine getType() {
+		return typeLines.getFirst();
+	}
+	
 	public Iterator<FormRelationLine> relationLinesIterator() {
 		return this.relationLines.iterator();
 	}
@@ -155,9 +160,17 @@ public class Form extends FormComponent {
 		return relationLines.isEmpty() && (typeLines.isEmpty());
 	}
 	
+	public boolean isTypeList() {
+		return this.typeLines.size() > 1;
+	}
+	
 	public boolean isAnonymous() {
 //		return anonymous;
-		return this.typeLines.isEmpty() || this.typeLines.size() > 1;
+		return this.typeLines.isEmpty();
+	}
+	
+	public boolean isTyped() {
+		return this.typeLines.size() == 1;
 	}
 
 	public void setAnonymous(boolean anonymous) {
@@ -184,13 +197,13 @@ public class Form extends FormComponent {
 		Iterator<FormRelationLine> itRelLines = this.relationLinesIterator();
 		while(itRelLines.hasNext()) {
 			FormLine line = itRelLines.next();
-			if(! line.equals(selectedLine) && ! line.equals(typeLines) && line.getVariableElement() != null) {
+			if(! line.equals(selectedLine) &&  line.isFinished()) {
 				String lineString =  line.toLispql();
 				otherlines.add(lineString);
 			}
 		}
-		if(! this.typeLines.isEmpty() || this.typeLines.size() > 1) {
-			Iterator<FormRelationLine> itTypeLines = this.relationLinesIterator();
+		if(! this.typeLines.isEmpty() && this.typeLines.size() > 1) {
+			Iterator<FormClassLine> itTypeLines = this.typeLinesIterator();
 			while(itTypeLines.hasNext()) {
 				FormLine line = itTypeLines.next();
 				if(! line.equals(selectedLine)) {
@@ -202,11 +215,11 @@ public class Form extends FormComponent {
 		
 		// Ligne selectionée
 		if(selectedLine != null && relationLines.contains(selectedLine)) {
-				result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
+			result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
 		} 
 
 		// Ligne de type
-		if(! this.isAnonymous()) {
+		if(! this.isAnonymous() && ! this.isTypeList()) {
 			if(isFinalRequest) {
 				result += "<" + typeLines.getFirst().getElementUri() + "> ";
 			}
@@ -268,7 +281,7 @@ public class Form extends FormComponent {
 	@Override
 	public String toString() {
 		String result = "";
-		if(! this.isAnonymous()) {
+		if(! this.isAnonymous() && ! this.isTypeList()) {
 			result += typeLines.getFirst().toLispql() + " ; ";
 		}
 		if(! this.typeLines.isEmpty()) {
@@ -325,14 +338,15 @@ public class Form extends FormComponent {
 	}
 
 	@Override
+	
 	public boolean isFinished() {
-		boolean result = true;
-		Iterator<? extends FormLine> itC = relationLinesIterator();
-		while(itC.hasNext()) {
-			FormLine line = itC.next();
-			result = result && line.isFinished();
+		boolean result = false;
+		Iterator<FormRelationLine> itRel = getRelationLines().iterator();
+		while(itRel.hasNext()) {
+			FormRelationLine rel = itRel.next();
+			result = result || rel.isFinished();
 		}
-		return result;
+		return result && ((isTyped() && this.typeLines.getFirst().isFinished()) || isAnonymous());
 	}
 
 	@Override

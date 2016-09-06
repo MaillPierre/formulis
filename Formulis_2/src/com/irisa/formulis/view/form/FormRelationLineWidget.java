@@ -161,13 +161,6 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			nWid.addClickWidgetEventHandler(this);
 			if(nWid instanceof AbstractFormElementWidget) {
 				AbstractFormElementWidget nFormElem = (AbstractFormElementWidget) nWid;
-//				nFormElem.addCompletionAskedHandler(this);
-//				nFormElem.addElementCreationHandler(this);
-//				nFormElem.addLineSelectionHandler(this);
-//				nFormElem.addMoreCompletionsHandler(this);
-//				nFormElem.addRelationCreationHandler(this);
-//				nFormElem.addRemoveLineHandler(this);
-//				nFormElem.addStatementChangeHandler(this);
 				ViewUtils.connectFormEventChain(nFormElem, this);
 				if(nFormElem.getData() instanceof FormComponent) { // Ligne ou Form (théoriquement seulement Form possible)
 					FormComponent formCompo = (FormComponent) nFormElem.getData();
@@ -188,7 +181,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 	@Override
 	public void onClickWidgetEvent(ClickWidgetEvent event)  { 
-		ControlUtils.debugMessage("RelationLineWidget onClickWidgetEvent CLICK ON LINE " + event.getSource() + " " + event.getSource().getClass() + " " + event.getSource().equals(this.variableElement));
+//		ControlUtils.debugMessage("RelationLineWidget onClickWidgetEvent CLICK ON LINE " + event.getSource() + " " + event.getSource().getClass() + " " + event.getSource().equals(this.variableElement));
 		if(event.getSource() == this.fixedElement) {
 			fireLineSelectionEvent();
 		} else if(this.variableElement instanceof CustomSuggestionWidget) {
@@ -199,7 +192,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		} else if(this.variableElement instanceof SelectCreateWidget){
 			try {
 				FormElement newElem =  this.getVariableElement().getData();
-				ControlUtils.debugMessage( "FormRelationLine onClickWidgetEvent from SelectCreateWidget : " + newElem);
+//				ControlUtils.debugMessage( "FormRelationLine onClickWidgetEvent from SelectCreateWidget : " + newElem);
 				setVariableElement(FormulisWidgetFactory.getWidget( newElem, this));
 				getData().setVariableElement(newElem);
 				setLineState(LINE_STATE.FINISHED);

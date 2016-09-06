@@ -15,9 +15,9 @@ import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FormulisWidgetFactory;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
-import com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 
-public class DisplayWidget extends AbstractFormulisWidget implements ClickHandler, ClickWidgetEventHandler {
+public class DisplayWidget extends AbstractFormulisWidget implements ClickHandler, ClickWidgetHandler {
 
 	private HorizontalPanel element = new HorizontalPanel();
 	private LinkedList<ClickHandler> handlers;

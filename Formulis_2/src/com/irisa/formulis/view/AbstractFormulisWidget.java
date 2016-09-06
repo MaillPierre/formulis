@@ -6,13 +6,13 @@ import java.util.LinkedList;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
-import com.irisa.formulis.view.event.interfaces.ClickWidgetEventHandler;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 
 public abstract class AbstractFormulisWidget extends AbstractDataWidget implements ClickHandler {
 
 	protected AbstractFormulisWidget parentWid;
 
-	private LinkedList<ClickWidgetEventHandler> handlers = new LinkedList<ClickWidgetEventHandler>();
+	private LinkedList<ClickWidgetHandler> handlers = new LinkedList<ClickWidgetHandler>();
 	
 	public AbstractFormulisWidget(FormElement d, AbstractFormulisWidget fParent){
 		super(d);
@@ -27,14 +27,14 @@ public abstract class AbstractFormulisWidget extends AbstractDataWidget implemen
 		this.parentWid = par;
 	}
 	
-	public void addClickWidgetEventHandler(ClickWidgetEventHandler handler) {
+	public void addClickWidgetEventHandler(ClickWidgetHandler handler) {
 		handlers.add(handler);
 	}
 	
 	public void fireClickWidgetEvent(ClickWidgetEvent event) {
-		Iterator<ClickWidgetEventHandler> itHand = handlers.iterator();
+		Iterator<ClickWidgetHandler> itHand = handlers.iterator();
 		while(itHand.hasNext()) {
-			ClickWidgetEventHandler hand = itHand.next();
+			ClickWidgetHandler hand = itHand.next();
 			hand.onClickWidgetEvent(event);
 		}
 	}

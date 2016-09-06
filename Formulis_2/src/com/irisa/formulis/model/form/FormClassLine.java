@@ -110,7 +110,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public boolean isFinished() {
-		return true;
+		return this.elementLabel != "";
 	}
 
 	@Override

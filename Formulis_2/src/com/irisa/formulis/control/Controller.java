@@ -31,6 +31,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.xml.client.XMLParser;
@@ -286,7 +287,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String pingRequestString = serverAdress + "/ping";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(pingRequestString));
 
-		navBar.setServerStatusMessage("Ping...");
+		navBar.setServerStatusMessage("attente...");
 		builder.sendRequest(null, new RequestCallback() {	
 			@Override		
 			public void onError(Request request, Throwable exception) {
@@ -1351,20 +1352,25 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		//		displayDebugMessage("FIN loadPlace");
 	}
 	
-	private void finishDisplay() {
-		this.setCurrentForm(this.finishedForm());
-		finish();
-	}
-	
 	@SuppressWarnings("deprecation")
 	private void finish() {
+//		ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
+//		Date nowDate = new Date();
+//		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getTypeLines().getFirst().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+//		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getTypeLines().getFirst().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+//		numberOfActions = 0;
+//		
+//		sewelisRunStatement("get " + this.form.toLispql(true) + "");
 		ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
 		Date nowDate = new Date();
-		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getTypeLines().getFirst().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
-		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getTypeLines().getFirst().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
 		numberOfActions = 0;
-		
-		sewelisRunStatement("get " + this.form.toLispql(true) + "");
+		finish(this.form);
+	}
+	
+	private void finish(Form f) {
+		sewelisRunStatement("get " + f.toLispql(true) + "");
 	}
 
 
@@ -1568,11 +1574,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		navBar.adminPanel.profileCreateButton.addClickHandler(this);
 		navBar.adminPanel.profileClearButton.addClickHandler(this);
 		navBar.adminPanel.profileGoButton.addClickHandler(this);
-		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
 		navBar.adminPanel.profileDeleteButton.addClickHandler(this);
 		navBar.adminPanel.profileEditSave.addClickHandler(this);
 		navBar.adminPanel.profileEditClear.addClickHandler(this);
 		navBar.adminPanel.profileEditReload.addClickHandler(this);
+		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
 		navBar.finishButton.addClickHandler(this);
 		
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
@@ -1621,6 +1627,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e1);
 		}
 		sewelisVisibleStores();
+		
+		Timer pingTimer = new Timer() {
+			@Override
+			public void run() {
+				try {
+					sewelisPing();
+				} catch (RequestException e) {
+					ControlUtils.exceptionMessage(e);
+				}
+			}
+		};
+		pingTimer.scheduleRepeating(30000);
 
 	}
 	
@@ -1652,7 +1670,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private LinkedList<? extends FormLine> extractFinishedLines(Form f) {
 		LinkedList<FormLine> result = new LinkedList<FormLine>();
 		if(! f.isAnonymous()) {
-			result.add(f.getTypeLines().getFirst());
+			result.add(f.getType());
 		}
 		Iterator<FormRelationLine> itRelL = f.relationLinesIterator();
 		while(itRelL.hasNext()) {
@@ -1683,7 +1701,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if(f.isFinished()) {
 				result = f;
 			} else {
-				result.setTypeLine(f.getTypeLines().getFirst());
+				result.setTypeLine(f.getType());
 				result.addAllLines(this.extractFinishedLines(f));
 			}
 		}
@@ -1700,16 +1718,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
-		if(event.getSource() == navBar.finishButton) {
-			finishDisplay();
-
-			//		} else if(event.getSource() == navBar.backButton) {
-			//			backHistory();
-			//
-			//		} else if(event.getSource() == navBar.forwardButton) {
-			//			forwardHistory();
-
-		} else if(event.getSource() == navBar.adminPanel.profileModeButton) {
+		if(event.getSource() == navBar.adminPanel.profileModeButton) {
 			this.mainPage.formWidget.toggleProfileMode();
 
 		} else if(event.getSource() == navBar.adminPanel.profileCreateButton) {
@@ -1805,14 +1814,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
 				// si le form n'a pas encore de type
-			} else if(dataSource != dataSourceParent.getTypeLines().getFirst()) {
+			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
 				dataSourceParent.addTypeLine((FormClassLine) dataSource, true);
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
 				// Si la ligne avait déjà un type (retractation)
 			} else {
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
-				dataSourceParent.addTypeLine(null, true);
+//				dataSourceParent.addTypeLine(null, true);
+//				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
+//				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
+				dataSourceParent.clear();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
 				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
 			}
@@ -2034,28 +2046,29 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			widSource.getData().addAllTypeLines(classLines);
 
 
-			if(widSource.getData().isAnonymous()) {
-				ControlUtils.debugMessage("loadFormContent anonymous Form = " + widSource.getData().toString());
+			if(widSource.getData().isAnonymous() || widSource.getData().isTypeList()) {
+				ControlUtils.debugMessage("loadFormContent anonyme" );
 				if(classLines.size() == 1 ) {
+					ControlUtils.debugMessage("loadFormContent anonyme un seul type" );
 					String queryString = lispqlStatementQuery(widSource.getData());
 					// Ca ne devrai pas modifier le statement, on chargement le contenu de Place ici
 					this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
 
 					incrementNumberOfActions();
 				} else {
-					
-					int nbLines = classLines.size();
-					Iterator<FormClassLine> itClassLines = classLines.iterator();
-					while(itClassLines.hasNext()) {
-						FormClassLine classLine = itClassLines.next();
-						classLine.setWeight(nbLines);
-						nbLines--;
-					}
-					
-					widSource.getData().addAllLines(classLines);
+//					ControlUtils.debugMessage("loadFormContent anonyme 0 ou n types : " + classLines );
+//					int nbLines = classLines.size();
+//					Iterator<FormClassLine> itClassLines = classLines.iterator();
+//					while(itClassLines.hasNext()) {
+//						FormClassLine classLine = itClassLines.next();
+//						classLine.setWeight(nbLines);
+//						nbLines--;
+//					}
+//					
+//					widSource.getData().addAllLines(classLines);
 				}
 			} else {
-				ControlUtils.debugMessage("loadFormContent typed Form");
+				ControlUtils.debugMessage("loadFormContent typé" );
 				int nbLines = relationLines.size();
 				Iterator<FormRelationLine> itRelLines = relationLines.iterator();
 				while(itRelLines.hasNext()) {
@@ -2103,7 +2116,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
 		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
 
-		return (widSource.getData().getTypeLines().isEmpty()
+		return (widSource.getData().isAnonymous()
 				&& ! classLines.isEmpty()
 				&& (classLines.size() == 1 
 				&& classLines.getFirst() instanceof FormClassLine)
@@ -2284,6 +2297,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} catch (RequestException e) {
 			ControlUtils.exceptionMessage(e);
 		}
+	}
+
+	@Override
+	public void onFinishForm(FinishFormEvent event) {
+		finish( ( (FormWidget)event.getSource()).getData());
 	}
 
 }
