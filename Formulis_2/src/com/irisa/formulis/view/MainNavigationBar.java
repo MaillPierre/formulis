@@ -25,7 +25,7 @@ public class MainNavigationBar extends Composite{
 	public Column controlsCol = new Column(12);
 	public FluidRow statusBarPanel = new FluidRow(); // 12
 	public LoginWidget loginWid = new LoginWidget();
-	private Column loginCol = new Column(6, loginWid); // 8 / 12
+	private Column loginCol = new Column(7, loginWid); // 8 / 12
 //	public FluidRow storeListPanel = new FluidRow(); // 3 / 12
 	public HorizontalPanel storeListPanel = new HorizontalPanel(); // 3 / 12
 	private Column storeListCol = new Column(2, storeListPanel);
@@ -54,8 +54,8 @@ public class MainNavigationBar extends Composite{
 //	private Column backButtonCol = new Column(2, backButton);
 //	public Button forwardButton = new Button("Forward");
 //	private Column forwardButtonCol = new Column(2, forwardButton);
-	public Button finishButton = new Button("Finish");
-	private Column finishButtonCol = new Column(1, finishButton);
+//	public Button finishButton = new Button("Finish");
+//	private Column finishButtonCol = new Column(1, finishButton);
 
 	public MainNavigationBar() {
 		super();
@@ -76,7 +76,7 @@ public class MainNavigationBar extends Composite{
 		statusBarPanel.add(loginCol);
 		statusBarPanel.add(storeListCol);
 		statusBarPanel.add(serverLabelCol);
-		statusBarPanel.add(finishButtonCol);
+//		statusBarPanel.add(finishButtonCol);
 		
 		buttonRow.add(adminPanel);
 		

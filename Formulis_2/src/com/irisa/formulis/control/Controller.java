@@ -1579,7 +1579,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		navBar.adminPanel.profileEditClear.addClickHandler(this);
 		navBar.adminPanel.profileEditReload.addClickHandler(this);
 		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
-		navBar.finishButton.addClickHandler(this);
 		
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
 			@Override

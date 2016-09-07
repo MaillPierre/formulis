@@ -152,8 +152,8 @@ public class FormWidget extends AbstractFormElementWidget {
 	public void onFinishLine(FinishLineEvent event) {
 		super.onFinishLine(event);
 		ControlUtils.debugMessage("FormWidget onFinishLine isFinished:" + this.getData().isFinished());
-		finishButton.setEnabled(event.getState() && this.getData().isFinished());
-		if(event.getState() && this.getData().isFinished()) {
+		finishButton.setEnabled(this.getData().isFinished());
+		if(this.getData().isFinished()) {
 			this.finishButton.setBaseIcon(IconType.CHECK);
 		} else {
 			this.finishButton.setBaseIcon(IconType.PENCIL);
