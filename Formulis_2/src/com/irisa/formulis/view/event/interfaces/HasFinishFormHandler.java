@@ -6,5 +6,5 @@ public interface HasFinishFormHandler {
 	
 	public void addFinishFormHandler(FinishFormHandler handler);
 	public void fireFinishFormEvent(FinishFormEvent event);
-	public void fireFinishFormEvent();
+	public void fireFinishFormEvent(boolean state);
 }

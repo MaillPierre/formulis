@@ -1,5 +1,6 @@
 package com.irisa.formulis.model.form;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileRelationLine;
 import com.irisa.formulis.model.basic.URI;
@@ -90,6 +91,10 @@ public class FormRelationLine extends FormLine {
 
 	@Override
 	public boolean isFinished() {
+//		ControlUtils.debugMessage("FormRelation isFinished variable:" + this.variableElement  );
+//		if(this.variableElement != null) {
+//			ControlUtils.debugMessage("FormRelation isFinished variableIsFinished:" + this.variableElement.isFinished()  );
+//		}
 		return this.variableElement != null && this.variableElement.isFinished();
 	}
 

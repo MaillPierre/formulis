@@ -158,7 +158,8 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 	public void onClick(ClickEvent event) {
 		ControlUtils.debugMessage("FormClassLine onClick");
 		if(event.getSource() == this.resetElementButton) {
-			setLineState(LINE_STATE.SUGGESTIONS);			
+			setLineState(LINE_STATE.SUGGESTIONS);
+			this.fireFinishLineEvent(false);
 		} else if(event.getSource() == this.removeLineButton) {
 			fireRemoveLineEvent();
 		}

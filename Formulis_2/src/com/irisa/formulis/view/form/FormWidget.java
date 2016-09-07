@@ -25,6 +25,7 @@ import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
+import com.irisa.formulis.view.event.FinishLineEvent;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
 /**
@@ -49,7 +50,7 @@ public class FormWidget extends AbstractFormElementWidget {
 	private Column contentCol = new Column(11,contentRow, newRelationRow);
 	
 	private Column finishCol = new Column(1);
-	private Button finishButton = new Button("", IconType.OK);
+	private Button finishButton = new Button("", IconType.PENCIL);
 	
 	public enum FORM_CALLBACK_MODE {
 		/**
@@ -85,6 +86,7 @@ public class FormWidget extends AbstractFormElementWidget {
 		newRelationButton.addClickHandler(this);
 		
 		finishButton.addClickHandler(this);
+		finishButton.setEnabled(this.getData().isFinished());
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -122,7 +124,7 @@ public class FormWidget extends AbstractFormElementWidget {
 	}
 	
 	public void reload() {
-		if(getData() != null && ! getData().isEmpty()/* && ! getData().isFinished()*/) {
+		if(getData() != null && ! getData().isEmpty()) {
 			clear();
 
 //			if(! formData.isAnonymous() ) {
@@ -144,6 +146,19 @@ public class FormWidget extends AbstractFormElementWidget {
 		if(this.getData().isEmpty() && this.getData().isRoot()) {
 			newRelationButton.setVisible(false);
 		}
+	}
+	
+	@Override
+	public void onFinishLine(FinishLineEvent event) {
+		super.onFinishLine(event);
+		ControlUtils.debugMessage("FormWidget onFinishLine isFinished:" + this.getData().isFinished());
+		finishButton.setEnabled(event.getState() && this.getData().isFinished());
+		if(event.getState() && this.getData().isFinished()) {
+			this.finishButton.setBaseIcon(IconType.CHECK);
+		} else {
+			this.finishButton.setBaseIcon(IconType.PENCIL);
+		}
+		
 	}
 	
 	protected LinkedList<FormLineWidget> formLinesToWidget() {
@@ -202,7 +217,7 @@ public class FormWidget extends AbstractFormElementWidget {
 			ControlUtils.debugMessage("Creation button click");
 			putRelationCreationWidget();
 		} else if(event.getSource() == finishButton) {
-			fireFinishFormEvent();
+			fireFinishFormEvent(true);
 		}
 //		fireClickWidgetEvent(new ClickWidgetEvent(this));s
 	}

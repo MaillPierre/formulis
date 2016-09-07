@@ -11,6 +11,8 @@ import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.irisa.formulis.control.ControlUtils;
@@ -62,6 +64,14 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		element.addClickHandler(this);
 		element.setWidth("100%");
 		element.getElement().setPropertyString("autocomplete", "off");
+		element.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if(! element.getValue().isEmpty()) {
+					ValueChangeEvent.fire(element, element.getValue());
+				}
+			}
+		});
 		
 		popover = new CustomSuggestionPopover(this);
 	}

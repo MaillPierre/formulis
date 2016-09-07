@@ -346,7 +346,8 @@ public class Form extends FormComponent {
 			FormRelationLine rel = itRel.next();
 			result = result || rel.isFinished();
 		}
-		return result && ((isTyped() && this.typeLines.getFirst().isFinished()) || isAnonymous());
+		ControlUtils.debugMessage("Form  isFinished lines="+ result +" typed="+(isTyped() && this.getType().isFinished()) + " anonymous=" + isAnonymous());
+		return ((isTyped() && this.getType().isFinished()) ||(result &&  isAnonymous()));
 	}
 
 	@Override

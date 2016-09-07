@@ -227,6 +227,8 @@ public class ViewUtils {
 	public static <H extends FormEventChainHandler, E extends HasFormEventChainHandlers> void connectFormEventChain(E emitter, H handler) {
 		emitter.addCompletionAskedHandler(handler);
 		emitter.addElementCreationHandler(handler);
+		emitter.addFinishFormHandler(handler);
+		emitter.addFinishLineHandler(handler);
 		emitter.addLineSelectionHandler(handler);
 		emitter.addMoreCompletionsHandler(handler);
 		emitter.addRelationCreationHandler(handler);

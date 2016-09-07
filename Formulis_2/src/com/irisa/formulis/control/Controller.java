@@ -1862,7 +1862,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			SuggestionCallback callback = (SuggestionCallback) event.getCallback();
-			if(widSource.isFinished()) {
+			if(widSource.getData().isFinished()) {
 				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
@@ -1872,7 +1872,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 		refreshAnswers();
 
-		incrementNumberOfActions();
+//		incrementNumberOfActions();
 	}
 
 //	@Override
@@ -2302,6 +2302,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
 		finish( ( (FormWidget)event.getSource()).getData());
+	}
+
+	/**
+	 * Le controller est handler parce qu'il est en bout de FormEventCHain, mais il n'est pas sensé en faire quoi que ce soit.
+	 * @param event
+	 */
+	@Override
+	public void onFinishLine(FinishLineEvent event) {
+		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString());
 	}
 
 }

@@ -150,6 +150,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			break;
 		case FINISHED:
 			resetElementButton.setEnabled(true);
+			fireFinishLineEvent(true);
 			break;
 		}
 		currentState = state;
@@ -229,10 +230,6 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
 		} 
-	}
-
-	public boolean isFinished() {
-		return this.currentState == LINE_STATE.FINISHED;
 	}
 
 	@Override

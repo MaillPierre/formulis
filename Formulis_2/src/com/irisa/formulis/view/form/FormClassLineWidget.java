@@ -6,6 +6,8 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -58,20 +60,14 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		
 		labelUriBox.setWidth("100%");
 		labelUriBox.setPlaceholder("Name of this new element (Random by default)");
-		labelUriBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+		labelUriBox.addValueChangeHandler(this);
+		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
 			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
-				getFormLine().setElementLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
-				String traitedLabel = UriUtils.encode(event.getValue()).replace(" ", "_");
-				getFormLine().setElementUri(Controller.newElementUri(traitedLabel));
+			public void onKeyUp(KeyUpEvent event) {
+				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
 			}
 		});
-//		labelUriBox.addClickHandler(new ClickHandler(){
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				fireLineSelectionEvent();
-//			}
-//		});
+		
 		if(! l.getElementLabel().isEmpty()) {
 			labelUriBox.setText(l.getElementLabel());
 		}
@@ -160,9 +156,9 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
-			this.getFormLine().setElementLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
-			String traitedLabel = UriUtils.encode(event.getValue()).replace(" ", "_");
-			this.getFormLine().setElementUri(Controller.newElementUri(traitedLabel));
+			getFormLine().setElementLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
+			ControlUtils.debugMessage("FormClassLineWidget onValueChange=" + event.getValue() + " finished=" + getFormLine().isFinished());
+			this.fireFinishLineEvent(this.getFormLine().isFinished());
 		}
 	}
 

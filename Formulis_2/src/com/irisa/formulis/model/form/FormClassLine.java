@@ -1,5 +1,6 @@
 package com.irisa.formulis.model.form;
 
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileClassLine;
@@ -66,12 +67,12 @@ public class FormClassLine extends FormLine {
 
 	public String getElementUri() {
 		elementUri = Controller.newElementUri(elementLabel);
-		ControlUtils.debugMessage("getElementUri : " + elementUri);
+//		ControlUtils.debugMessage("getElementUri : " + elementUri);
 		return elementUri;
 	}
 
 	public void setElementUri(String elementUri) {
-		ControlUtils.debugMessage("setElementUri : " + elementUri);
+//		ControlUtils.debugMessage("setElementUri : " + elementUri);
 		this.elementUri = elementUri;
 	}
 
@@ -81,6 +82,8 @@ public class FormClassLine extends FormLine {
 
 	public void setElementLabel(String label) {
 		this.elementLabel = label;
+		String traitedLabel = UriUtils.encode(label).replace(" ", "_");
+		setElementUri(Controller.newElementUri(traitedLabel));
 	}
 	
 	@Override
@@ -110,7 +113,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public boolean isFinished() {
-		return this.elementLabel != "";
+		return ! this.elementLabel.isEmpty();
 	}
 
 	@Override

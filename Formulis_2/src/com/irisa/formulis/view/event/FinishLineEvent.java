@@ -1,12 +1,12 @@
 package com.irisa.formulis.view.event;
 
-import com.irisa.formulis.view.form.FormWidget;
+import com.irisa.formulis.view.form.FormLineWidget;
 
-public class FinishFormEvent extends FormEvent {
+public class FinishLineEvent extends FormEvent {
 
 	private boolean finishState = false;
 	
-	public FinishFormEvent(FormWidget src, boolean state) {
+	public FinishLineEvent(FormLineWidget src, boolean state) {
 		super(src);
 		finishState = state;
 	}

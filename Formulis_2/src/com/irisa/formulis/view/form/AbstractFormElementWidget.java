@@ -10,6 +10,7 @@ import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
+import com.irisa.formulis.view.event.FinishLineEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
@@ -19,6 +20,7 @@ import com.irisa.formulis.view.event.StatementChangeEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
+import com.irisa.formulis.view.event.interfaces.FinishLineHandler;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 //import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
@@ -35,12 +37,13 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
+	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
+	protected LinkedList<FinishLineHandler> finishLineHandlers = new LinkedList<FinishLineHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
-	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected boolean profileMode = false;
 
 	public AbstractFormElementWidget(FormElement d, AbstractFormulisWidget fParent) {
@@ -100,6 +103,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireStatementChangeEvent(StatementChangeEvent event) {
+		ControlUtils.debugMessage( "fireStatementChangeEvent : " + this.getClass()); 
 		Iterator<StatementChangeHandler> itHand = this.statementChangeHandlers.iterator();
 		while(itHand.hasNext()) {
 			StatementChangeHandler hand = itHand.next();
@@ -145,9 +149,9 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireFinishFormEvent() {
+	public void fireFinishFormEvent(boolean state) {
 		if(this instanceof FormWidget) {
-			FinishFormEvent event = new FinishFormEvent((FormWidget) this);
+			FinishFormEvent event = new FinishFormEvent((FormWidget) this, state);
 			fireFinishFormEvent(event);
 		}
 	}
@@ -167,6 +171,34 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
+	public void addFinishLineHandler(FinishLineHandler handler) {
+		this.finishLineHandlers.add(handler);
+	}
+
+	@Override
+	public void fireFinishLineEvent(boolean state) {
+		if(this instanceof FormLineWidget) {
+			FinishLineEvent event = new FinishLineEvent((FormLineWidget) this, state);
+			fireFinishLineEvent(event);
+		}
+	}
+
+	@Override
+	public void fireFinishLineEvent(FinishLineEvent event) {
+		ControlUtils.debugMessage(this.getClass() + " fireFinishLineEvent" );
+		Iterator<FinishLineHandler> itHand = this.finishLineHandlers.iterator();
+		while(itHand.hasNext()) {
+			FinishLineHandler hand = itHand.next();
+			hand.onFinishLine(event);
+		}
+	}
+
+	@Override
+	public void onFinishLine(FinishLineEvent event) {
+		fireFinishLineEvent(event);
+	}
+
+	@Override
 	public void addLineSelectionHandler(LineSelectionHandler handler) {
 		this.lineSelectionHandlers.add(handler);
 	}
@@ -182,6 +214,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireLineSelectionEvent(LineSelectionEvent event) {
+		ControlUtils.debugMessage( "fireLineSelectionEvent : " + this.getClass()); 
 		Iterator<LineSelectionHandler> itHand = this.lineSelectionHandlers.iterator();
 		while(itHand.hasNext()) {
 			LineSelectionHandler hand = itHand.next();
