@@ -93,19 +93,7 @@ public abstract class FormLine extends FormComponent{
 	public abstract String toLispql(boolean selected, boolean isFinalRequest);
 	
 	@Override
-	public boolean equals(Object o) {
-		if(o!= null) {
-			if(o instanceof FormLine) {
-				FormLine oLine = ((FormLine)o);
-//				if(oLine.getVariableElement() != null) {
-//					return oLine.getFixedElement().equals(this.fixedElement) && oLine.getVariableElement().equals(this.variableElement);
-//				} else {
-					return oLine.getFixedElement().equals(this.fixedElement);
-//				}
-			}
-		}
-		return super.equals(o);
-	}
+	public abstract boolean equals(Object o) ;
 	
 	@Override
 	public boolean isLine() {

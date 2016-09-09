@@ -6,21 +6,26 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.UriUtils;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileLine;
+import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FormulisWidgetFactory;
+import com.irisa.formulis.view.basic.PlainWidget;
+import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 
@@ -31,6 +36,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 //	private FluidRow labelButtonLine = new FluidRow();
 	private TextBox labelUriBox = new TextBox();
 //	private Column labelCol = new Column(9, labelUriBox);
+	private PlainWidget labelWid = new PlainWidget(new Plain(getFormLine().getEntityLabel()), this);
 	private Button newElementButton = new Button("", IconType.EDIT);
 //	private Column buttonCol = new Column(3, newElementButton);
 
@@ -65,16 +71,19 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
+				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					setLineState(LINE_STATE.FINISHED);
+				}
 			}
 		});
 		
-		if(! l.getElementLabel().isEmpty()) {
-			labelUriBox.setText(l.getElementLabel());
+		if(! l.getEntityLabel().isEmpty()) {
+			labelUriBox.setText(l.getEntityLabel());
 		}
 
 		newElementButton.setTitle("Créer un nouvel élement");
 		newElementButton.addClickHandler(this);
-		if(this.getData().getParent() != null && this.getData().getParent().isRoot()) {
+		if(this.getData() != null && this.getData().getParent() != null && this.getData().getParent().isRoot()) {
 			newElementButton.setVisible(false);
 		}
 
@@ -91,9 +100,13 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 
 		elementRow.add(fixedElement);
 		elementRow.add(labelUriBox);
-		elementRow.addStyleName("weblis-max-width");
+		elementRow.setWidth("100%");
+		elementRow.setCellWidth(labelUriBox, "100%");
+		elementRow.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 		contentRow.add(elementCol);
 		labelUriBox.addStyleName("weblis-max-width");
+		
+		this.repeatLineButton.setEnabled(false);
 
 		this.setLineState(LINE_STATE.FINISHED);
 		this.hideLabelBox();
@@ -107,11 +120,23 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	public void hideLabelBox() {
 		labelUriBox.setVisible(false);
 		newElementButton.setVisible(false);
+		
+		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
+			URIWidget labelWid = new URIWidget(this.getFormLine().getEntityUri(), null);
+			elementRow.remove(labelUriBox);
+			elementRow.add(labelWid);
+			elementRow.setCellWidth(labelWid, "100%");
+		}
 	}
 	
 	public void showLabelBox() {
 		labelUriBox.setVisible(true);
 		newElementButton.setVisible(true);
+		if(this.getData() != null) {
+			elementRow.remove(labelWid);
+			elementRow.add(labelUriBox);
+			elementRow.setCellWidth(labelUriBox, "100%");
+		}
 	}
 
 	@Override
@@ -122,16 +147,17 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public void setLineState(LINE_STATE state) {
 		if(state == LINE_STATE.FINISHED) {
-			this.resetElementButton.setEnabled(false);
+			if(! this.getParentWidget().getData().isTypeList()) {
+				this.resetElementButton.setEnabled(true);
+			}
+			hideLabelBox();
 
-			if(this.getData().getParent() != null && this.getData().getParent().isRoot()) {
-				this.newElementButton.setVisible(false);
-			}
-		} else if(state == LINE_STATE.CREATION) {
-			if( this.getData().getParent() != null && ! this.getParentWidget().getData().isRoot()) {
-				this.getParentWidget().clear();
-				this.getParentWidget().getParentWidget().setLineState(LINE_STATE.CREATION);
-			}
+//			if(this.getData() != null && this.getData().getParent() != null && this.getData().getParent().isRoot()) {
+//				this.newElementButton.setVisible(false);
+//			}
+		} else if(state == LINE_STATE.SUGGESTIONS) {
+			showLabelBox();
+			this.resetElementButton.setEnabled(false);
 		}
 	}
 
@@ -156,7 +182,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
-			getFormLine().setElementLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
+			getFormLine().setEntityLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
 			ControlUtils.debugMessage("FormClassLineWidget onValueChange=" + event.getValue() + " finished=" + getFormLine().isFinished());
 			this.fireFinishLineEvent(this.getFormLine().isFinished());
 		}

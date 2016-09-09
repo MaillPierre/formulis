@@ -625,6 +625,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								Node placeNode = homePlaceElem.getFirstChild();
 								if(placeNode.getNodeName() == "place") {
 									loadPlace(placeNode);
+									loadFormContent();
 								} else {
 									// FIXME GESTION DES MESSAGES D'ERREUR
 									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
@@ -675,7 +676,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 										loadPlace(placeNode);
 //										getRootForm();
 										setCurrentForm( newForm());
-										loadFormContent(mainPage.formWidget);
+										loadFormContent();
 									} else {
 										if(placeNode.getNodeName() == "message") {
 											ControlUtils.debugMessage( placeNode.getFirstChild().getNodeValue());
@@ -1353,24 +1354,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void finish() {
-//		ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
-//		Date nowDate = new Date();
-//		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getTypeLines().getFirst().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
-//		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getTypeLines().getFirst().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
-//		numberOfActions = 0;
-//		
-//		sewelisRunStatement("get " + this.form.toLispql(true) + "");
-		ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
-		Date nowDate = new Date();
-		ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getElementUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
-		this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
-		numberOfActions = 0;
-		finish(this.form);
-	}
-	
 	private void finish(Form f) {
 		sewelisRunStatement("get " + f.toLispql(true) + "");
+		if(f == this.rootForm()) {
+			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
+			Date nowDate = new Date();
+			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+//			this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+			numberOfActions = 0;
+		}
 	}
 
 
@@ -1587,7 +1579,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					int selectIndex= navBar.storeListBox.getSelectedIndex();
 					String selectValue = navBar.storeListBox.getValue(selectIndex);
 					setCurrentStore(selectValue);
-					sewelisGetPlaceHome();
+//					sewelisGetPlaceHome();
+					sewelisGetPlaceRoot();
 				}
 			}
 		});
@@ -2023,6 +2016,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		mainPage.formWidget.setData(this.form);
 		mainPage.formWidget.reload();
 	}
+	
+	/**
+	 * Chargement dans le widget principal
+	 */
+	public void loadFormContent() {
+		loadFormContent(mainPage.formWidget);
+	}
 
 	/**
 	 * Vide et charge les lignes du formulaire en argument en fonction du contenu de la place courante.
@@ -2033,41 +2033,36 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void loadFormContent(FormWidget widSource) {
 		ControlUtils.debugMessage("loadFormContent " + widSource);
 
-		if(this.isFormContentLoadable(widSource)) {
+		if(this.isFormContentLoadable(widSource) &&  widSource.getData() != null) {
 
-			widSource.getData().clear();
-
-			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
-			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
+			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 			Collections.sort(relationLines, new FormLineComparator());
 			Collections.sort(classLines, new FormLineComparator());
-			//		LinkedList<FormLine> literalLines = this.getPlaceliteralLines(widSource);
-			widSource.getData().addAllTypeLines(classLines);
 
-
-			if(widSource.getData().isAnonymous() || widSource.getData().isTypeList()) {
-				ControlUtils.debugMessage("loadFormContent anonyme" );
-				if(classLines.size() == 1 ) {
-					ControlUtils.debugMessage("loadFormContent anonyme un seul type" );
-					String queryString = lispqlStatementQuery(widSource.getData());
-					// Ca ne devrai pas modifier le statement, on chargement le contenu de Place ici
-					this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
-
-					incrementNumberOfActions();
-				} else {
-//					ControlUtils.debugMessage("loadFormContent anonyme 0 ou n types : " + classLines );
-//					int nbLines = classLines.size();
-//					Iterator<FormClassLine> itClassLines = classLines.iterator();
-//					while(itClassLines.hasNext()) {
-//						FormClassLine classLine = itClassLines.next();
-//						classLine.setWeight(nbLines);
-//						nbLines--;
-//					}
-//					
-//					widSource.getData().addAllLines(classLines);
+			// Si il n'y a qu'un seul type proposé, alors il faut qu'il soit selectionné et placé dans le statement 
+			// pour que les relations proposées soient les bonnes
+//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
+			if(! (widSource.getData().getTypeLines().size() == classLines.size() 
+					&& widSource.getData().getTypeLines().containsAll(classLines) ) ) {
+				
+				
+				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
+				widSource.getData().clear();
+				
+				widSource.getData().addAllTypeLines(classLines);
+				
+				// Si il n'y a qu'un type proposé, on change le statement vers ce type
+				if(widSource.getData().isTyped()) {
+						ControlUtils.debugMessage("Controller loadFormContent typé" );
+						String queryString = lispqlStatementQuery(widSource.getData());
+						relationLines.clear();
+						this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
 				}
-			} else {
-				ControlUtils.debugMessage("loadFormContent typé" );
+			} 
+				
+			if(widSource.getData().isTyped() || widSource.getData().isAnonymous()) {
+				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
 				int nbLines = relationLines.size();
 				Iterator<FormRelationLine> itRelLines = relationLines.iterator();
 				while(itRelLines.hasNext()) {
@@ -2081,14 +2076,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 			widSource.reload();
 		}
+
 	}
 
 	public void appendFormContent(FormWidget widSource) {
 		ControlUtils.debugMessage("appendFormContent " + widSource);
 
 		if(this.isFormContentLoadable(widSource)) {
-			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
-			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
+			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
 			if(widSource.getData().getTypeLines().isEmpty()) {
 				widSource.getData().addAllLines(classLines);
@@ -2112,8 +2108,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
-		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource);
-		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource);
+		ControlUtils.debugMessage("isFormContentLoadable " + widSource);
+		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
 		return (widSource.getData().isAnonymous()
 				&& ! classLines.isEmpty()
@@ -2143,14 +2140,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-	public LinkedList<FormClassLine> getPlaceClassLines(FormWidget widSource) {
+	public LinkedList<FormClassLine> getPlaceClassLines(Form source) {
 		LinkedList<FormClassLine> result = new LinkedList<FormClassLine>();
 
 		Iterator<Increment> itIncre = place.getSuggestions().relationIterator();
 		while(itIncre.hasNext()) {
 			Increment incre = itIncre.next();
 			if(incre.getKind() == KIND.CLASS) {
-				FormLine newLine = DataUtils.formLineFromIncrement(incre, widSource.getData());
+				FormLine newLine = DataUtils.formLineFromIncrement(incre, source);
 				if(newLine instanceof FormClassLine && newLine.getFixedElement() instanceof URI) {
 					URI uriClass = (URI)newLine.getFixedElement();
 					if(! ControlUtils.FORBIDDEN_URIS.isForbidden(uriClass.getUri()) && ! ControlUtils.LITTERAL_URIS.isLitteralType(uriClass.getUri())) {
@@ -2168,14 +2165,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param widSource Widget sont les données seront la racine des lignes retournées
 	 * @return lignes relations après filtrage des valeurs interdites
 	 */
-	public LinkedList<FormRelationLine> getPlaceRelationLines(FormWidget widSource) {
+	public LinkedList<FormRelationLine> getPlaceRelationLines(Form source) {
 		LinkedList<FormRelationLine> result = new LinkedList<FormRelationLine>();
 
 		Iterator<Increment> itIncre = place.getSuggestions().relationIterator();
 		while(itIncre.hasNext()) {
 			Increment incre = itIncre.next();
 			if(incre.getKind() == KIND.PROPERTY) {
-				FormLine newLine = DataUtils.formLineFromIncrement(incre, widSource.getData());
+				FormLine newLine = DataUtils.formLineFromIncrement(incre, source);
 				if (newLine instanceof FormRelationLine) {
 					if(newLine.getFixedElement() instanceof URI) {
 						URI uriProperty = (URI)newLine.getFixedElement();
@@ -2219,24 +2216,24 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	public static String newElementUri(String label) {
 		String result = serverAdress + /*"/" + currentStore.getName() +*/ "#";
-		int uriMinSize = 8;
-		if(label != null && label.length() > uriMinSize) {
+//		int uriMinSize = 8;
+//		if(label != null && label.length() > uriMinSize) {
 			result += label;
-		} else {
-			if(label != null && label.length() < uriMinSize) {
-				result += label + "_";
-			}
-			// CTRL-C CTRL-V de http://stackoverflow.com/questions/20536566/creating-a-random-string-with-a-z-and-0-9-in-java
-			String RANDCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-			StringBuilder randBuilder = new StringBuilder();
-			int randSize = uriMinSize - label.length();
-			while (randBuilder.length() < randSize) {
-				int index = (Random.nextInt(RANDCHARS.length()));
-				randBuilder.append(RANDCHARS.charAt(index));
-			}
-			String randString = randBuilder.toString();
-			result += randString;
-		}
+//		} else {
+//			if(label != null && label.length() < uriMinSize) {
+//				result += label + "_";
+//			}
+//			// CTRL-C CTRL-V de http://stackoverflow.com/questions/20536566/creating-a-random-string-with-a-z-and-0-9-in-java
+//			String RANDCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+//			StringBuilder randBuilder = new StringBuilder();
+//			int randSize = uriMinSize - label.length();
+//			while (randBuilder.length() < randSize) {
+//				int index = (Random.nextInt(RANDCHARS.length()));
+//				randBuilder.append(RANDCHARS.charAt(index));
+//			}
+//			String randString = randBuilder.toString();
+//			result += randString;
+//		}
 		return result;
 	}
 

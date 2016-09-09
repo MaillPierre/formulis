@@ -113,7 +113,7 @@ public class FormRelationLine extends FormLine {
 				return fixedEqual;
 			}
 		}
-		return super.equals(o);
+		return false;
 	}
 
 }

@@ -6,6 +6,7 @@ import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileClassLine;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.basic.URI;
+import com.irisa.formulis.model.basic.URI.KIND;
 
 public class FormClassLine extends FormLine {
 	
@@ -57,7 +58,7 @@ public class FormClassLine extends FormLine {
 				result += "a " + this.fixedElement.toLispql();
 			}
 			if(! this.anonymous && this.elementLabel != "" && isFinalRequest) {
-				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getElementLabel() + "\"@fr"; 
+				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getEntityLabel() + "\"@fr"; 
 			}
 		}
 
@@ -65,25 +66,28 @@ public class FormClassLine extends FormLine {
 		return result;
 	}
 
-	public String getElementUri() {
-		elementUri = Controller.newElementUri(elementLabel);
-//		ControlUtils.debugMessage("getElementUri : " + elementUri);
-		return elementUri;
+	public URI getEntityUri() {
+//		elementUri = Controller.newElementUri(elementLabel);
+		if(this.getEntityLabel().isEmpty()) {
+			return null;
+		}
+		ControlUtils.debugMessage("FormClassLine getElementUri : " + elementUri);
+		return new URI(elementUri, KIND.ENTITY, elementLabel);
 	}
 
-	public void setElementUri(String elementUri) {
+	public void setEntityUri(String elementUri) {
 //		ControlUtils.debugMessage("setElementUri : " + elementUri);
 		this.elementUri = elementUri;
 	}
 
-	public String getElementLabel() {
+	public String getEntityLabel() {
 		return elementLabel;
 	}
 
-	public void setElementLabel(String label) {
+	public void setEntityLabel(String label) {
 		this.elementLabel = label;
 		String traitedLabel = UriUtils.encode(label).replace(" ", "_");
-		setElementUri(Controller.newElementUri(traitedLabel));
+		setEntityUri(Controller.newElementUri(traitedLabel));
 	}
 	
 	@Override
@@ -93,6 +97,10 @@ public class FormClassLine extends FormLine {
 
 	public boolean isAnonymous() {
 		return anonymous;
+	}
+	
+	public boolean isUnnamed() {
+		return this.isAnonymous() && this.getEntityUri() == null;
 	}
 
 	public void setAnonymous(boolean isAnonymous) {
@@ -113,7 +121,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public boolean isFinished() {
-		return ! this.elementLabel.isEmpty();
+		return ! this.isUnnamed();
 	}
 
 	@Override
@@ -124,9 +132,12 @@ public class FormClassLine extends FormLine {
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof FormClassLine) {
-			return elementUri.equals(((FormClassLine) o).getElementUri());
+			if(this.getEntityUri() != null) {
+				return this.getFixedElement().equals(((FormClassLine) o).getFixedElement()) && this.getEntityUri().equals(((FormClassLine) o).getEntityUri());
+			}
+			return this.getFixedElement().equals(((FormClassLine) o).getFixedElement());
 		}
-		return super.equals(o);
+		return false;
 	}
 
 }

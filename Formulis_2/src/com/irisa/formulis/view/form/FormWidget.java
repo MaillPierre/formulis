@@ -124,15 +124,9 @@ public class FormWidget extends AbstractFormElementWidget {
 	}
 	
 	public void reload() {
+		ControlUtils.debugMessage("FormWidget reload ");
 		if(getData() != null && ! getData().isEmpty()) {
 			clear();
-
-//			if(! formData.isAnonymous() ) {
-//				FormClassLineWidget typeLineWid = new FormClassLineWidget( formData.getTypeLines().peekFirst(), this);
-//				typeLineWid.setLineState(LINE_STATE.FINISHED);
-//				typeLineWid.showLabelBox();
-//				addLine(typeLineWid);
-//			}
 						
 			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
 			while(itFo.hasNext()) {
@@ -143,7 +137,7 @@ public class FormWidget extends AbstractFormElementWidget {
 		} 
 
 		// Si le formulaire est le root
-		if(this.getData().isEmpty() && this.getData().isRoot()) {
+		if(getData() != null && this.getData().isEmpty() && this.getData().isRoot()) {
 			newRelationButton.setVisible(false);
 		}
 	}

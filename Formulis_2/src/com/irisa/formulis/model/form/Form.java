@@ -14,6 +14,7 @@ import com.irisa.formulis.model.basic.URI;
 /**
  * Classe de données pour représenter une édition en cours.
  * Un form peut être traduit vers une requête lispql pour interroger le serveur, en demandant la relation courante (en cours d'édition)
+ * Etat de Form: Anonyme: aucun type, liste de type: plus d'un type, Typé: un seul type
  * @author pmaillot
  *
  */
@@ -23,7 +24,6 @@ public class Form extends FormComponent {
 	private LinkedList<FormRelationLine> relationLines = new LinkedList<FormRelationLine>();
 //	private FormClassLine typeLine = null;
 	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
-	private boolean anonymous;
 	
 	private HashMap<URI, LinkedList<FormComponent>> formIndex = new HashMap<URI, LinkedList<FormComponent>>(); // TEST
 
@@ -172,16 +172,15 @@ public class Form extends FormComponent {
 	public boolean isTyped() {
 		return this.typeLines.size() == 1;
 	}
-
-	public void setAnonymous(boolean anonymous) {
-		this.anonymous = anonymous;
-		this.typeLines.clear();
-	}
 	
 	public void clear() {
 		this.relationLines.clear();
 		this.typeLines.clear();
 		this.formIndex.clear();
+	}
+	
+	public void clearRelations() {
+		this.relationLines.clear();
 	}
 
 	public String toLispql(FormLine selectedLine) {
@@ -221,7 +220,7 @@ public class Form extends FormComponent {
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList()) {
 			if(isFinalRequest) {
-				result += "<" + typeLines.getFirst().getElementUri() + "> ";
+				result += "<" + this.getType().getEntityUri() + "> ";
 			}
 			result += "[ " + typeLines.getFirst().toLispql(isFinalRequest);
 			if(! otherlines.isEmpty()) {

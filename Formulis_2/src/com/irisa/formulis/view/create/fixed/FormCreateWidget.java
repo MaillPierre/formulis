@@ -40,7 +40,6 @@ public class FormCreateWidget extends AbstractDataWidget {
 		anonymousCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				((Form)data).setAnonymous(event.getValue());
 				classNameBox.setReadOnly(event.getValue());
 				classUriBox.setReadOnly(event.getValue());
 				if(event.getValue()) {
