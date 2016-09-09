@@ -36,9 +36,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 //	private FluidRow labelButtonLine = new FluidRow();
 	private TextBox labelUriBox = new TextBox();
 //	private Column labelCol = new Column(9, labelUriBox);
-	private PlainWidget labelWid = new PlainWidget(new Plain(getFormLine().getEntityLabel()), this);
-	private Button newElementButton = new Button("", IconType.EDIT);
-//	private Column buttonCol = new Column(3, newElementButton);
+	private URIWidget labelWid = null;
 
 	protected AbstractFormulisWidget fixedElement = null;
 
@@ -81,12 +79,6 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			labelUriBox.setText(l.getEntityLabel());
 		}
 
-		newElementButton.setTitle("Créer un nouvel élement");
-		newElementButton.addClickHandler(this);
-		if(this.getData() != null && this.getData().getParent() != null && this.getData().getParent().isRoot()) {
-			newElementButton.setVisible(false);
-		}
-
 		if(! l.isAnonymous()) {
 			try {
 				this.fixedElement = FormulisWidgetFactory.getWidget((URI)l.getFixedElement(), this, this);
@@ -119,21 +111,23 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	
 	public void hideLabelBox() {
 		labelUriBox.setVisible(false);
-		newElementButton.setVisible(false);
 		
 		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
-			URIWidget labelWid = new URIWidget(this.getFormLine().getEntityUri(), null);
+			labelWid = new URIWidget(this.getFormLine().getEntityUri(), null);
 			elementRow.remove(labelUriBox);
-			elementRow.add(labelWid);
-			elementRow.setCellWidth(labelWid, "100%");
+			if(labelWid != null) {
+				elementRow.add(labelWid);
+				elementRow.setCellWidth(labelWid, "100%");
+			}
 		}
 	}
 	
 	public void showLabelBox() {
 		labelUriBox.setVisible(true);
-		newElementButton.setVisible(true);
 		if(this.getData() != null) {
-			elementRow.remove(labelWid);
+			if(labelWid != null) {
+				elementRow.remove(labelWid);
+			}
 			elementRow.add(labelUriBox);
 			elementRow.setCellWidth(labelUriBox, "100%");
 		}
@@ -146,18 +140,11 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 
 	@Override
 	public void setLineState(LINE_STATE state) {
+		this.resetElementButton.setEnabled(! this.getParentWidget().getData().isTypeList() && this.getFormLine().isNamed());
 		if(state == LINE_STATE.FINISHED) {
-			if(! this.getParentWidget().getData().isTypeList()) {
-				this.resetElementButton.setEnabled(true);
-			}
 			hideLabelBox();
-
-//			if(this.getData() != null && this.getData().getParent() != null && this.getData().getParent().isRoot()) {
-//				this.newElementButton.setVisible(false);
-//			}
 		} else if(state == LINE_STATE.SUGGESTIONS) {
 			showLabelBox();
-			this.resetElementButton.setEnabled(false);
 		}
 	}
 
@@ -172,11 +159,9 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	public void onClick(ClickEvent event) {
 		ControlUtils.debugMessage("FormClassLine onClick");
 		super.onClick(event);
-		if(event.getSource() == this.newElementButton) {
-			if(! this.getData().getParent().isRoot()) {
-				this.getParentWidget().getParentWidget().setLineState(LINE_STATE.CREATION);
-			}
-		}
+		if(event.getSource() == this.resetElementButton) {
+			this.setLineState(LINE_STATE.SUGGESTIONS);
+		} 
 	}
 
 	@Override

@@ -99,8 +99,8 @@ public class FormClassLine extends FormLine {
 		return anonymous;
 	}
 	
-	public boolean isUnnamed() {
-		return this.isAnonymous() && this.getEntityUri() == null;
+	public boolean isNamed() {
+		return this.getEntityUri() != null;
 	}
 
 	public void setAnonymous(boolean isAnonymous) {
@@ -121,7 +121,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public boolean isFinished() {
-		return ! this.isUnnamed();
+		return this.isNamed();
 	}
 
 	@Override

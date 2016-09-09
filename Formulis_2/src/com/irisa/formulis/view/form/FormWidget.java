@@ -140,6 +140,8 @@ public class FormWidget extends AbstractFormElementWidget {
 		if(getData() != null && this.getData().isEmpty() && this.getData().isRoot()) {
 			newRelationButton.setVisible(false);
 		}
+		
+		this.finishButton.setVisible(! getData().isEmpty());
 	}
 	
 	@Override

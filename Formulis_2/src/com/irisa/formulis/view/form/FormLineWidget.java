@@ -78,8 +78,10 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		initWidget(element);
 		
 		resetElementButton.setTitle("Reset");
+		resetElementButton.addClickHandler(this);
 		repeatLineButton.setTitle("Repeat");
 		removeLineButton.setTitle("Delete");
+		removeLineButton.addClickHandler(this);
 				
 		buttonsContainer.add(buttonsRow);
 		buttonsRow.setWidth("100%"); // TEST
