@@ -32,11 +32,6 @@ public class FormClassLine extends FormLine {
 	public FormClassLine(FormComponent par) {
 		this(par, ControlUtils.thingKeyword);
 	}
-
-	@Override
-	public FormClassLine repeatLine() {
-		return new FormClassLine(this.getParent() , this.getFixedElement(), this.getVariableElement());
-	}
 	
 	@Override
 	public String toLispql(boolean isFinalRequest) {
@@ -71,7 +66,6 @@ public class FormClassLine extends FormLine {
 		if(this.getEntityLabel().isEmpty()) {
 			return null;
 		}
-		ControlUtils.debugMessage("FormClassLine getElementUri : " + elementUri);
 		return new URI(elementUri, KIND.ENTITY, elementLabel);
 	}
 

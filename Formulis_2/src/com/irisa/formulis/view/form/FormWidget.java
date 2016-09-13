@@ -8,6 +8,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
+import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -86,7 +87,7 @@ public class FormWidget extends AbstractFormElementWidget {
 		newRelationButton.addClickHandler(this);
 		
 		finishButton.addClickHandler(this);
-		finishButton.setEnabled(this.getData().isFinished());
+		setFinishButtonState(this.getData().isFinished());
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -147,14 +148,18 @@ public class FormWidget extends AbstractFormElementWidget {
 	@Override
 	public void onFinishLine(FinishLineEvent event) {
 		super.onFinishLine(event);
-		ControlUtils.debugMessage("FormWidget onFinishLine isFinished:" + this.getData().isFinished());
-		finishButton.setEnabled(this.getData().isFinished());
-		if(this.getData().isFinished()) {
+		this.setFinishButtonState(this.getData().isFinished());
+	}
+	
+	public void setFinishButtonState(boolean finished) {
+		finishButton.setEnabled(finished);
+		if(finished) {
 			this.finishButton.setBaseIcon(IconType.CHECK);
+			this.finishButton.setType(ButtonType.SUCCESS);
 		} else {
 			this.finishButton.setBaseIcon(IconType.PENCIL);
+			this.finishButton.setType(ButtonType.DANGER);
 		}
-		
 	}
 	
 	protected LinkedList<FormLineWidget> formLinesToWidget() {

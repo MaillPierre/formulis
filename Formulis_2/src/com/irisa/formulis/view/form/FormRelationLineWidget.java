@@ -89,10 +89,6 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 		if(this.variableElement != null) {
 			variableElementCol.add(variableElement);
-
-			resetElementButton.addClickHandler(this);
-			repeatLineButton.addClickHandler(this);
-			removeLineButton.addClickHandler(this);
 		}
 
 		if( this.getData().getParent().isAnonymous()) {
@@ -205,14 +201,21 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 	@Override
 	public void onClick(ClickEvent event) {
-		super.onClick(event);
-		if(event.getSource() == this.repeatLineButton) {
-			if(this.getParentWidget() != null) {
-				FormWidget parWid = this.getParentWidget();
-				Form parData = parWid.getData();
-				parData.repeatRelationLine((FormRelationLine) this.getData());
-				parWid.reload();
-			}
+		ControlUtils.debugMessage("FormRelationLine onClick");
+		if(event.getSource() == this.repeatLineButton 
+				&& this.getParentWidget() != null) {
+			FormWidget parWid = this.getParentWidget();
+			Form parData = parWid.getData();
+			parData.repeatRelationLine((FormRelationLine) this.getData());
+			parWid.reload();
+		}
+		else if(event.getSource() == this.resetElementButton) {
+			ControlUtils.debugMessage("FormRelationLine onClick reset");
+			setLineState(LINE_STATE.SUGGESTIONS);
+			this.fireFinishLineEvent(false);
+		} else if(event.getSource() == this.removeLineButton) {
+			ControlUtils.debugMessage("FormRelationLine onClick remove");
+			fireRemoveLineEvent();
 		}
 	}
 

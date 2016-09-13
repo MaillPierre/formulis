@@ -22,6 +22,7 @@ import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.IntegerBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 
 public abstract class FormLineWidget extends AbstractFormElementWidget 
 	implements ClickWidgetHandler {
@@ -80,6 +81,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		resetElementButton.setTitle("Reset");
 		resetElementButton.addClickHandler(this);
 		repeatLineButton.setTitle("Repeat");
+		repeatLineButton.addClickHandler(this);
 		removeLineButton.setTitle("Delete");
 		removeLineButton.addClickHandler(this);
 				
@@ -88,6 +90,10 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		buttonsRow.add(resetElementButton);
 		buttonsRow.add(repeatLineButton);
 		buttonsRow.add(removeLineButton);
+		
+		resetElementButton.setSize(ButtonSize.SMALL);
+		repeatLineButton.setSize(ButtonSize.SMALL);
+		removeLineButton.setSize(ButtonSize.SMALL);
 		
 		profileRow.add(profileIndexPlus);
 		profileRow.add(profileIndexMinus);
@@ -157,15 +163,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 	public abstract void onClickWidgetEvent(ClickWidgetEvent event);
 
 	@Override
-	public void onClick(ClickEvent event) {
-		ControlUtils.debugMessage("FormClassLine onClick");
-		if(event.getSource() == this.resetElementButton) {
-			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishLineEvent(false);
-		} else if(event.getSource() == this.removeLineButton) {
-			fireRemoveLineEvent();
-		}
-	}
+	public abstract void onClick(ClickEvent event);
 	
 	public abstract void setLineState(LINE_STATE state);
 	public abstract void setLineState(LINE_STATE state, CreationTypeOracle oracl);
@@ -203,12 +201,12 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		this.profileRow.setVisible(value);
 		if(! value) {
 			this.buttonsRow.remove(profileRow);
-			this.buttonsCol.setSize(2);
-			this.contentCol.setSize(10);
-		} else {
-			this.buttonsRow.add(profileRow);
 			this.buttonsCol.setSize(3);
 			this.contentCol.setSize(9);
+		} else {
+			this.buttonsRow.add(profileRow);
+			this.buttonsCol.setSize(4);
+			this.contentCol.setSize(8);
 		}
 		
 //		this.profileRow.setVisible(value);

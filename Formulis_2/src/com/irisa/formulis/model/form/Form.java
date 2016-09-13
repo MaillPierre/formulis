@@ -1,15 +1,12 @@
 package com.irisa.formulis.model.form;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
-import com.irisa.formulis.control.profile.ProfileLine;
-import com.irisa.formulis.model.basic.URI;
 
 /**
  * Classe de données pour représenter une édition en cours.
@@ -24,8 +21,6 @@ public class Form extends FormComponent {
 	private LinkedList<FormRelationLine> relationLines = new LinkedList<FormRelationLine>();
 //	private FormClassLine typeLine = null;
 	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
-	
-	private HashMap<URI, LinkedList<FormComponent>> formIndex = new HashMap<URI, LinkedList<FormComponent>>(); // TEST
 
 	public Form(FormComponent par) {
 		super(par);
@@ -117,22 +112,21 @@ public class Form extends FormComponent {
 	public void repeatRelationLine(FormRelationLine l) {
 		if(relationLines.contains(l)) {
 			int index = relationLines.indexOf(l);
-			FormRelationLine newLine = l.repeatLine();
+			FormRelationLine newLine = new FormRelationLine( l.getParent(), l.getFixedElement(), l.getVariableElement());
 			relationLines.add(index+1, newLine);
 		}
 	}
 	
 	public void removeRelationLine(FormLine l) {
+		ControlUtils.debugMessage("Form removeRelationLine( " + l + " )");
 		if(l != null && this.relationLines.contains(l)) {
 			this.relationLines.remove(l);
-			this.formIndex.remove(l.getFixedElement());
 		}
 	}
 	
 	public void removeClassLine(FormLine l) {
 		if(l != null && this.typeLines.contains(l)) {
 			this.typeLines.remove(l);
-			this.formIndex.remove(l.getFixedElement());
 		}
 	}
 	
@@ -176,7 +170,6 @@ public class Form extends FormComponent {
 	public void clear() {
 		this.relationLines.clear();
 		this.typeLines.clear();
-		this.formIndex.clear();
 	}
 	
 	public void clearRelations() {
@@ -345,7 +338,6 @@ public class Form extends FormComponent {
 			FormRelationLine rel = itRel.next();
 			result = result || rel.isFinished();
 		}
-		ControlUtils.debugMessage("Form  isFinished lines="+ result +" typed="+(isTyped() && this.getType().isFinished()) + " anonymous=" + isAnonymous());
 		return ((isTyped() && this.getType().isFinished()) ||(result &&  isAnonymous()));
 	}
 

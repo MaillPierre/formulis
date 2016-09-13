@@ -183,12 +183,16 @@ public class ViewUtils {
 				if(formCompo.isForm()) {
 					String formTable = "<table class=\"weblis-suggestion-table table table-bordered\"><tbody>";
 					Form formform = (Form) formCompo;
-					Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
-					while(itTypeFormLine.hasNext()) {
-						formTable += "<tr><td>";
-						FormLine line = itTypeFormLine.next();
-						formTable += toSimpleHtml(line).asString();
-						formTable += "</td></tr>";
+					if(! formform.isAnonymous()) {
+						Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
+						while(itTypeFormLine.hasNext()) {
+							FormClassLine line = itTypeFormLine.next();
+							if(! line.isAnonymous()) {
+								formTable += "<tr><td>";
+								formTable += toSimpleHtml(line).asString();
+								formTable += "</td></tr>";
+							}
+						}
 					}
 					Iterator<FormRelationLine> itRelFormLine = formform.relationLinesIterator();
 					while(itRelFormLine.hasNext()) {

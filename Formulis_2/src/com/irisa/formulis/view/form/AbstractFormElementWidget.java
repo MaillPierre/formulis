@@ -3,7 +3,6 @@ package com.irisa.formulis.view.form;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
@@ -16,20 +15,17 @@ import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
-//import com.irisa.formulis.view.event.TypeLineSetEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
 import com.irisa.formulis.view.event.interfaces.FinishLineHandler;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
-//import com.irisa.formulis.view.event.interfaces.HasTypeLineSetHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
-//import com.irisa.formulis.view.event.interfaces.TypeLineSetHandler;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
 
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
@@ -103,7 +99,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireStatementChangeEvent(StatementChangeEvent event) {
-		ControlUtils.debugMessage( "fireStatementChangeEvent : " + this.getClass()); 
 		Iterator<StatementChangeHandler> itHand = this.statementChangeHandlers.iterator();
 		while(itHand.hasNext()) {
 			StatementChangeHandler hand = itHand.next();
@@ -185,7 +180,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireFinishLineEvent(FinishLineEvent event) {
-		ControlUtils.debugMessage(this.getClass() + " fireFinishLineEvent" );
 		Iterator<FinishLineHandler> itHand = this.finishLineHandlers.iterator();
 		while(itHand.hasNext()) {
 			FinishLineHandler hand = itHand.next();
@@ -214,7 +208,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireLineSelectionEvent(LineSelectionEvent event) {
-		ControlUtils.debugMessage( "fireLineSelectionEvent : " + this.getClass()); 
 		Iterator<LineSelectionHandler> itHand = this.lineSelectionHandlers.iterator();
 		while(itHand.hasNext()) {
 			LineSelectionHandler hand = itHand.next();

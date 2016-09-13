@@ -286,7 +286,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String pingRequestString = serverAdress + "/ping";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(pingRequestString));
 
-		navBar.setServerStatusMessage("attente...");
+		navBar.setServerStatusMessage("Waiting...");
 		builder.sendRequest(null, new RequestCallback() {	
 			@Override		
 			public void onError(Request request, Throwable exception) {
@@ -315,6 +315,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		registerRequestString += "&passwd=" + Crypto.getCryptedString(nu.getPassword(), Controller.serverAdress);
 		registerRequestString += "&email=" + nu.getEmail();
 
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(registerRequestString));
 
 		try {
@@ -353,6 +354,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		loginRequestString += "?userKey=" + userKey;
 		loginRequestString += "&userLogin=" + t.getLogin();
 		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), Controller.serverAdress);
+		navBar.setServerStatusMessage("Waiting...");
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(loginRequestString));
 
@@ -397,6 +399,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisLogout() {
 		String logoutRequestString = serverAdress + "/logout";
 		logoutRequestString += "?userKey=" + userKey;
+		navBar.setServerStatusMessage("Waiting...");
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(logoutRequestString));
 		try {
@@ -453,6 +456,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						Document storeListDoc = XMLParser.parse(response.getText());
 						NodeList storeListNode = storeListDoc.getDocumentElement().getChildNodes();
 						ArrayList<Store> storeList = new ArrayList<Store>();
+						Element docElement = storeListDoc.getDocumentElement();
+						String status = docElement.getAttribute("status");
+						navBar.setServerStatusMessage(status);
 						for(int i = 0; i< storeListNode.getLength(); i++) {
 							Node storeNode = storeListNode.item(i);
 							String storeName = storeNode.getAttributes().getNamedItem("storeName").getNodeValue();
@@ -487,6 +493,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String removedStoresRequestString = serverAdress + "/removedStores";
 		removedStoresRequestString += "?userKey=" + userKey;
 		removedStoresRequestString += "&storeId=" + currentStore.getName();
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(removedStoresRequestString));
 
 		try {
@@ -606,7 +613,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String placeHomeRequestString = serverAdress + "/getPlaceRoot?";
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
-			navBar.setServerStatusMessage("Loading...");
+			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
@@ -620,6 +627,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						if (200 == response.getStatusCode()) {
 							Document homePlaceDoc = XMLParser.parse(response.getText());
 							Element homePlaceElem = homePlaceDoc.getDocumentElement();
+							String status = homePlaceElem.getAttribute("status");
+							navBar.setServerStatusMessage(status);
 							if(homePlaceElem.getNodeName() == "getPlaceRootResponse" && homePlaceElem.getAttribute("status") == "ok") {
 								Node placeNode = homePlaceElem.getFirstChild();
 								if(placeNode.getNodeName() == "place") {
@@ -654,7 +663,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String placeHomeRequestString = serverAdress + "/getPlaceHome?";
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
-			navBar.setServerStatusMessage("Loading...");
+			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
@@ -669,6 +678,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							try {
 								Document homePlaceDoc = XMLParser.parse(response.getText());
 								Element homePlaceElem = homePlaceDoc.getDocumentElement();
+								String status = homePlaceElem.getAttribute("status");
+								navBar.setServerStatusMessage(status);
 								if(homePlaceElem.getNodeName() == "getPlaceHomeResponse" && homePlaceElem.getAttribute("status") == "ok") {
 									Node placeNode = homePlaceElem.getFirstChild();
 									if(placeNode.getNodeName() == "place") {
@@ -719,7 +730,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
-			navBar.setServerStatusMessage("Loading...");
+			navBar.setServerStatusMessage("Waiting...");
 			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {
 				
 				private Place resultPlace = null;
@@ -802,7 +813,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
-			navBar.setServerStatusMessage("Loading...");
+			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
@@ -864,7 +875,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String insertIncrementRequestString = serverAdress + "/runStatement?userKey=" + userKey ;
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&statement=" + URL.encodeQueryString(statString);
-		navBar.setServerStatusMessage("Creation...");
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, insertIncrementRequestString);
 
 		try {
@@ -912,7 +923,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&placeId=" + place.getId(); 
 		insertIncrementRequestString += "&matchingKey=" + match;
-		navBar.setServerStatusMessage("Loading...");
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
 
 		try {
@@ -1153,6 +1164,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String showMostRequestString = serverAdress + "/showMost?userKey=" + userKey ;
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
 		showMostRequestString += "&placeId=" + place.getId(); 
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMostRequestString));
 
 		try {
@@ -1190,6 +1202,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
 
 		try {
@@ -1227,6 +1240,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLessRequestString));
 
 		try {
@@ -1264,6 +1278,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String showLeastRequestString = serverAdress + "/showLeast?userKey=" + userKey ;
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
 		showLeastRequestString += "&placeId=" + place.getId(); 
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLeastRequestString));
 
 		try {
@@ -1303,7 +1318,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		showMoreRequestString += "&userkey=" + this.userKey;
 		showMoreRequestString += "&prefix=" + prefix;
 		showMoreRequestString += "&uri=" + adress;
-		
+
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
 
 		try {
@@ -1370,6 +1386,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String insertIncrementRequestString = serverAdress + "/doRun?userKey=" + userKey ;
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&placeId=" + place.getId();
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1406,11 +1423,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void sewelisChangeFocus(String focusId, final FormEvent followUp) {
-		ControlUtils.debugMessage("changeFocus " + focusId + " " + followUp.getClass());
 		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&placeId=" + place.getId(); 
 		insertIncrementRequestString += "&focusId=" + focusId;
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1437,7 +1454,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								}
 							}
 						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
 							if(docElement.getFirstChild().getNodeName() == "message") {
 								ControlUtils.debugMessage( docElement.getFirstChild().getFirstChild().getNodeValue());
 							}
@@ -1460,6 +1476,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
 		insertIncrementRequestString += "&placeId=" + here.getId(); 
 		insertIncrementRequestString += "&focusId=" + focusId;
+		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
 		try {
 			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {

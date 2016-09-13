@@ -133,7 +133,7 @@ public class DataUtils {
 				} else if(elements.size() == 1 && elements.getFirst() instanceof Pair) { // Objet anonyme, création d'un formulaire pour contenir son contenu
 					result = DataUtils.pairToForm((Pair) elements.getFirst(), null);
 				
-				} else if(elements.size() == 2 && elements.getFirst() == theKeyword) {
+				} else if(elements.size() == 2 && elements.getFirst().equals(theKeyword)) {
 				} else {
 					throw new FormElementConversionException("extractEntityFromIncrement expect element to be URI or keyword or Pair " + elements);
 				}
@@ -196,7 +196,7 @@ public class DataUtils {
 				Keyword firstKwd = (Keyword) firstLine.getFirst();
 				BasicElement lastWord = firstLine.getLast();
 				FormClassLine thingLine = new FormClassLine(parent, lastWord);
-				if(firstKwd.getKeyword() == "the" && (lastWord == new Keyword("thing")) ) {
+				if(firstKwd.getKeyword().equals("the") && (lastWord.equals(thingKeyword)) ) {
 					thingLine = new FormClassLine(parent, ControlUtils.thingUri);
 					thingLine.setAnonymous(true);
 				}

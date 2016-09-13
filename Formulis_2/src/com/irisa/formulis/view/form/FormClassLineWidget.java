@@ -28,6 +28,7 @@ import com.irisa.formulis.view.basic.PlainWidget;
 import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
 public class FormClassLineWidget extends FormLineWidget implements ValueChangeHandler<String>, ClickHandler {
 
@@ -158,9 +159,13 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public void onClick(ClickEvent event) {
 		ControlUtils.debugMessage("FormClassLine onClick");
-		super.onClick(event);
 		if(event.getSource() == this.resetElementButton) {
-			this.setLineState(LINE_STATE.SUGGESTIONS);
+			ControlUtils.debugMessage("FormClassLine onClick reset");
+			setLineState(LINE_STATE.SUGGESTIONS);
+			this.fireFinishLineEvent(false);
+		} else if(event.getSource() == this.removeLineButton) {
+			ControlUtils.debugMessage("FormClassLine onClick remove");
+			fireRemoveLineEvent();
 		} 
 	}
 
@@ -168,7 +173,6 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
-			ControlUtils.debugMessage("FormClassLineWidget onValueChange=" + event.getValue() + " finished=" + getFormLine().isFinished());
 			this.fireFinishLineEvent(this.getFormLine().isFinished());
 		}
 	}

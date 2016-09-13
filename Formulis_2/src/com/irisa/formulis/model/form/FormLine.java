@@ -75,8 +75,6 @@ public abstract class FormLine extends FormComponent{
 		this.isNewLine = n;
 	}
 	
-	public abstract FormLine repeatLine();
-	
 	@Override
 	public Form getParent() {
 		if(super.getParent() != null && super.getParent() instanceof Form) {
