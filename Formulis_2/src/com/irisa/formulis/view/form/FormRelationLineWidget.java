@@ -49,21 +49,11 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			// Soit l'élément est un fomulaire
 			if(l.getVariableElement() instanceof Form) {
 				FormWidget newForm = new FormWidget((Form)l.getVariableElement(), this);
-				if(this.parentWid != null && this.parentWid.getClass() == FormWidget.class) {
-					ViewUtils.connectFormEventChain(newForm, this);
-//					newForm.addCompletionAskedHandler(this);
-//					newForm.addElementCreationHandler(this);
-//					newForm.addLineSelectionHandler(this);
-//					newForm.addMoreCompletionsHandler(this);
-//					newForm.addRelationCreationHandler(this);
-//					newForm.addRemoveLineHandler(this);
-//					newForm.addStatementChangeHandler(this);
-				}
-				this.variableElement = newForm;
+				this.setVariableElement(newForm);
 			} else { // Soit c'est un élément normal DisplayElement
 				BasicElement disElem = (BasicElement) l.getVariableElement();
 				try {
-					variableElement = FormulisWidgetFactory.getWidget(disElem, this, this);
+					this.setVariableElement(FormulisWidgetFactory.getWidget(disElem, this, this));
 				} catch (FormElementConversionException e) {
 					ControlUtils.exceptionMessage(e);
 				}
@@ -76,14 +66,14 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		
 		// La ligne attend ses suggestions
 		} else {
-			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
-			sugg.addSuggestionSelectionHandler(this);
-			sugg.addMoreCompletionsHandler(this);
-			sugg.addCompletionAskedHandler(this);
-			sugg.setPlaceholder("Valeur de " + this.getData().getFixedElement().toLispql());
-
-			variableElement = sugg;
-			variableElement.addClickWidgetEventHandler(this);
+//			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
+//			sugg.addSuggestionSelectionHandler(this);
+//			sugg.addMoreCompletionsHandler(this);
+//			sugg.addCompletionAskedHandler(this);
+//			sugg.setPlaceholder("Valeur de " + this.getData().getFixedElement().toLispql());
+//
+//			variableElement = sugg;
+//			variableElement.addClickWidgetEventHandler(this);
 			setLineState(LINE_STATE.SUGGESTIONS);
 		}
 
@@ -123,11 +113,11 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		case SUGGESTIONS:
 			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
 			sugg.addSuggestionSelectionHandler(this);
-			sugg.addMoreCompletionsHandler(this);
-			sugg.addCompletionAskedHandler(this);
+//			sugg.addMoreCompletionsHandler(this);
+//			sugg.addCompletionAskedHandler(this);
 			sugg.setPlaceholder("Value of " + this.getFormLine().getFixedElement().getLabel());
 			variableElement = sugg;
-			variableElement.addClickWidgetEventHandler(this);
+//			variableElement.addClickWidgetEventHandler(this);
 			getData().setVariableElement(null);
 			setVariableElement(sugg);
 
@@ -201,7 +191,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 	@Override
 	public void onClick(ClickEvent event) {
-		ControlUtils.debugMessage("FormRelationLine onClick");
+//		ControlUtils.debugMessage("FormRelationLine onClick");
 		if(event.getSource() == this.repeatLineButton 
 				&& this.getParentWidget() != null) {
 			FormWidget parWid = this.getParentWidget();
@@ -210,18 +200,18 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			parWid.reload();
 		}
 		else if(event.getSource() == this.resetElementButton) {
-			ControlUtils.debugMessage("FormRelationLine onClick reset");
+//			ControlUtils.debugMessage("FormRelationLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
 			this.fireFinishLineEvent(false);
 		} else if(event.getSource() == this.removeLineButton) {
-			ControlUtils.debugMessage("FormRelationLine onClick remove");
+//			ControlUtils.debugMessage("FormRelationLine onClick remove");
 			fireRemoveLineEvent();
 		}
 	}
 
 	@Override
 	public void onSelection(SuggestionSelectionEvent event) {
-		ControlUtils.debugMessage("RelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
+//		ControlUtils.debugMessage("RelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
 		try {
 			FormElement elem = event.getSuggestion().getElement();
 			AbstractFormulisWidget nWid = FormulisWidgetFactory.getWidget(elem, this);

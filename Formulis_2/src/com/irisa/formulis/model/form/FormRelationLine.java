@@ -56,7 +56,7 @@ public class FormRelationLine extends FormLine {
 			}
 		}
 
-//		Utils.displayDebugMessage("RelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) " + result);
+//		ControlUtils.debugMessage("RelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) " + result);
 		return result;
 	}
 	

@@ -194,11 +194,11 @@ public class Form extends FormComponent {
 				otherlines.add(lineString);
 			}
 		}
-		if(! this.typeLines.isEmpty() && this.typeLines.size() > 1) {
+		if( this.isTypeList()/* ! this.typeLines.isEmpty() && this.typeLines.size() > 1 */) {
 			Iterator<FormClassLine> itTypeLines = this.typeLinesIterator();
 			while(itTypeLines.hasNext()) {
-				FormLine line = itTypeLines.next();
-				if(! line.equals(selectedLine)) {
+				FormClassLine line = itTypeLines.next();
+				if(! line.equals(selectedLine) && ! line.isAnonymous()) {
 					String lineString =  line.toLispql();
 					otherlines.add(lineString);
 				}
@@ -209,19 +209,21 @@ public class Form extends FormComponent {
 		if(selectedLine != null && relationLines.contains(selectedLine)) {
 			result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
 		} 
+//		ControlUtils.debugMessage("Form toLispql [ligne selectionnée] " + result);
 
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList()) {
 			if(isFinalRequest) {
 				result += "<" + this.getType().getEntityUri() + "> ";
 			}
-			result += "[ " + typeLines.getFirst().toLispql(isFinalRequest);
+			result += "[ " + this.getType().toLispql(isFinalRequest);
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
 			}
 		} else {
-			result += " [ ";
+			result += " [ a thing ;";
 		}
+//		ControlUtils.debugMessage("Form toLispql [ligne de type] " + result + " otherlines: " + otherlines.size());
 		
 		// Ajout des autres lignes
 		if(! otherlines.isEmpty()) {
@@ -237,6 +239,7 @@ public class Form extends FormComponent {
 				}
 			}
 		}
+//		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
 		if(getParent() != null && getParent() instanceof FormLine && selectedLine != null) {
@@ -244,19 +247,20 @@ public class Form extends FormComponent {
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();
 				String parentFormString = parentForm.toLispql(parentLine);
-				if((! otherlines.isEmpty()) || typeLines != null) {
+				if((! otherlines.isEmpty()) || ! this.isAnonymous()) {
 					result += " ; ";
 				}
 				result += parentFormString;
 			}
 		}
+//		ControlUtils.debugMessage("Form toLispql [lien vers parent] " + result);
 		
 		// Fermeture de la requête
 //		if(selectedLine != null && selectedLine.getClass() == RelationLine.class && formLines.contains(selectedLine)) {
 			result += " ]";
 //		}
 		
-//		Utils.debugMessage("Form toLispql( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);
+//		ControlUtils.debugMessage("Form toLispql( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);
 		return result;
 	}
 

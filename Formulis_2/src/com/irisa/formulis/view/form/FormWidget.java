@@ -125,10 +125,9 @@ public class FormWidget extends AbstractFormElementWidget {
 	}
 	
 	public void reload() {
-		ControlUtils.debugMessage("FormWidget reload ");
 		if(getData() != null && ! getData().isEmpty()) {
 			clear();
-						
+
 			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
 			while(itFo.hasNext()) {
 				FormLineWidget line = itFo.next();
@@ -167,16 +166,18 @@ public class FormWidget extends AbstractFormElementWidget {
 		
 		Iterator<FormClassLine> itClassL = getData().typeLinesIterator();
 		while(itClassL.hasNext()) {
-			FormLine line = itClassL.next();
-			FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
-			nClassLine.setProfileMode(this.profileMode);
-			result.add(nClassLine);
-			if(this.getData().isTyped()) {
-				nClassLine.setLineState(LINE_STATE.FINISHED);
-				nClassLine.showLabelBox();
+			FormClassLine line = itClassL.next();
+			if(! line.isAnonymous()) {
+				FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
+				nClassLine.setProfileMode(this.profileMode);
+				result.add(nClassLine);
+				if(this.getData().isTyped()) {
+					nClassLine.setLineState(LINE_STATE.FINISHED);
+					nClassLine.showLabelBox();
+				}
 			}
 		}
-		
+
 		Iterator<FormRelationLine> itRelL = getData().relationLinesIterator();
 		while(itRelL.hasNext()) {
 			FormLine line = itRelL.next();
@@ -184,7 +185,7 @@ public class FormWidget extends AbstractFormElementWidget {
 			nRelLine.setProfileMode(this.profileMode);
 			result.add(nRelLine);
 		}
-		
+
 		return result;
 	}
 	

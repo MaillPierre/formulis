@@ -1924,7 +1924,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //			newFormWid.addRelationCreationHandler(widSource);
 //			newFormWid.addRemoveLineHandler(widSource);
 //			newFormWid.addStatementChangeHandler(widSource);
-			ViewUtils.connectFormEventChain(newFormWid, widSource);
+//			ViewUtils.connectFormEventChain(newFormWid, widSource);
 
 			String queryLineLispql = lispqlStatementQuery(dataSource);
 			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));

@@ -57,7 +57,7 @@ public class FormClassLine extends FormLine {
 			}
 		}
 
-//		Utils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" ) = \"" + result + "\"");
+//		ControlUtils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" ) = \"" + result + "\"");
 		return result;
 	}
 

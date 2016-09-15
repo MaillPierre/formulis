@@ -154,6 +154,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	@Override
 	public void addCompletionAskedHandler(CompletionAskedHandler handler) {
+		ControlUtils.debugMessage("CustomSuggestionWidget addCompletionAskedHandler " + handler.getClass());
 		this.completionAskedHandlers.add(handler);
 	}
 	
