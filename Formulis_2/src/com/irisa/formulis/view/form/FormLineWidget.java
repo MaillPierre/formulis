@@ -29,11 +29,11 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 	
 	protected FluidRow element = new FluidRow();
 	protected FluidRow contentRow = new FluidRow();
-	protected Column contentCol = new Column(9, contentRow);
+	protected Column contentCol = new Column(8, contentRow);
 
 	protected FluidContainer buttonsContainer = new FluidContainer();
 	protected HorizontalPanel buttonsRow = new HorizontalPanel(); // TEST
-	protected Column buttonsCol = new Column(3, buttonsContainer);
+	protected Column buttonsCol = new Column(4, buttonsContainer);
 	protected Button resetElementButton = new Button("", IconType.REMOVE_CIRCLE);
 	protected Button repeatLineButton = new Button("", IconType.PLUS);
 	protected Button removeLineButton = new Button("", IconType.REMOVE);
@@ -201,12 +201,12 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		this.profileRow.setVisible(value);
 		if(! value) {
 			this.buttonsRow.remove(profileRow);
-			this.buttonsCol.setSize(3);
-			this.contentCol.setSize(9);
-		} else {
-			this.buttonsRow.add(profileRow);
 			this.buttonsCol.setSize(4);
 			this.contentCol.setSize(8);
+		} else {
+			this.buttonsRow.add(profileRow);
+			this.buttonsCol.setSize(5);
+			this.contentCol.setSize(7);
 		}
 		
 //		this.profileRow.setVisible(value);

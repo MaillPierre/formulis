@@ -37,8 +37,10 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 		createButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
-				fireRelationCreationEvent();
-				parent.putRelationCreationButton();
+				if(!getTextValue().isEmpty()) {
+					fireRelationCreationEvent();
+					parent.putRelationCreationButton();
+				}
 			}
 		});
 		

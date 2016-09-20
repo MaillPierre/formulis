@@ -3,6 +3,7 @@ package com.irisa.formulis.view.form;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
@@ -153,6 +154,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireFinishFormEvent(FinishFormEvent event) {
+		ControlUtils.debugMessage("fireFinishFormEvent " + this.getClass());
 		Iterator<FinishFormHandler> itHand = this.finishFormHandlers.iterator();
 		while(itHand.hasNext()) {
 			FinishFormHandler hand = itHand.next();

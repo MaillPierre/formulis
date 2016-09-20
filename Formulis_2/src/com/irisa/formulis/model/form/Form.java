@@ -160,7 +160,7 @@ public class Form extends FormComponent {
 	
 	public boolean isAnonymous() {
 //		return anonymous;
-		return this.typeLines.isEmpty();
+		return this.typeLines.isEmpty() || (this.isTyped() && this.getType().isAnonymous());
 	}
 	
 	public boolean isTyped() {
@@ -214,9 +214,9 @@ public class Form extends FormComponent {
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList()) {
 			if(isFinalRequest) {
-				result += "<" + this.getType().getEntityUri() + "> ";
+				result += this.getType().getEntityUri().toLispql(isFinalRequest) + " ";
 			}
-			result += "[ " + this.getType().toLispql(isFinalRequest);
+			result += "[ " + this.getType().toLispql(isFinalRequest) + " ";
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
 			}

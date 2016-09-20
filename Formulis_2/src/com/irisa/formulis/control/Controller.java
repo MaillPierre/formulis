@@ -72,6 +72,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private MainPage mainPage;
 	private MainNavigationBar navBar = new MainNavigationBar();
 
+	private static String uriBaseAdress = "http://www.irisa.fr/LIS";
+	
 	private static String serverAdress = "http://127.0.0.1:9999/";
 	//	private String serverAdress = "http://lisfs2008.irisa.fr:9999/"; // TODO Rendre adresse serveur configurable
 //	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
@@ -1311,6 +1313,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e);
 		}
 	}
+	
+	public void sewelisUriDescription(URI u) {
+		// TODO Remplir Uri-description
+	}
 
 	public void sewelisDefineNamespace(String prefix, String adress) {
 		String showMoreRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
@@ -1370,7 +1376,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	@SuppressWarnings("deprecation")
 	private void finish(Form f) {
-		sewelisRunStatement("get " + f.toLispql(true) + "");
+		sewelisRunStatement(/*"get " +*/ f.toLispql(true) + "");
 		if(f == this.rootForm()) {
 			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
 			Date nowDate = new Date();
@@ -2231,7 +2237,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public static String newElementUri(String label) {
-		String result = serverAdress + /*"/" + currentStore.getName() +*/ "#";
+		String result = uriBaseAdress + /*"/" + currentStore.getName() +*/ "#";
 //		int uriMinSize = 8;
 //		if(label != null && label.length() > uriMinSize) {
 			result += label;
@@ -2313,6 +2319,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
+		ControlUtils.debugMessage("Controller onFinishForm " + ((FormWidget)event.getSource()).getData());
 		finish( ( (FormWidget)event.getSource()).getData());
 	}
 

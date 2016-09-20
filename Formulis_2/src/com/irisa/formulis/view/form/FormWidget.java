@@ -219,6 +219,7 @@ public class FormWidget extends AbstractFormElementWidget {
 			ControlUtils.debugMessage("Creation button click");
 			putRelationCreationWidget();
 		} else if(event.getSource() == finishButton) {
+			ControlUtils.debugMessage("FormWidget onClick finishButton");
 			fireFinishFormEvent(true);
 		}
 //		fireClickWidgetEvent(new ClickWidgetEvent(this));s
