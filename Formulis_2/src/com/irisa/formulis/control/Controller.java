@@ -230,14 +230,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void reloadNavbarProfileList() {
-		navBar.adminPanel.profileList.clear();
-		Iterator<Profile> itPro = this.profiles.iterator();
-		while(itPro.hasNext()) {
-			Profile pro = itPro.next();
-			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
-		}
-		
-		navBar.adminPanel.profileEditReload.click(); // SALE
+//		navBar.adminPanel.profileList.clear();
+//		Iterator<Profile> itPro = this.profiles.iterator();
+//		while(itPro.hasNext()) {
+//			Profile pro = itPro.next();
+//			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
+//		}
+//		
+//		navBar.adminPanel.profileEditReload.click(); // SALE
 	}
 
 
@@ -896,7 +896,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						navBar.setServerStatusMessage(status);
 						if(status == "ok") {
 //							getRootForm();
-							sewelisGetPlaceHome();
+//							sewelisGetPlaceHome();
 						} else {
 							navBar.setServerStatusMessage(docElement.getAttribute("status"));
 							if(docElement.getFirstChild().getNodeName() == "message") {
@@ -1375,9 +1375,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void finish(Form f) {
-		sewelisRunStatement(/*"get " +*/ f.toLispql(true) + "");
-		if(f == this.rootForm()) {
+	private void finish(FormWidget f) {
+		sewelisRunStatement(/*"get " +*/ f.getData().toLispql(true) + "");
+		if(f.getData() == this.rootForm()) {
+			// Retour au formulaire de départ
+			sewelisGetPlaceRoot();
+			
+			// Logging des actions
 			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
 			Date nowDate = new Date();
 			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
@@ -1580,19 +1584,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 
 		// PROFILES
-		navBar.adminPanel.profileEditArea.setText(this.getProfileDocument().toString());
-
-		// handlers attribution
-
-		navBar.adminPanel.profileModeButton.addClickHandler(this);
-		navBar.adminPanel.profileCreateButton.addClickHandler(this);
-		navBar.adminPanel.profileClearButton.addClickHandler(this);
-		navBar.adminPanel.profileGoButton.addClickHandler(this);
-		navBar.adminPanel.profileDeleteButton.addClickHandler(this);
-		navBar.adminPanel.profileEditSave.addClickHandler(this);
-		navBar.adminPanel.profileEditClear.addClickHandler(this);
-		navBar.adminPanel.profileEditReload.addClickHandler(this);
-		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
+//		navBar.adminPanel.profileEditArea.setText(this.getProfileDocument().toString());
+//
+//		// handlers attribution
+//
+//		navBar.adminPanel.profileModeButton.addClickHandler(this);
+//		navBar.adminPanel.profileCreateButton.addClickHandler(this);
+//		navBar.adminPanel.profileClearButton.addClickHandler(this);
+//		navBar.adminPanel.profileGoButton.addClickHandler(this);
+//		navBar.adminPanel.profileDeleteButton.addClickHandler(this);
+//		navBar.adminPanel.profileEditSave.addClickHandler(this);
+//		navBar.adminPanel.profileEditClear.addClickHandler(this);
+//		navBar.adminPanel.profileEditReload.addClickHandler(this);
+//		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
 		
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
 			@Override
@@ -1607,7 +1611,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		});
 
-		navBar.adminPanel.limitBox.setValue(CustomSuggestionWidget.getLimit());
+//		navBar.adminPanel.limitBox.setValue(CustomSuggestionWidget.getLimit());
 		// LOGIN
 
 		this.navBar.loginWid.notLoggedLoginButton.addClickHandler(this);
@@ -1732,39 +1736,40 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
-		if(event.getSource() == navBar.adminPanel.profileModeButton) {
-			this.mainPage.formWidget.toggleProfileMode();
+//		if(event.getSource() == navBar.adminPanel.profileModeButton) {
+//			this.mainPage.formWidget.toggleProfileMode();
+//
+//		} else if(event.getSource() == navBar.adminPanel.profileCreateButton) {
+//			if(this.mainPage.formWidget.isInProfileMode()) {
+//				Profile pro = formToProfile();
+//				pro.setName(navBar.adminPanel.profileNameBox.getValue());
+//				addProfile(pro);
+//				reloadNavbarProfileList();
+//			}
+//
+//		} else if(event.getSource() == navBar.adminPanel.profileClearButton) {
+//			this.clearProfiles();
+//			reloadNavbarProfileList();
+//
+//		}else if(event.getSource() == navBar.adminPanel.profileGoButton) {
+//			String select = navBar.adminPanel.profileList.getSelectedValue();
+//			setProfile(findProfile(profiles, select));
+//
+//		}else if(event.getSource() == navBar.adminPanel.profileDeleteButton) {
+//			String select = navBar.adminPanel.profileList.getSelectedValue();
+//			Profile pro = findProfile(profiles, select);
+//			if(pro != null) {
+//				removeProfile(pro);
+//			}
+//			
+//			reloadNavbarProfileList();
+//		}else if(event.getSource() == navBar.adminPanel.namespaceDefineButton) {
+//			if(navBar.adminPanel.namespacePrefixBox.getValue() != "" && navBar.adminPanel.namespaceUriBox.getValue() != "") {
+//				this.sewelisDefineNamespace(navBar.adminPanel.namespacePrefixBox.getValue(), navBar.adminPanel.namespaceUriBox.getValue());
+//			}
 
-		} else if(event.getSource() == navBar.adminPanel.profileCreateButton) {
-			if(this.mainPage.formWidget.isInProfileMode()) {
-				Profile pro = formToProfile();
-				pro.setName(navBar.adminPanel.profileNameBox.getValue());
-				addProfile(pro);
-				reloadNavbarProfileList();
-			}
-
-		} else if(event.getSource() == navBar.adminPanel.profileClearButton) {
-			this.clearProfiles();
-			reloadNavbarProfileList();
-
-		}else if(event.getSource() == navBar.adminPanel.profileGoButton) {
-			String select = navBar.adminPanel.profileList.getSelectedValue();
-			setProfile(findProfile(profiles, select));
-
-		}else if(event.getSource() == navBar.adminPanel.profileDeleteButton) {
-			String select = navBar.adminPanel.profileList.getSelectedValue();
-			Profile pro = findProfile(profiles, select);
-			if(pro != null) {
-				removeProfile(pro);
-			}
-			
-			reloadNavbarProfileList();
-		}else if(event.getSource() == navBar.adminPanel.namespaceDefineButton) {
-			if(navBar.adminPanel.namespacePrefixBox.getValue() != "" && navBar.adminPanel.namespaceUriBox.getValue() != "") {
-				this.sewelisDefineNamespace(navBar.adminPanel.namespacePrefixBox.getValue(), navBar.adminPanel.namespaceUriBox.getValue());
-			}
-
-		} else if(event.getSource() == navBar.loginWid.notLoggedLoginButton) {
+//		} else 
+			if(event.getSource() == navBar.loginWid.notLoggedLoginButton) {
 			String login = this.navBar.loginWid.notLoggedLoginTextbox.getText();
 			String password = this.navBar.loginWid.notLoggedPasswdTextBox.getText();
 			this.sewelisLogin(new LoginToken( login, password));
@@ -1786,15 +1791,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String email = this.navBar.loginWid.newUserEmailTextbox.getText();
 			sewelisRegister(new NewUserToken( login, password, email));
 			
-		} else if(event.getSource() == this.navBar.adminPanel.profileEditSave) {
-			this.setProfileDocument(navBar.adminPanel.profileEditArea.getText());
-			
-		} else if(event.getSource() == this.navBar.adminPanel.profileEditClear) {
-			navBar.adminPanel.profileEditArea.setText("");
-			
-		} else if(event.getSource() == this.navBar.adminPanel.profileEditReload) {
-			navBar.adminPanel.profileEditArea.setText(getProfileDocument().toString());
-		}
+		} 
+//			else if(event.getSource() == this.navBar.adminPanel.profileEditSave) {
+//			this.setProfileDocument(navBar.adminPanel.profileEditArea.getText());
+//			
+//		} else if(event.getSource() == this.navBar.adminPanel.profileEditClear) {
+//			navBar.adminPanel.profileEditArea.setText("");
+//			
+//		} else if(event.getSource() == this.navBar.adminPanel.profileEditReload) {
+//			navBar.adminPanel.profileEditArea.setText(getProfileDocument().toString());
+//		}
 
 	}
 
@@ -1810,20 +1816,29 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onLineSelection(LineSelectionEvent event) {
 		// SELECTION DE LIGNE
 		// la selection d'une ligne entraine un changement de statement
+
 		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource() + " )");
 		this.place.clearCurrentCompletions();
+		FormLineWidget widSource = null;
+		FormWidget widSourceParent = null;
+		FormLine dataSource = null;
+		Form dataSourceParent = null;
+		String queryLineLispql = null;
 		// La source est forcément une ligne
-		FormLineWidget widSource = (FormLineWidget)event.getSource();
-		FormWidget widSourceParent = widSource.getParentWidget();
-		FormLine dataSource = widSource.getFormLine();
-		Form dataSourceParent = dataSource.getParent();
-		String queryLineLispql = lispqlStatementQuery(dataSource);
-
+		widSource = (FormLineWidget)event.getSource();
+		widSourceParent = widSource.getParentWidget();
+		dataSource = widSource.getFormLine();
+		dataSourceParent = dataSource.getParent();
+		try{
+		queryLineLispql = lispqlStatementQuery(dataSource);
+		} catch(Exception e) {
+			ControlUtils.debugMessage("Controller onLineSelection EXCEPTION ");
+			throw e;
+		}
+		
+		
 		if(dataSource instanceof FormClassLine) { // Selection d'une classe
 			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
-//			if(dataSource.getFixedElement() instanceof BasicElement) {
-//				this.place.getAnswers().setPivotElement((BasicElement) dataSource.getFixedElement());
-//			}
 			// Si c'est une classe de litteral
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
@@ -1831,25 +1846,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
 				dataSourceParent.addTypeLine((FormClassLine) dataSource, true);
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 				// Si la ligne avait déjà un type (retractation)
 			} else {
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
-//				dataSourceParent.addTypeLine(null, true);
-//				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
-//				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
 				dataSourceParent.clear();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
-				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getCallback()));
+				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 			}
 		} else if(dataSource instanceof FormRelationLine) { // selection d'une relation
 			ControlUtils.debugMessage("Controller onLineSelection BY A RELATION");
-//			if(dataSource.getFixedElement() instanceof BasicElement) {
-//				this.place.getAnswers().setPivotElement((BasicElement) dataSource.getFixedElement());
-//			}
 			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
 		}
-
 		incrementNumberOfActions();
 	}
 
@@ -1933,7 +1941,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //			ViewUtils.connectFormEventChain(newFormWid, widSource);
 
 			String queryLineLispql = lispqlStatementQuery(dataSource);
-			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));
+			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getLoadCallback()));
 		} else {
 			widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget())));
 		}
@@ -1995,9 +2003,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onValueChange(ValueChangeEvent<Integer> event) {
-		if(event.getSource() == this.navBar.adminPanel.limitBox) {
-			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
-		}
+//		if(event.getSource() == this.navBar.adminPanel.limitBox) {
+//			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
+//		}
 	}
 
 	@Override
@@ -2029,7 +2037,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	protected void getRootForm() {
 		setCurrentForm( newForm());
-		sewelisGetPlaceStatement("get [ ]", new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getCallback()));
+		sewelisGetPlaceStatement("get [ ]", new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
 	}
 	
 	public void setCurrentForm(Form f) {
@@ -2079,7 +2087,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage("Controller loadFormContent typé" );
 						String queryString = lispqlStatementQuery(widSource.getData());
 						relationLines.clear();
-						this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getCallback()));
+						this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));
 				}
 			} 
 				
@@ -2155,7 +2163,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.debugMessage("setProfile currentForm (AFTER): " + this.form);
 			ControlUtils.debugMessage(pro + " = " + fo);
 			//		this.mainPage.setFormWidget(new FormWidget(fo, null));
-			StatementChangeEvent event = new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getCallback(FORM_CALLBACK_MODE.APPEND));
+			StatementChangeEvent event = new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getAppendCallback());
 			sewelisGetPlaceStatement(lispqlStatementQuery(form), event);
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
@@ -2263,25 +2271,36 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return lispqlStatementQuery(e, false);
 	}
 
-	public String lispqlStatementQuery(FormElement e, boolean root) {
-//		Utils.debugMessage("lispqlStatementQuery( " + e + " )");
+	public String lispqlStatementQuery(FormElement eleme, boolean root) {
+//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
 		String result = "";
-		if(e instanceof FormLine) {
-			FormLine line = (FormLine) e;
-			if(e instanceof FormRelationLine) {
+		if(eleme instanceof FormLine) {
+//			ControlUtils.debugMessage("lispqlStatementQuery FormLine");
+			FormLine line = (FormLine) eleme;
+			if(eleme instanceof FormRelationLine) {
+//				ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine");
 				if(root) {
-					FormRelationLine relLine = (FormRelationLine) e;
+//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine Root");
+					FormRelationLine relLine = (FormRelationLine) eleme;
 					result = "get [ " + relLine.toRootLispql() + " ]";
 				} else {
+//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine not Root");
+					try{
 					result = "get [ " + line.toLispql(true, false) + " ]";
+					}catch(Exception e) {
+						ControlUtils.debugMessage("lispqlStatemetQuery EXCEPTION " + eleme );
+						throw e;
+					}
 				}
-			} else if(e instanceof FormClassLine) {
+			} else if(eleme instanceof FormClassLine) {
+//				ControlUtils.debugMessage("lispqlStatementQuery FormClassLine");
 				result = "get [ " + line.toLispql() + " ]";
 			}
 		} else {
-			result = "get " + e.toLispql() + "";
+//			ControlUtils.debugMessage("lispqlStatementQuery not FormLine");
+			result = "get " + eleme.toLispql() + "";
 		}
-//		Utils.debugMessage("lispqlStatementQuery( " + e + " ) " + result);
+//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
 		return result;
 	}
 	
@@ -2320,7 +2339,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
 		ControlUtils.debugMessage("Controller onFinishForm " + ((FormWidget)event.getSource()).getData());
-		finish( ( (FormWidget)event.getSource()).getData());
+		finish( ( (FormWidget)event.getSource()));
+		event.getCallback().call(this);
 	}
 
 	/**

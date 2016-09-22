@@ -1,5 +1,6 @@
 package com.irisa.formulis.view.event;
 
+import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.FormWidget;
 
 public class FinishFormEvent extends FormEvent {
@@ -8,6 +9,11 @@ public class FinishFormEvent extends FormEvent {
 	
 	public FinishFormEvent(FormWidget src, boolean state) {
 		super(src);
+		finishState = state;
+	}
+	
+	public FinishFormEvent(FormWidget src, boolean state, FormEventCallback formEventCallback) {
+		super(src, formEventCallback);
 		finishState = state;
 	}
 	

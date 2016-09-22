@@ -181,7 +181,7 @@ public class Form extends FormComponent {
 	}
 	
 	public String toLispql(FormLine selectedLine, boolean isFinalRequest) {
-//		Utils.debugMessage("Form toLispql( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") typeLine=" + typeLine + " isRoot=" + this.isRoot() );
+//		ControlUtils.debugMessage("Form toLispql( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") typeLine=" + this.getType() + " isRoot=" + this.isRoot() );
 		String result = "";
 		
 		// Filtrage des lignes qui ne sont aps de type ou selectionnées
@@ -189,12 +189,18 @@ public class Form extends FormComponent {
 		Iterator<FormRelationLine> itRelLines = this.relationLinesIterator();
 		while(itRelLines.hasNext()) {
 			FormLine line = itRelLines.next();
+			try {
 			if(! line.equals(selectedLine) &&  line.isFinished()) {
 				String lineString =  line.toLispql();
+//				ControlUtils.debugMessage("Form toLispql line added:" + lineString);
 				otherlines.add(lineString);
 			}
+			} catch(Exception e) {
+				ControlUtils.debugMessage("Form toLispql EXCEPTION line:" + line + " selectedLine: " + selectedLine + " isFinished:" + line.isFinished());
+				throw e;
+			}
 		}
-		if( this.isTypeList()/* ! this.typeLines.isEmpty() && this.typeLines.size() > 1 */) {
+		if( this.isTypeList()) {
 			Iterator<FormClassLine> itTypeLines = this.typeLinesIterator();
 			while(itTypeLines.hasNext()) {
 				FormClassLine line = itTypeLines.next();
@@ -204,6 +210,7 @@ public class Form extends FormComponent {
 				}
 			}
 		}
+//		ControlUtils.debugMessage("Form toLispql [lisql des lignes extrait] " + result);
 		
 		// Ligne selectionée
 		if(selectedLine != null && relationLines.contains(selectedLine)) {
@@ -220,8 +227,13 @@ public class Form extends FormComponent {
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
 			}
+		} else if(this.isAnonymous() ) {
+			result += " [ a thing ";
+			if(! otherlines.isEmpty()) {
+				result += " ; ";
+			}
 		} else {
-			result += " [ a thing ;";
+			result += " [ ";
 		}
 //		ControlUtils.debugMessage("Form toLispql [ligne de type] " + result + " otherlines: " + otherlines.size());
 		
@@ -260,7 +272,7 @@ public class Form extends FormComponent {
 			result += " ]";
 //		}
 		
-//		ControlUtils.debugMessage("Form toLispql( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);
+//		ControlUtils.debugMessage("Form toLispql FIN ( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);
 		return result;
 	}
 

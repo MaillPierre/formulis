@@ -153,6 +153,14 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
+	public void fireFinishFormEvent(boolean state, FormEventCallback callback) {
+		if(this instanceof FormWidget) {
+			FinishFormEvent event = new FinishFormEvent((FormWidget) this, state, callback);
+			fireFinishFormEvent(event);
+		}
+	}
+
+	@Override
 	public void fireFinishFormEvent(FinishFormEvent event) {
 		ControlUtils.debugMessage("fireFinishFormEvent " + this.getClass());
 		Iterator<FinishFormHandler> itHand = this.finishFormHandlers.iterator();
@@ -229,6 +237,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireMoreCompletionsEvent(MoreCompletionsEvent event) {
+		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreCompletionsEvent");
 		Iterator<MoreCompletionsHandler> itHand = this.moreCompletionsHandlers.iterator();
 		while(itHand.hasNext()) {
 			MoreCompletionsHandler hand = itHand.next();

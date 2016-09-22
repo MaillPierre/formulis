@@ -27,14 +27,6 @@ public class MainPage extends Composite {
 			
 			// Content
 			setFormWidget(new FormWidget(c.rootForm(), null));
-//			formWidget.addCompletionAskedHandler(c);
-//			formWidget.addElementCreationHandler(c);
-//			formWidget.addLineSelectionHandler(c);
-//			formWidget.addMoreCompletionsHandler(c);
-//			formWidget.addNestedFormHandler(c);
-//			formWidget.addRemoveLineHandler(c);
-//			formWidget.addStatementChangeHandler(c);
-//			formWidget.addTypeLineSetHandler(c);
 			
 			// Content
 			formWidgetCol = new Column(8, formWidget);
@@ -53,15 +45,6 @@ public class MainPage extends Composite {
 	
 	public void setFormWidget(FormWidget wid) {
 		formWidget = wid;
-//		formWidget.addCompletionAskedHandler(control);
-//		formWidget.addElementCreationHandler(control);
-//		formWidget.addLineSelectionHandler(control);
-//		formWidget.addMoreCompletionsHandler(control);
-////		formWidget.addNestedFormHandler(control);
-//		formWidget.addRemoveLineHandler(control);
-//		formWidget.addRelationCreationHandler(control);
-//		formWidget.addStatementChangeHandler(control);
-//		formWidget.addTypeLineSetHandler(control);
 		ViewUtils.connectFormEventChain(formWidget, control);
 	}
 

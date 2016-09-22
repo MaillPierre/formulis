@@ -32,7 +32,13 @@ public class FormRelationLine extends FormLine {
 	 * @return
 	 */
 	public String toRootLispql() {
-		return "is " + this.fixedElement.toLispql() + " of []";
+		String result = "";
+		try {
+			result = "is " + this.fixedElement.toLispql() + " of []";
+		} catch(Exception e) {
+			ControlUtils.debugMessage("FormRelationLine toRootLispql EXCEPTION");
+		}
+		return result;
 	}
 	
 	@Override
@@ -42,9 +48,10 @@ public class FormRelationLine extends FormLine {
 
 	@Override
 	public String toLispql(boolean selected, boolean isFinalRequest) {
-//		Utils.displayDebugMessage("RelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " )");
+//		ControlUtils.debugMessage("FormRelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) "+ this.fixedElement + " " + this.variableElement);
 		String result = "";
-
+		try{
+		
 		if(getParent() != null && this.getParent() instanceof Form && selected ) {
 			result = this.getParent().toLispql(this);
 		} else {
@@ -55,8 +62,12 @@ public class FormRelationLine extends FormLine {
 				result += " [] ";
 			}
 		}
+		} catch(Exception e){
+			ControlUtils.debugMessage("FormRelationLine toLispql EXCEPTION fixed:" + this.fixedElement + " variable:"+this.variableElement + " parent:" + this.getParent());
+			throw e;
+		}
 
-//		ControlUtils.debugMessage("RelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) " + result);
+//		ControlUtils.debugMessage("FormRelationLine toLispql FIN ( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) "+ this.fixedElement + " " + this.variableElement);
 		return result;
 	}
 	
@@ -100,13 +111,20 @@ public class FormRelationLine extends FormLine {
 
 	@Override
 	public boolean equals(Object o) {
+		try {
 		if(o instanceof FormRelationLine) {
-			boolean fixedEqual = this.fixedElement.equals(((FormRelationLine) o).getFixedElement());
-			if(this.variableElement != null) {
-				return fixedEqual && this.variableElement.equals(((FormRelationLine) o).getVariableElement());
-			} else {
+			FormRelationLine oRelation = (FormRelationLine) o;
+			boolean fixedEqual = this.fixedElement.equals(oRelation.getFixedElement());
+			if(this.variableElement != null && oRelation.getVariableElement() != null) {
+				return fixedEqual && this.variableElement.equals(oRelation.getVariableElement());
+			} else if(this.variableElement == null && oRelation.getVariableElement() == null) {
 				return fixedEqual;
+			} else {
+				return false;
 			}
+		}
+		} catch(Exception e) {
+			ControlUtils.debugMessage("FormRelationLine equals EXCEPTION source:"+ this +" object:" + o);
 		}
 		return false;
 	}

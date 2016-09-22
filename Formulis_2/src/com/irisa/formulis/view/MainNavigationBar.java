@@ -12,6 +12,9 @@ import com.github.gwtbootstrap.client.ui.NavText;
 import com.github.gwtbootstrap.client.ui.ResponsiveNavbar;
 import com.github.gwtbootstrap.client.ui.constants.LabelType;
 import com.github.gwtbootstrap.client.ui.constants.NavbarPosition;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -26,7 +29,6 @@ public class MainNavigationBar extends Composite{
 	public FluidRow statusBarPanel = new FluidRow(); // 12
 	public LoginWidget loginWid = new LoginWidget();
 	private Column loginCol = new Column(7, loginWid); // 8 / 12
-//	public FluidRow storeListPanel = new FluidRow(); // 3 / 12
 	public HorizontalPanel storeListPanel = new HorizontalPanel(); // 3 / 12
 	private Column storeListCol = new Column(2, storeListPanel);
 	
@@ -40,28 +42,22 @@ public class MainNavigationBar extends Composite{
 	public ListBox storeListBox = new ListBox();
 	private Column storeListBoxCol = new Column(8, storeListBox); // 2 / 3
 	
-//	public CustomSuggestionWidget debugField = new CustomSuggestionWidget(null);
-//	private Column debugFieldCol = new Column(1, debugField);
-	
 	// Buttons
 	private FluidRow buttonRow = new FluidRow();
-	public AdminPanel adminPanel = new AdminPanel();
-//	private FluidRow navigRow = new FluidRow();
-//	private Column navigCol = new Column(6, navigRow);
-//	public Paragraph navigLabel = new Paragraph("History: ");
-//	private Column navigLabelCol = new Column(2, navigLabel);
-//	public Button backButton = new Button("Back");
-//	private Column backButtonCol = new Column(2, backButton);
-//	public Button forwardButton = new Button("Forward");
-//	private Column forwardButtonCol = new Column(2, forwardButton);
-//	public Button finishButton = new Button("Finish");
-//	private Column finishButtonCol = new Column(1, finishButton);
+//	public AdminPanel adminPanel = new AdminPanel();
+	public Label adminPanel = new Label(LabelType.INFO, "Beta version, for data browsing go to http://www.irisa.fr/LIS/ferre/sewelis-servolis/");
 
 	public MainNavigationBar() {
 		super();
 		try {
 		initWidget(navBar);
 		
+		adminPanel.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.open("http://www.irisa.fr/LIS/ferre/sewelis-servolis/", "SEWELIS", "");
+			}
+		});
 		
 		// Barre de statut pour démo 12/04/2016
 		storeListPanel.setWidth("100%");
@@ -76,7 +72,6 @@ public class MainNavigationBar extends Composite{
 		statusBarPanel.add(loginCol);
 		statusBarPanel.add(storeListCol);
 		statusBarPanel.add(serverLabelCol);
-//		statusBarPanel.add(finishButtonCol);
 		
 		buttonRow.add(adminPanel);
 		

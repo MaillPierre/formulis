@@ -1,6 +1,5 @@
 package com.irisa.formulis.view.form;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -11,7 +10,6 @@ import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.irisa.formulis.control.ControlUtils;
@@ -21,7 +19,6 @@ import com.irisa.formulis.control.profile.ProfileForm;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormLine;
-import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
@@ -101,12 +98,50 @@ public class FormWidget extends AbstractFormElementWidget {
 		reload();
 	}
 	
-	public FormCallback getCallback() {
-		return new FormCallback(this);
+	public FormCallback getLoadCallback() {
+		return new FormCallback(this) {
+			@Override
+			public void call(Controller control) {
+				control.loadFormContent(this.getSource());
+			}
+		};
 	}
 	
-	public FormCallback getCallback(FORM_CALLBACK_MODE mode) {
-		return new FormCallback(this, mode);
+	public FormCallback getAppendCallback() {
+		return new FormCallback(this) {
+			@Override
+			public void call(Controller control) {
+				control.appendFormContent(this.getSource());
+			}
+		};
+	}
+	
+	public FormCallback getSubmittedCallback() {
+		return new FormCallback(this) {
+			@Override
+			public void call(Controller control) {
+				this.getSource().transformToSubmittedForm();
+			}
+		};
+	}
+	
+	public void transformToSubmittedForm() {
+		if(getData() != null && ! getData().isEmpty()) {
+			clear();
+
+			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
+			while(itFo.hasNext()) {
+				FormLineWidget line = itFo.next();
+				if(line.getData().isFinished()) {
+					addLine(line);
+				}
+			}
+		} 
+		newRelationButton.setVisible(false);
+		
+		this.finishButton.setVisible(! getData().isEmpty());
+		this.setFinishButtonState(true);
+		this.finishButton.setEnabled(false);
 	}
 	
 	public void putRelationCreationButton(){
@@ -122,6 +157,7 @@ public class FormWidget extends AbstractFormElementWidget {
 	public void clear() {
 		linesCol.clear();
 		newRelationButton.setVisible(false);
+		setFinishButtonState(false);
 	}
 	
 	public void reload() {
@@ -220,11 +256,11 @@ public class FormWidget extends AbstractFormElementWidget {
 			putRelationCreationWidget();
 		} else if(event.getSource() == finishButton) {
 			ControlUtils.debugMessage("FormWidget onClick finishButton");
-			fireFinishFormEvent(true);
+			fireFinishFormEvent(true, this.getSubmittedCallback());
 		}
 //		fireClickWidgetEvent(new ClickWidgetEvent(this));s
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Form widget " + this.getData().toString();		
@@ -294,27 +330,16 @@ public class FormWidget extends AbstractFormElementWidget {
 		}
 	}
 	
-	public class FormCallback implements FormEventCallback {
+	public abstract class FormCallback implements FormEventCallback {
 
 		private FormWidget source;
-		private FORM_CALLBACK_MODE callbackMode = FORM_CALLBACK_MODE.LOAD ;
 		
 		public FormCallback(FormWidget src) {
 			source = src;
 		}
 		
-		public FormCallback(FormWidget src, FORM_CALLBACK_MODE mode) {
-			source = src;
-			callbackMode = mode;
-		}
-		
-		@Override
-		public void call(Controller control) {
-			if(callbackMode == FORM_CALLBACK_MODE.LOAD) {
-				control.loadFormContent(source);
-			} else if (callbackMode == FORM_CALLBACK_MODE.APPEND) {
-				control.appendFormContent(source);
-			}
+		public FormWidget getSource() {
+			return this.source;
 		}
 		
 	}

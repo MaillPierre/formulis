@@ -113,11 +113,11 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		case SUGGESTIONS:
 			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
 			sugg.addSuggestionSelectionHandler(this);
-//			sugg.addMoreCompletionsHandler(this);
-//			sugg.addCompletionAskedHandler(this);
+			sugg.addMoreCompletionsHandler(this);
+			sugg.addCompletionAskedHandler(this);
 			sugg.setPlaceholder("Value of " + this.getFormLine().getFixedElement().getLabel());
 			variableElement = sugg;
-//			variableElement.addClickWidgetEventHandler(this);
+			variableElement.addClickWidgetEventHandler(this);
 			getData().setVariableElement(null);
 			setVariableElement(sugg);
 

@@ -49,11 +49,6 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	private boolean moreCompletionMode = false;
 	
-	public enum CALLBACK_MODE {
-		SET,
-		ADD
-	};
-	
 	public CustomSuggestionWidget(FormRelationLineWidget par) {
 		super(null, par );
 		initWidget(element);
@@ -134,7 +129,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onClick(ClickEvent event) {
-		fireClickWidgetEvent(new ClickWidgetEvent(this, new SuggestionCallback(this)));
+		fireClickWidgetEvent(new ClickWidgetEvent(this, this.getSetCallback()));
 	}
 	
 	public void refreshSuggestions() {
@@ -160,7 +155,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	@Override
 	public void fireCompletionAskedEvent() {
-		CompletionAskedEvent event = new CompletionAskedEvent(this, new SuggestionCallback(this, CALLBACK_MODE.SET));
+		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback());
 		fireCompletionAskedEvent(event);
 	}
 
@@ -193,7 +188,8 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 
 	public void fireMoreCompletionsEvent() {
-		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, new SuggestionCallback(this, CALLBACK_MODE.ADD)));
+		ControlUtils.debugMessage("CustomSuggestionWidget fireMoreCompletionsEvent");
+		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, this.getAddCallback()));
 	}
 
 	@Override
@@ -232,7 +228,6 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onKeyDown(KeyDownEvent event) {
-		ControlUtils.debugMessage("CustomSuggestionWidget keyPressed " + event);
 		if(event.isDownArrow()) {
 			this.popover.focus();
 		} if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -241,47 +236,45 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 			}
 		}
 	}
+	
+	public SuggestionCallback getSetCallback() {
+		return new SuggestionCallback(this){
+			@Override
+			public void call(Controller control) {
+				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
+				this.source.oracle.clear();
+				Iterator<Increment> itInc = increments.iterator();
+				while(itInc.hasNext()) {
+					Increment inc = itInc.next();
+					this.source.oracle.add(new CustomSuggestion(inc));
+				}
+				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+			}
+		};
+	}
+	
+	public SuggestionCallback getAddCallback() {
+		return new SuggestionCallback(this){
+			@Override
+			public void call(Controller control) {
+				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
+				Iterator<Increment> itInc = increments.iterator();
+				while(itInc.hasNext()) {
+					Increment inc = itInc.next();
+					this.source.oracle.add(new CustomSuggestion(inc));
+				}
+				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+//				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+			}
+		};
+	}
 
-	public class SuggestionCallback implements FormEventCallback {
+	public abstract class SuggestionCallback implements FormEventCallback {
 		
-		private CustomSuggestionWidget source;
-		private CALLBACK_MODE callMode = CALLBACK_MODE.SET;
+		protected CustomSuggestionWidget source;
 		
 		public SuggestionCallback(CustomSuggestionWidget src) {
 			this.source = src;
-		}
-		
-		public SuggestionCallback(CustomSuggestionWidget src, CALLBACK_MODE mode) {
-			this.source = src;
-			this.callMode = mode;
-		}
-
-		@Override
-		public void call(Controller control) {
-			if(this.callMode == CALLBACK_MODE.ADD) {
-				callAdd(control.getPlace().getSuggestions().getEntitySuggestions());
-			} else if(this.callMode == CALLBACK_MODE.SET) {
-				callSet(control.getPlace().getSuggestions().getEntitySuggestions());
-			}
-		}
-		
-		public void callSet(Collection<Increment> c) {
-			source.oracle.clear();
-			Iterator<Increment> itInc = c.iterator();
-			while(itInc.hasNext()) {
-				Increment inc = itInc.next();
-				source.oracle.add(new CustomSuggestion(inc));
-			}
-			source.popover.setContent(source.oracle.matchingIncrement(getValue(), limit));
-		}
-		
-		public void callAdd(Collection<Increment> c) {
-			Iterator<Increment> itInc = c.iterator();
-			while(itInc.hasNext()) {
-				Increment inc = itInc.next();
-				source.oracle.add(new CustomSuggestion(inc));
-			}
-			source.popover.setContent(source.oracle.matchingIncrement(getValue(), limit));
 		}
 	}
 
