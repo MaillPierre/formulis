@@ -11,6 +11,7 @@ import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
 import com.irisa.formulis.view.event.FinishLineEvent;
+import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
@@ -22,6 +23,7 @@ import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
 import com.irisa.formulis.view.event.interfaces.FinishLineHandler;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
+import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
@@ -36,6 +38,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected LinkedList<FinishLineHandler> finishLineHandlers = new LinkedList<FinishLineHandler>();
+	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
@@ -253,6 +256,31 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
 		fireMoreCompletionsEvent(event);
+	}
+
+	@Override
+	public void addLessCompletionsHandler(LessCompletionsHandler handler) {
+		this.lessCompletionsHandlers.add(handler);
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
+		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireLessCompletionsEvent");
+		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
+		while(itHand.hasNext()) {
+			LessCompletionsHandler hand = itHand.next();
+			hand.onLessCompletions(event);
+		}
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(SuggestionCallback cb) {
+		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, cb));
+	}
+
+	@Override
+	public void onLessCompletions(LessCompletionsEvent event) {
+		fireLessCompletionsEvent(event);
 	}
 
 	@Override

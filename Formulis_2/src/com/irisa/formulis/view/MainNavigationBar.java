@@ -33,7 +33,7 @@ public class MainNavigationBar extends Composite{
 	private Column storeListCol = new Column(2, storeListPanel);
 	
 	private HorizontalPanel serverPanel = new HorizontalPanel();
-	public NavText serverLabel = new NavText("Serveur: ");
+	public NavText serverLabel = new NavText("Server: ");
 	private Label serverStatusLabel = new Label();
 	private Column serverLabelCol = new Column(2, serverPanel); // 1 / 12
 

@@ -98,6 +98,10 @@ public class FormWidget extends AbstractFormElementWidget {
 		reload();
 	}
 	
+	/**
+	 * 
+	 * @return un callback qui charge un nouveau contenu de formulaire 
+	 */
 	public FormCallback getLoadCallback() {
 		return new FormCallback(this) {
 			@Override
@@ -106,7 +110,11 @@ public class FormWidget extends AbstractFormElementWidget {
 			}
 		};
 	}
-	
+
+	/**
+	 * 
+	 * @return un callback qui ajoute un nouveau contenu au formulaire 
+	 */
 	public FormCallback getAppendCallback() {
 		return new FormCallback(this) {
 			@Override

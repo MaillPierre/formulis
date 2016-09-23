@@ -104,7 +104,7 @@ public class CustomSuggestionPopover extends PopupPanel {
 				@Override
 				public void execute() {
 					hide();
-					source.fireCompletionAskedEvent();
+					source.fireLessCompletionsEvent();
 					source.setMoreCompletionMode(false);
 				}
 			});

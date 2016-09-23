@@ -22,23 +22,33 @@ import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
+import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasLessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
+import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 
 public class CustomSuggestionWidget extends AbstractFormulisWidget 
-	implements ValueChangeHandler<String>, HasCompletionAskedHandler, HasMoreCompletionsHandler, HasSuggestionSelectionHandler, FocusHandler, KeyDownHandler {
+	implements ValueChangeHandler<String>, 
+	HasCompletionAskedHandler, 
+	HasLessCompletionsHandler, 
+	HasMoreCompletionsHandler, 
+	HasSuggestionSelectionHandler, 
+	FocusHandler, 
+	KeyDownHandler {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
+	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
 	protected LinkedList<SuggestionSelectionHandler> suggestionSelectionHandlers = new LinkedList<SuggestionSelectionHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	
@@ -89,7 +99,8 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 	
 	public void setPlaceholder(String placeholder) {
-		element.getElement().setPropertyString("placeholder", placeholder);
+//		element.getElement().setPropertyString("placeholder", placeholder);
+		element.setPlaceholder(placeholder);
 	}
 	
 	@Override
@@ -129,7 +140,9 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onClick(ClickEvent event) {
-		fireClickWidgetEvent(new ClickWidgetEvent(this, this.getSetCallback()));
+		ControlUtils.debugMessage("CustomSuggestionWidget onClick " );
+//		fireCompletionAskedEvent();
+		this.getParentWidget().fireLineSelectionEvent(this.getSetCallback());
 	}
 	
 	public void refreshSuggestions() {
@@ -149,12 +162,12 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	@Override
 	public void addCompletionAskedHandler(CompletionAskedHandler handler) {
-		ControlUtils.debugMessage("CustomSuggestionWidget addCompletionAskedHandler " + handler.getClass());
 		this.completionAskedHandlers.add(handler);
 	}
 	
 	@Override
 	public void fireCompletionAskedEvent() {
+		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent");
 		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback());
 		fireCompletionAskedEvent(event);
 	}
@@ -166,6 +179,30 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 			CompletionAskedHandler hand = itHand.next();
 			hand.onCompletionAsked(event);
 		}
+	}
+
+	@Override
+	public void addLessCompletionsHandler(LessCompletionsHandler handler) {
+		this.lessCompletionsHandlers.add(handler);
+	}
+
+	public void fireLessCompletionsEvent() {
+		ControlUtils.debugMessage("CustomSuggestionWidget fireLessCompletionsEvent");
+		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, this.getSetCallback()));
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
+		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
+		while(itHand.hasNext()) {
+			LessCompletionsHandler hand = itHand.next();
+			hand.onLessCompletions(event);
+		}
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(SuggestionCallback cb) {
+		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, cb));
 	}
 
 	@Override
@@ -237,10 +274,15 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		}
 	}
 	
+	/**
+	 * 
+	 * @return un callback pour les evenement visant à remplacer les suggestions existantes
+	 */
 	public SuggestionCallback getSetCallback() {
 		return new SuggestionCallback(this){
 			@Override
 			public void call(Controller control) {
+				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call");
 				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
 				this.source.oracle.clear();
 				Iterator<Increment> itInc = increments.iterator();
@@ -252,7 +294,11 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 			}
 		};
 	}
-	
+
+	/**
+	 * 
+	 * @return un callback pour les evenement visant à ajouter des suggestions aux existantes
+	 */
 	public SuggestionCallback getAddCallback() {
 		return new SuggestionCallback(this){
 			@Override

@@ -1201,6 +1201,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void sewelisShowMore() {
+		sewelisShowMore(null);
+	}
+	
+	public void sewelisShowMore(final MoreCompletionsEvent event) {
 		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
@@ -1225,6 +1229,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								if(event != null && event instanceof MoreCompletionsEvent) {
+									event.getCallback().call(instance());
+								}
 							}
 						}
 					} else {
@@ -1237,8 +1244,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e);
 		}
 	}
-
+	
 	public void sewelisShowLess() {
+		sewelisShowLess(null);
+	}
+
+	public void sewelisShowLess(final LessCompletionsEvent event) {
 		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
@@ -1263,6 +1274,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								if(event != null && event instanceof LessCompletionsEvent) {
+									event.getCallback().call(instance());
+								}
 							}
 						}
 					} else {
@@ -1993,10 +2007,26 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	@Override
+	public void onLessCompletions(LessCompletionsEvent event) {
+		ControlUtils.debugMessage("onLessCompletions");
+		if(this.getPlace().hasLess()) {
+			sewelisShowLess(event);
+		} else {
+			event.getSource().getParentWidget().fireLineSelectionEvent(event.getCallback());
+		}
+
+		incrementNumberOfActions();
+	}
+
+	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
 //		Utils.debugMessage("onMoreCompletions");
-		String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
-		sewelisGetPlaceStatement(queryString, event);
+//		if(this.getPlace().hasMore()) {
+//			sewelisShowMore(event);
+//		} else {
+			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
+			sewelisGetPlaceStatement(queryString, event);		
+//		}
 
 		incrementNumberOfActions();
 	}
@@ -2014,7 +2044,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			RelationCreateWidget widSource = (RelationCreateWidget) event.getSource();
 			FormWidget parentWidSource = widSource.getParentWidget();
 			
-			String uri = serverAdress + widSource.getTextValue();
+			String uri = newElementUri(widSource.getTextValue());
 			String label = widSource.getTextValue();
 			
 			URI uriObj = new URI(uri, URI.KIND.PROPERTY, label);

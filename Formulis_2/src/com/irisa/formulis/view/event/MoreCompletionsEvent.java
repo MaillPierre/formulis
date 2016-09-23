@@ -9,24 +9,14 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
  * @author pmaillot
  *
  */
-public class MoreCompletionsEvent extends FormEvent {
+public class MoreCompletionsEvent extends CompletionEvent {
 	
-	private MoreCompletionsEvent(CustomSuggestionWidget src) {
+	public MoreCompletionsEvent(CustomSuggestionWidget src) {
 		super(src);
 	}
 
-	public MoreCompletionsEvent(Widget src, SuggestionCallback cb) {
-		super(src, cb);
-	}
-
-	@Override
-	public CustomSuggestionWidget getSource() {
-		return (CustomSuggestionWidget)super.getSource(); 
-	}
-	
-	@Override
-	public SuggestionCallback getCallback() {
-		return (SuggestionCallback) super.getCallback();
+	public MoreCompletionsEvent(Widget widget, SuggestionCallback cb) {
+		super(widget, cb);
 	}
 	
 }

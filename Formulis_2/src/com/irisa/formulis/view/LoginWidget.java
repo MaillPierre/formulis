@@ -25,49 +25,49 @@ public class LoginWidget extends Composite {
 	private FluidRow notLoggedRow = new FluidRow();
 		private FluidRow notLoggedLoginRow = new FluidRow();
 		private Column notLoggedLoginCol = new Column(4, notLoggedLoginRow);
-			private NavText notLoggedLoginLabel = new NavText("Nom:");
+			private NavText notLoggedLoginLabel = new NavText("Username:");
 			private Column notLoggedLoginLabelCol = new Column(4, notLoggedLoginLabel);
 			public TextBox notLoggedLoginTextbox = new TextBox(); 
 			private Column notLoggedLoginTextboxCol = new Column(8, notLoggedLoginTextbox);
 		private FluidRow notLoggedPasswdRow = new FluidRow();
 		private Column notLoggedPasswdCol = new Column(5, notLoggedPasswdRow);
-			private NavText notLoggedPasswdLabel = new NavText("Mot de passe:");
+			private NavText notLoggedPasswdLabel = new NavText("Password:");
 			private Column notLoggedPasswdLabelCol = new Column(5, notLoggedPasswdLabel);
 			public PasswordTextBox notLoggedPasswdTextBox = new PasswordTextBox();
 			private Column notLoggedPasswdTextBoxCol = new Column(7, notLoggedPasswdTextBox);
 		private HorizontalPanel notLoggedButtonPanel = new HorizontalPanel();
 		private Column notLoggedButtonCol = new Column(3 , notLoggedButtonPanel);
-		public Button notLoggedLoginButton = new Button("Connexion");
+		public Button notLoggedLoginButton = new Button("Login");
 //		private Column notLoggedLoginButtonCol = new Column(1, notLoggedLoginButton);
-		public Button notLoggedNewuserButton = new Button("Nouveau");
+		public Button notLoggedNewuserButton = new Button("New");
 //		private Column notLoggedNewuserButtonCol = new Column(2, notLoggedNewuserButton);
 	
 	// Logged
 	private HorizontalPanel loggedRow = new HorizontalPanel();
 	public NavText loggedUsernameLabel = new NavText();
-	public Button logoutButton = new Button("Déco.");
+	public Button logoutButton = new Button("Logout");
 	
 	// New user
 	private FluidRow newUserLoginPsswdRow = new FluidRow();
-	private NavText newUserloginLabel = new NavText("Nom:");
+	private NavText newUserloginLabel = new NavText("Login:");
 	private Column newUserloginLabelCol = new Column(1, newUserloginLabel);
 	public TextBox newUserTextbox = new TextBox(); 
 	private Column newUserTextboxCol = new Column(4, newUserTextbox);
-	private NavText newUserpasswdLabel = new NavText("Mot de passe:");
+	private NavText newUserpasswdLabel = new NavText("Password:");
 	private Column newUserpasswdLabelCol = new Column(2, newUserpasswdLabel);
 	public PasswordTextBox newUserpasswdTextBox = new PasswordTextBox();
 	private Column newUserpasswdTextBoxCol = new Column(4, newUserpasswdTextBox);
 	
 	private FluidRow newUserRepeatEmailRow = new FluidRow();
-	private NavText newUserEmailLabel = new NavText("e-mail:");
+	private NavText newUserEmailLabel = new NavText("E-mail:");
 	private Column newUserEmailLabelCol = new Column(1, newUserEmailLabel);
 	public TextBox newUserEmailTextbox = new TextBox();
 	private Column newUserEmailTextboxCol = new Column(4, newUserEmailTextbox);
-	private NavText newUserRepeatPasswdLabel = new NavText("Répéter:");
+	private NavText newUserRepeatPasswdLabel = new NavText("Repeat:");
 	private Column newUserRepeatPasswdLabelCol = new Column(2, newUserRepeatPasswdLabel);
 	public PasswordTextBox newUserRepeatPasswdTextBox = new PasswordTextBox();
 	private Column newUserRepeatPasswdTextBoxCol = new Column(4, newUserRepeatPasswdTextBox);
-	public Button newUserButton = new Button("Céer");
+	public Button newUserButton = new Button("Create");
 	private Column newUserButtonCol = new Column(1, newUserButton);
 	private Column newUserCol = new Column(12, newUserLoginPsswdRow, newUserRepeatEmailRow);
 	
@@ -93,12 +93,12 @@ public class LoginWidget extends Composite {
 		notLoggedLoginLabel.addStyleName("weblis-navbar-text");
 		notLoggedLoginTextbox.setWidth("100%");
 		notLoggedLoginTextbox.addStyleName("weblis-navbar-textbox");
-		notLoggedLoginTextbox.setPlaceholder("Nom d'utilisateur");
+		notLoggedLoginTextbox.setPlaceholder("Username");
 		notLoggedPasswdLabel.setWidth("100%");
 		notLoggedPasswdLabel.addStyleName("weblis-navbar-text");
 		notLoggedPasswdTextBox.setWidth("100%");
 		notLoggedPasswdTextBox.addStyleName("weblis-navbar-textbox");
-		notLoggedPasswdTextBox.setPlaceholder("Mot de passe");
+		notLoggedPasswdTextBox.setPlaceholder("Password");
 
 		notLoggedRow.setWidth("100%");
 		notLoggedLoginRow.add( notLoggedLoginLabelCol);
