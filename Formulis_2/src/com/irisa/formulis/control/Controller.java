@@ -329,10 +329,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						Document statusDoc = XMLParser.parse(response.getText());
 						Element docElement = statusDoc.getDocumentElement();
 						String status = docElement.getAttribute("status");
+						navBar.setServerStatusMessage(status);
 						if(status.equals("ok")) {
 							sewelisLogin(new LoginToken(nu.getUserName(), nu.getPassword()));
 						} else {
 							ControlUtils.debugMessage(docElement.getNodeValue());
+							navBar.setServerStatusHovertext(docElement.getNodeValue());
 						}
 					} else {
 						// FIXME GESTION DES MESSAGE D'ERREUR
@@ -371,6 +373,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						String status = docElement.getAttribute("status");
 						if(!status.equals("ok")) {
 							ControlUtils.debugMessage(docElement.getNodeValue());
+							navBar.setServerStatusHovertext(docElement.getNodeValue());
 						} else {
 							userLogin = t.getLogin();
 							userKey = docElement.getAttribute("userKey");
@@ -415,6 +418,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						String status = docElement.getAttribute("status");
 						if(!status.equals("ok")) {
 							ControlUtils.debugMessage(docElement.getNodeValue());
+							navBar.setServerStatusHovertext(docElement.getNodeValue());
 						} else {
 							Cookies.setCookie(cookiesUserLogin, "");
 							Cookies.setCookie(cookiesUserkey, "");
@@ -474,7 +478,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							}
 						}
 						navBar.setStoreList(storeList);
-						navBar.setServerStatusMessage("ok");
+						if(status != "ok") {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+							}
+						}
 
 					} else {
 						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
@@ -643,7 +653,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							} else {
 								navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
 								if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-									ControlUtils.debugMessage( homePlaceElem.getFirstChild().getFirstChild().getNodeValue());
+									String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+									ControlUtils.debugMessage(message );
+									navBar.setServerStatusHovertext(message);
 								}
 							}
 						} else {
@@ -697,7 +709,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								} else {
 									navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
 									if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-										ControlUtils.debugMessage( homePlaceElem.getFirstChild().getFirstChild().getNodeValue());
+										String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+										ControlUtils.debugMessage(message );
+										navBar.setServerStatusHovertext(message);
 									}
 								}
 							} catch(DOMParseException e) {
@@ -777,7 +791,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						} else {
 							navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
 							if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( homePlaceElem.getFirstChild().getFirstChild().getNodeValue());
+								String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage(message);
+								navBar.setServerStatusHovertext(message);
 							}
 						}
 					} else {
@@ -853,7 +869,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
 								}
 							} else {
-								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + homePlaceElem.getFirstChild().getFirstChild().getNodeValue());
+								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+								navBar.setServerStatusHovertext(message);
 							}
 						} else {
 							// FIXME GESTION DES MESSAGES D'ERREUR
@@ -901,6 +919,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							navBar.setServerStatusMessage(docElement.getAttribute("status"));
 							if(docElement.getFirstChild().getNodeName() == "message") {
 								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
@@ -1188,6 +1207,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 							}
+						} else {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+							}
 						}
 					} else {
 						// TODO GESTION DES MESSAGE D'ERREUR
@@ -1232,6 +1257,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								if(event != null && event instanceof MoreCompletionsEvent) {
 									event.getCallback().call(instance());
 								}
+							}
+						} else {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
@@ -1278,6 +1309,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									event.getCallback().call(instance());
 								}
 							}
+						} else {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+							}
 						}
 					} else {
 						// TODO GESTION DES MESSAGE D'ERREUR
@@ -1315,6 +1352,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+							}
+						} else {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
@@ -1359,7 +1402,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						if(status != "ok") {
 							ControlUtils.debugMessage("sewelisDefineNamespace ERROR " + status);
 							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().getFirstChild().getNodeValue());
+								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage( message);
+								navBar.setServerStatusHovertext(message);
 							}
 						}
 					} else {
@@ -1478,8 +1523,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								}
 							}
 						} else {
+							ControlUtils.debugMessage("sewelisChangeFocus ERROR " + status);
 							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().getFirstChild().getNodeValue());
+								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage( message);
+								navBar.setServerStatusHovertext(message);
 							}
 						}
 					} else {
@@ -1527,6 +1575,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								} catch (XMLParsingException e) {
 									ControlUtils.exceptionMessage(e);
 								}
+							}
+						}else {
+							ControlUtils.debugMessage("sewelisChangeFocusAlone ERROR " + status);
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage( message);
+								navBar.setServerStatusHovertext(message);
 							}
 						}
 					} else {
@@ -1660,11 +1715,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 		sewelisVisibleStores();
 		
+		// Ping toutes les 30 secondes
 		Timer pingTimer = new Timer() {
 			@Override
 			public void run() {
 				try {
-					sewelisPing();
+					if(navBar.getServerStatusMessage() != "error") {
+						sewelisPing();
+					}
 				} catch (RequestException e) {
 					ControlUtils.exceptionMessage(e);
 				}

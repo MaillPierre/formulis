@@ -104,13 +104,35 @@ public class MainNavigationBar extends Composite{
 		storeListBox.setItemSelected(0, true);
 	}
 	
+	public String getServerStatusMessage() {
+		return serverStatusLabel.getText();
+	}
+	
 	public void setServerStatusMessage(String message) {
 		if(message == "ok") {
 			serverStatusLabel.setType(LabelType.SUCCESS);
+		} else if(message == "error"){
+			serverStatusLabel.setType(LabelType.WARNING);
 		} else {
 			serverStatusLabel.setType(LabelType.INFO);
 		}
 		serverStatusLabel.setText(message);
+	}
+	
+	public void setServerStatusMessage(String message, String hovertext) {
+		if(message == "ok") {
+			serverStatusLabel.setType(LabelType.SUCCESS);
+		} else if(message == "error"){
+			serverStatusLabel.setType(LabelType.WARNING);
+		} else {
+			serverStatusLabel.setType(LabelType.INFO);
+		}
+		serverStatusLabel.setText(message);
+		setServerStatusHovertext(hovertext);
+	}
+	
+	public void setServerStatusHovertext(String hovertext) {
+		serverStatusLabel.setTitle(hovertext);
 	}
 
 }
