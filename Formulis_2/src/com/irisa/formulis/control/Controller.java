@@ -118,15 +118,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private int getNumberOfActions() {
 		return numberOfActions;
 	}
-	
-	// Historique
-	private void addHistoryToken(String token) {
-		History.newItem(Crypto.obfuscate(token), false);
-	}
-	
-	private String getHistoryToken(String token) {
-		return Crypto.deobfuscate(token);
-	}
 
 	// Profiles
 
@@ -1659,22 +1650,23 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
 		}
 
-		// PROFILES
-//		navBar.adminPanel.profileEditArea.setText(this.getProfileDocument().toString());
+		// History
+
 		History.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
-				String historyToken = getHistoryToken(event.getValue());
-				ControlUtils.debugMessage("History change: " + historyToken);
+				String historyToken;
 				try {
+					historyToken = HistoryUtils.getHistoryToken(event.getValue());
 					Profile newForm = Parser.parseProfile(XMLParser.parse(historyToken).getDocumentElement());
 					setProfile(newForm);
-				} catch (XMLParsingException e) {
+				} catch (XMLParsingException|InvalidHistoryState e) {
 					ControlUtils.exceptionMessage(e);
-				}
+				} 
 			}
 		});
-//
+		
+
 //		// handlers attribution
 //
 //		navBar.adminPanel.profileModeButton.addClickHandler(this);
@@ -1969,12 +1961,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onStatementChange(StatementChangeEvent event) {
+		try {
+		String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
 		// CHANGEMENT DE STATEMENT
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
 		ControlUtils.debugMessage("onStatementChange " + event.getSource().getClass());
 		if(event.getSource() instanceof FormWidget) {
 			FormWidget widSource = (FormWidget)event.getSource();
 			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
+			if(! widSource.getData().isTypeList() && ! widSource.getData().isEmpty()) {
+				HistoryUtils.addHistoryToken(currentProfile);
+			}
 			event.getCallback().call(this);
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
@@ -1986,18 +1983,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
 				onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
 			}
+
+			HistoryUtils.addHistoryToken(currentProfile);
 		}
 		refreshAnswers();
-
-		try {
-			String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
-			this.historyPlaceStack.add(currentProfile);
-			this.addHistoryToken(currentProfile);
-			
-			ControlUtils.debugMessage("Added to history: " + currentProfile);
 		} catch (SerializingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ControlUtils.exceptionMessage(e);
 		}
 		
 //		incrementNumberOfActions();
@@ -2233,20 +2224,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	private void setProfile(Profile pro) {
-		ControlUtils.debugMessage("setProfile " + pro);
 		if(this.currentStore == null || this.currentStore.getName() != pro.getStoreName()) {
 			this.setCurrentStore(pro.getStoreName());
 		}
 		try {
 			Form fo = pro.toForm();
-			ControlUtils.debugMessage("setProfile candidate Form: " + fo);
-			ControlUtils.debugMessage("setProfile currentForm (BEFORE): " + this.form);
 			this.setCurrentForm(fo);
-			ControlUtils.debugMessage("setProfile currentForm (AFTER): " + this.form);
-			ControlUtils.debugMessage(pro + " = " + fo);
-			//		this.mainPage.setFormWidget(new FormWidget(fo, null));
-//			StatementChangeEvent event = new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getAppendCallback());
-//			sewelisGetPlaceStatement(lispqlStatementQuery(form), event);
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
 		}

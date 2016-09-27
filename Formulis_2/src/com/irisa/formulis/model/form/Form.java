@@ -339,7 +339,9 @@ public class Form extends FormComponent {
 		Iterator<FormClassLine> itType = this.typeLinesIterator();
 		while(itType.hasNext()) {
 			FormClassLine type = itType.next();
-			fo.addTypeLine(type.toProfileClassLine());
+			if(! type.isAnonymous()) {
+				fo.addTypeLine(type.toProfileClassLine());
+			}
 		}
 		
 		Iterator<FormRelationLine> itLine = this.relationLinesIterator();
