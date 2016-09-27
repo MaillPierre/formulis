@@ -47,7 +47,6 @@ import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
-import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
@@ -55,7 +54,6 @@ import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
-import com.irisa.formulis.view.form.FormWidget.FORM_CALLBACK_MODE;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
 
@@ -83,7 +81,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Store currentStore = null;
 	private Place place = null;
 	private Form form = null;
-	private HashMap<String, Place> historyPlaceStack = new HashMap<String, Place>();
+	private LinkedList<String> historyPlaceStack = new LinkedList<String>();
 
 	private String cookiesProfilesIndex = "FormulisProfile";
 	private String cookiesUserLogin = "FormulisUserLogin";
@@ -119,6 +117,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	private int getNumberOfActions() {
 		return numberOfActions;
+	}
+	
+	// Historique
+	private void addHistoryToken(String token) {
+		History.newItem(Crypto.obfuscate(token), false);
+	}
+	
+	private String getHistoryToken(String token) {
+		return Crypto.deobfuscate(token);
 	}
 
 	// Profiles
@@ -245,39 +252,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 
-	public void backHistory() {
-		ControlUtils.debugMessage("backHistory");
-		History.back();
-		String backId = History.getToken();
-		if(this.historyPlaceStack.containsKey(backId)) {
-			if(this.historyPlaceStack.get(backId) != null) {
-				place = this.historyPlaceStack.get(backId);
-				ControlUtils.debugMessage("place = " + backId);
-				//				refreshPlace();
-			} else {
-				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(backId));
-			}
-		} else {
-			ControlUtils.debugMessage("backId: " + backId);
-		}
-	}
+//	public void backHistory() {
+//		ControlUtils.debugMessage("backHistory");
+//		History.back();
+//		String backId = History.getToken();
+//		if(this.historyPlaceStack.containsKey(backId)) {
+//			if(this.historyPlaceStack.get(backId) != null) {
+//				place = this.historyPlaceStack.get(backId);
+//				ControlUtils.debugMessage("place = " + backId);
+//				//				refreshPlace();
+//			} else {
+//				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(backId));
+//			}
+//		} else {
+//			ControlUtils.debugMessage("backId: " + backId);
+//		}
+//	}
 
-	public void forwardHistory() {
-		ControlUtils.debugMessage("forwardHistory");
-		History.forward();
-		String forwardId = History.getToken();
-		if(this.historyPlaceStack.containsKey(forwardId)) {
-			if(this.historyPlaceStack.get(forwardId) != null) {
-				place = this.historyPlaceStack.get(forwardId);
-				ControlUtils.debugMessage("place = " + forwardId);
-				//				refreshPlace();
-			} else {
-				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(forwardId));
-			}
-		} else {
-			ControlUtils.debugMessage("forwardId: " + forwardId);
-		}
-	}
+//	public void forwardHistory() {
+//		ControlUtils.debugMessage("forwardHistory");
+//		History.forward();
+//		String forwardId = History.getToken();
+//		if(this.historyPlaceStack.containsKey(forwardId)) {
+//			if(this.historyPlaceStack.get(forwardId) != null) {
+//				place = this.historyPlaceStack.get(forwardId);
+//				ControlUtils.debugMessage("place = " + forwardId);
+//				//				refreshPlace();
+//			} else {
+//				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(forwardId));
+//			}
+//		} else {
+//			ControlUtils.debugMessage("forwardId: " + forwardId);
+//		}
+//	}
 
 	/**
 	 * Ping request
@@ -1654,6 +1661,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		// PROFILES
 //		navBar.adminPanel.profileEditArea.setText(this.getProfileDocument().toString());
+		History.addValueChangeHandler(new ValueChangeHandler<String>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				String historyToken = getHistoryToken(event.getValue());
+				ControlUtils.debugMessage("History change: " + historyToken);
+				try {
+					Profile newForm = Parser.parseProfile(XMLParser.parse(historyToken).getDocumentElement());
+					setProfile(newForm);
+				} catch (XMLParsingException e) {
+					ControlUtils.exceptionMessage(e);
+				}
+			}
+		});
 //
 //		// handlers attribution
 //
@@ -1738,12 +1758,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Interroge la base, crée un profile de base pour la classe, hors rdfs/owl, qui a le plus d'élements
 	 */
 	public Profile formToProfile() {
+		ControlUtils.debugMessage("Controller formToProfile " + this.mainPage.formWidget.getData());
 		if(currentStore != null) {
 			Profile pro = new Profile(this.currentStore.getName(), this.currentStore.getName());
-			pro.setForm(this.mainPage.formWidget.toProfileForm());
+			pro.setForm(this.mainPage.formWidget.getData().toProfileForm());
 
+			ControlUtils.debugMessage("Controller formToProfile FIN " + pro);
 			return pro;
 		}
+		ControlUtils.debugMessage("Controller formToProfile FIN null");
 		return null;
 	}
 
@@ -1966,22 +1989,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 		refreshAnswers();
 
+		try {
+			String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
+			this.historyPlaceStack.add(currentProfile);
+			this.addHistoryToken(currentProfile);
+			
+			ControlUtils.debugMessage("Added to history: " + currentProfile);
+		} catch (SerializingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 //		incrementNumberOfActions();
 	}
-
-//	@Override
-//	public void onNestedForm(NestedFormEvent event) {
-//		// NOUVEAU FORMULAIRE IMBRIQUE
-//		// Crée un nouveau formulaire, demande un changement de statement puis un chargement du formulaire
-//		ControlUtils.debugMessage("onNestedForm");
-//		FormLineWidget widSource = ((FormLineWidget)event.getSource());
-//		FormLine dataSource = widSource.getFormLine();
-//		Form newDataForm = new Form(dataSource);
-//		FormWidget newFormWid = new FormWidget(newDataForm, widSource);
-//		widSource.setVariableElement(newFormWid);
-//		String queryLineLispql = lispqlStatementQuery(dataSource);
-//		sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getCallback()));
-//	}
 
 	/**
 	 * Evenement de demande de création d'élément provenant d'un widget de ligne de relation (FormRelationLineWidget)
@@ -2003,13 +2023,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			dataSource.setVariableElement(newDataForm);
 			widSource.setVariableElement(newFormWid);
 			newFormWid.addClickWidgetEventHandler(widSource);
-//			newFormWid.addCompletionAskedHandler(widSource);
-//			newFormWid.addElementCreationHandler(widSource);
-//			newFormWid.addLineSelectionHandler(widSource);
-//			newFormWid.addMoreCompletionsHandler(widSource);
-//			newFormWid.addRelationCreationHandler(widSource);
-//			newFormWid.addRemoveLineHandler(widSource);
-//			newFormWid.addStatementChangeHandler(widSource);
 //			ViewUtils.connectFormEventChain(newFormWid, widSource);
 
 			String queryLineLispql = lispqlStatementQuery(dataSource);
@@ -2033,25 +2046,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		incrementNumberOfActions();
 	}
-
-//	@Override
-//	public void onTypeLineSet(TypeLineSetEvent event) {
-//		String queryString = lispqlStatementQuery(event.getSource().getData());
-//		this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(event.getSource(), event.getSource().getCallback()));
-//
-//		incrementNumberOfActions();
-//	}
-
-	//	public void onCompletionReady(ElementSuggestionWidget source) {
-	//		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
-	//		if(place.getCurrentCompletions().size() < 2 && place.hasMore()) {
-	//			showMore();
-	//		}
-	//		if(place.getCurrentCompletions() != null) {
-	//			source.setOracleSuggestion(place.getCurrentCompletions());
-	//			source.getSuggestBox().showSuggestionList();
-	//		}
-	//	}
 
 	public void onCompletionReady(CustomSuggestionWidget source) {
 //		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
@@ -2251,8 +2245,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.debugMessage("setProfile currentForm (AFTER): " + this.form);
 			ControlUtils.debugMessage(pro + " = " + fo);
 			//		this.mainPage.setFormWidget(new FormWidget(fo, null));
-			StatementChangeEvent event = new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getAppendCallback());
-			sewelisGetPlaceStatement(lispqlStatementQuery(form), event);
+//			StatementChangeEvent event = new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getAppendCallback());
+//			sewelisGetPlaceStatement(lispqlStatementQuery(form), event);
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
 		}

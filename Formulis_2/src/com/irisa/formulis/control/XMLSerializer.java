@@ -164,18 +164,21 @@ public class XMLSerializer {
 		ControlUtils.debugMessage("formToXml( " + f + " )");
 		Element result = serialRootDoc.createElement("form");
 		
-		if(f.getTypeLine() != null) {
-			Element classCat = serialRootDoc.createElement("type");
-			classCat.appendChild(classlineToXml(f.getTypeLine()));
-			result.appendChild(classCat);
+		if(! f.getTypeLines().isEmpty()) {
+			Iterator<ProfileClassLine> itType = f.typeIterator();
+			while(itType.hasNext()) {
+				ProfileClassLine type = itType.next();
+				Element classCat = serialRootDoc.createElement("types");
+				classCat.appendChild(classlineToXml(type));
+				result.appendChild(classCat);
+			}
 		}
 		
 		if(! f.getLines().isEmpty()) {
 			Element linesCat = serialRootDoc.createElement("lines");
-			Iterator<ProfileLine> itLines = f.lineIterator();
+			Iterator<ProfileRelationLine> itLines = f.relationIterator();
 			while(itLines.hasNext()) {
 				ProfileLine li = itLines.next();
-				
 				linesCat.appendChild(formlineToXml(li));
 			}
 			result.appendChild(linesCat);

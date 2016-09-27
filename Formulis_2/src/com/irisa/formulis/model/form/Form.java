@@ -49,6 +49,10 @@ public class Form extends FormComponent {
 	public void setTypeLine(FormClassLine l) {
 		this.addTypeLine(l, true);
 	}
+
+	public void addTypeLine(FormClassLine l) {
+		this.addTypeLine(l, false);
+	}
 	
 	public void addTypeLine(FormClassLine l, boolean clear) {
 		if(! this.typeLines.contains(l)) {
@@ -330,13 +334,19 @@ public class Form extends FormComponent {
 
 	@Override
 	protected ProfileElement toProfileElement() {
-		ProfileForm fo =null;// new ProfileForm(this.typeLines.toProfileClassLine());
+		ProfileForm fo = new ProfileForm();
 		
-//		Iterator<FormRelationLine> itLine = this.relationLinesIterator();
-//		while(itLine.hasNext()) {
-//			FormLine line = itLine.next();
-//			fo.addLine((ProfileLine) line.toProfileElement());
-//		}
+		Iterator<FormClassLine> itType = this.typeLinesIterator();
+		while(itType.hasNext()) {
+			FormClassLine type = itType.next();
+			fo.addTypeLine(type.toProfileClassLine());
+		}
+		
+		Iterator<FormRelationLine> itLine = this.relationLinesIterator();
+		while(itLine.hasNext()) {
+			FormRelationLine line = itLine.next();
+			fo.addLine( line.toProfileRelationLine());
+		}
 		
 		return fo;
 	}

@@ -16,4 +16,12 @@ public class Crypto {
 		return hex; 
 		
 	}-*/;
+	
+	public static native String obfuscate(String ch) /*-{
+		return btoa(ch);
+	}-*/;
+	
+	public static native String deobfuscate(String ch) /*-{
+		return atob(ch);
+	}-*/;
 }

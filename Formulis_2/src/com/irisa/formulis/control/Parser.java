@@ -464,7 +464,7 @@ public class Parser {
 		} else if(node.getNodeName() == "ClassLine") {
 			return parseProfileClassLine(node);
 		} else {
-			throw new XMLParsingException("parseProfileLine expect relationline or classline node, got: " + node);
+			throw new XMLParsingException("parseProfileLine expect relationline or classline node, got: "+  node.getNodeName() + " : " + node);
 		}
 	}
 
@@ -538,14 +538,18 @@ public class Parser {
 			NodeList nodeChilds = node.getChildNodes();
 			for(int chi = 0; chi < nodeChilds.getLength(); chi++) {
 				Node child = nodeChilds.item(chi);
-				if(child.getNodeName() == "type") {
-					ProfileClassLine typeLine = parseProfileClassLine(child.getFirstChild());
-					result.setTypeLine(typeLine);
+				if(child.getNodeName() == "types") {
+					NodeList lineList = child.getChildNodes();
+					for(int li = 0; li < lineList.getLength(); li++) {
+						Node lineNode = lineList.item(li);
+						ProfileClassLine typeLine = parseProfileClassLine(lineNode);
+						result.setTypeLine(typeLine);
+					}
 				} else if(child.getNodeName() == "lines") {
 					NodeList lineList = child.getChildNodes();
 					for(int li = 0; li < lineList.getLength(); li++) {
 						Node lineNode = lineList.item(li);
-						ProfileLine line = parseProfileLine(lineNode);
+						ProfileRelationLine line = parseProfileRelationLine(lineNode);
 						result.addLine(line);
 					}
 				}
