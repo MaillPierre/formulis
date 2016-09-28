@@ -1,5 +1,6 @@
 package com.irisa.formulis.view.basic;
 
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
@@ -52,12 +53,14 @@ public class URIWidget extends AbstractFormulisWidget {
 		element.addMouseOutHandler(new MouseOutHandler() {
 			@Override
 			public void onMouseOut(MouseOutEvent event) {
+				element.getElement().getStyle().setCursor(Cursor.DEFAULT);
 				tooltip.hide();
 			}
 		});
 		element.addMouseOverHandler(new MouseOverHandler() {
 			@Override
 			public void onMouseOver(MouseOverEvent event) {
+				element.getElement().getStyle().setCursor(Cursor.MOVE);
 				tooltip.show();
 			}
 		});
