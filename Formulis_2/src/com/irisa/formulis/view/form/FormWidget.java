@@ -22,6 +22,7 @@ import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
+import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.FinishLineEvent;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
@@ -40,15 +41,21 @@ public class FormWidget extends AbstractFormElementWidget {
 	private Column controlCol = new Column(1);
 	private CheckBox profileCheckbox = new CheckBox();
 	
-	private FluidRow newRelationRow = new FluidRow();
+	private FluidRow newElementRow = new FluidRow();
 	private Button newRelationButton = new Button("New line");
+	private Button newClassButton = new Button("New class");
+	private Column newRelationCol = new Column(6, newRelationButton);
+	private Column newClassCol = new Column(6, newClassButton);
 	private RelationCreateWidget relationCreationWid = new RelationCreateWidget(this);
+	private ClassCreateWidget classCreationWid = new ClassCreateWidget(this);
 	
 	private FluidRow contentRow = new FluidRow();
-	private Column contentCol = new Column(11,contentRow, newRelationRow);
+	private Column contentCol = new Column(11,contentRow, newElementRow);
 	
 	private Column finishCol = new Column(1);
 	private Button finishButton = new Button("", IconType.PENCIL);
+	
+	private boolean storeSet = false;
 	
 	public enum FORM_CALLBACK_MODE {
 		/**
@@ -76,14 +83,23 @@ public class FormWidget extends AbstractFormElementWidget {
 		contentRow.add(linesCol);
 		contentRow.add(finishCol);
 		finishCol.add(finishButton);
-		newRelationButton.addStyleName("weblis-max-width");
-		newRelationRow.add(newRelationButton);
+//		newRelationButton.addStyleName("weblis-max-width");
+//		newClassButton.addStyleName("weblis-max-width");
+		newRelationButton.setBlock(true);
+		newClassButton.setBlock(true);
+		newElementRow.add(newRelationCol);
+		newElementRow.add(newClassCol);
 		relationCreationWid.addRelationCreationHandler(this);
+		classCreationWid.addClassCreationHandler(this);
 		controlCol.add(profileCheckbox);
 		
 		newRelationButton.addClickHandler(this);
+		newRelationButton.setEnabled(false);
+		newClassButton.addClickHandler(this);
+		newClassButton.setEnabled(false);
 		
 		finishButton.addClickHandler(this);
+		finishButton.setBlock(true);
 		setFinishButtonState(this.getData().isFinished());
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -96,6 +112,14 @@ public class FormWidget extends AbstractFormElementWidget {
 		setProfileMode(false);
 		
 		reload();
+	}
+	
+	public boolean isStoreIsSet() {
+		return this.storeSet;
+	}
+	
+	public void setStoreIsSet(boolean storeIsSet) {
+		this.storeSet = storeIsSet;
 	}
 	
 	/**
@@ -145,47 +169,56 @@ public class FormWidget extends AbstractFormElementWidget {
 				}
 			}
 		} 
-		newRelationButton.setVisible(false);
+		newRelationButton.setEnabled(false);
+		newClassButton.setEnabled(false);
 		
 		this.finishButton.setVisible(! getData().isEmpty());
 		this.setFinishButtonState(true);
 		this.finishButton.setEnabled(false);
 	}
 	
-	public void putRelationCreationButton(){
-		newRelationRow.clear();
-		newRelationRow.add(newRelationButton);
+	public void putElementCreationButtons(){
+		newElementRow.clear();
+		newElementRow.add(newRelationCol);
+		newElementRow.add(newClassCol);
 	}
 	
 	public void putRelationCreationWidget(){
-		newRelationRow.clear();
-		newRelationRow.add(relationCreationWid);
+		newElementRow.clear();
+		newElementRow.add(relationCreationWid);
+	}
+
+	public void putClassCreationWidget() {
+		newElementRow.clear();
+		newElementRow.add(classCreationWid);
 	}
 	
 	public void clear() {
 		linesCol.clear();
-		newRelationButton.setVisible(false);
+		newRelationButton.setEnabled(false);
+		newClassButton.setEnabled(false);
 		setFinishButtonState(false);
 	}
 	
 	public void reload() {
-		if(getData() != null && ! getData().isEmpty()) {
-			clear();
-
-			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
-			while(itFo.hasNext()) {
-				FormLineWidget line = itFo.next();
-				addLine(line);
-			}
-			newRelationButton.setVisible(true);
-		} 
-
-		// Si le formulaire est le root
-		if(getData() != null && this.getData().isEmpty() && this.getData().isRoot()) {
-			newRelationButton.setVisible(false);
+		if(getData() != null ) {
+			if(! getData().isEmpty()) {
+				clear();
+	
+				Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
+				while(itFo.hasNext()) {
+					FormLineWidget line = itFo.next();
+					addLine(line);
+				}
+				newRelationButton.setEnabled(true);
+			} 
+	
+			
+			newClassButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTypeList()));
+			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
+			
+			this.finishButton.setVisible(! getData().isEmpty());
 		}
-		
-		this.finishButton.setVisible(! getData().isEmpty());
 	}
 	
 	@Override
@@ -260,8 +293,9 @@ public class FormWidget extends AbstractFormElementWidget {
 	@Override
 	public void onClick(ClickEvent event) {
 		if(event.getSource() == newRelationButton) {
-			ControlUtils.debugMessage("Creation button click");
 			putRelationCreationWidget();
+		} else if(event.getSource() == newClassButton) {
+			putClassCreationWidget();
 		} else if(event.getSource() == finishButton) {
 			ControlUtils.debugMessage("FormWidget onClick finishButton");
 			fireFinishFormEvent(true, this.getSubmittedCallback());

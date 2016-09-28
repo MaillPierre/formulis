@@ -21,11 +21,11 @@ public class DateCreateWidget extends AbstractDataWidget implements ValueChangeH
 	private DateBox dateBox = new DateBox();
 	
 	private FluidContainer checkRow = new FluidContainer(); 
-	private CheckBox yearCheckBox = new CheckBox("Année");
-	private CheckBox monthCheckBox = new CheckBox("Mois");
-	private CheckBox dayCheckBox = new CheckBox("Jour");
-	private CheckBox yearMonthCheckBox = new CheckBox("Année-Mois");
-	private CheckBox monthDayCheckBox = new CheckBox("Mois-jour");
+	private CheckBox yearCheckBox = new CheckBox("Year");
+	private CheckBox monthCheckBox = new CheckBox("Month");
+	private CheckBox dayCheckBox = new CheckBox("Day");
+	private CheckBox yearMonthCheckBox = new CheckBox("Year-Month");
+	private CheckBox monthDayCheckBox = new CheckBox("Month-Day");
 	
 	private String dateFormat = "yyyy-MM-dd";
 	private ControlUtils.LITTERAL_URIS datatype = ControlUtils.LITTERAL_URIS.xsdDate;

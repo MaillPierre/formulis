@@ -66,10 +66,10 @@ public class ProfileForm extends ProfileLeafElement {
 	}
 	
 	public Form toForm(FormRelationLine parent) throws FormElementConversionException {
-		ControlUtils.debugMessage("Form toForm( " + parent + " )");
+//		ControlUtils.debugMessage("Form toForm( " + parent + " )");
 		Form result = new Form(parent);
 
-		ControlUtils.debugMessage("Form toForm typeLine " + this.getTypeLines());
+//		ControlUtils.debugMessage("Form toForm typeLine " + this.getTypeLines());
 		if(! this.getTypeLines().isEmpty()) {
 			Iterator<ProfileClassLine> itType = this.typeIterator();
 			while(itType.hasNext()) {
@@ -78,17 +78,17 @@ public class ProfileForm extends ProfileLeafElement {
 			}
 		}
 		
-		ControlUtils.debugMessage("Form toForm lines " + this.getLines());
+//		ControlUtils.debugMessage("Form toForm lines " + this.getLines());
 		Iterator<ProfileRelationLine> itLines = this.relationIterator();
 		while(itLines.hasNext()) {
 			ProfileRelationLine line = itLines.next();
-			ControlUtils.debugMessage("Form toForm line " + line);
-			ControlUtils.debugMessage("Form toForm result (BEFORE)" + result);
+//			ControlUtils.debugMessage("Form toForm line " + line);
+//			ControlUtils.debugMessage("Form toForm result (BEFORE)" + result);
 			result.addLine(line.toFormLine(result));
-			ControlUtils.debugMessage("Form toForm result (AFTER)" + result);
+//			ControlUtils.debugMessage("Form toForm result (AFTER)" + result);
 		}
 		
-		ControlUtils.debugMessage("Form toForm result " + result);
+//		ControlUtils.debugMessage("Form toForm result " + result);
 		
 		return result;
 	}

@@ -90,7 +90,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		elementRow.setCellWidth(labelUriBox, "100%");
 		elementRow.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 		contentRow.add(elementCol);
-		labelUriBox.addStyleName("weblis-max-width");
+		labelUriBox.addStyleName("input-block-level");
 		
 		this.repeatLineButton.setEnabled(false);
 

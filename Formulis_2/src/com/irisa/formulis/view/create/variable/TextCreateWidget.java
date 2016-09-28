@@ -22,7 +22,7 @@ public class TextCreateWidget extends AbstractDataWidget {
 	@Override
 	public Plain getData() {
 		String value = SafeHtmlUtils.htmlEscape(textBox.getText());
-		return new Plain(value, "fr");
+		return new Plain(value, "en");
 	}
 
 }

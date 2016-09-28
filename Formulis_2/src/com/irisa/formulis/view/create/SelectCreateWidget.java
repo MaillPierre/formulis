@@ -27,7 +27,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	private ListBox typeList = new ListBox();
 	private HashMap<String, Integer> typeIndexMap = new HashMap<String, Integer>();
 	private AbstractDataWidget createWid = null;
-	private Button createButton = new Button("Créer");
+	private Button createButton = new Button("Create");
 	private int selectTypeIndex = 0;
 	private int createWidgetIndex = 1;
 	private int createButtonIndex = 2;

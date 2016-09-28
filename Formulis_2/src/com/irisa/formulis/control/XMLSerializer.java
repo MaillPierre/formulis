@@ -161,7 +161,7 @@ public class XMLSerializer {
 	}
 	
 	public static Element formToXml(ProfileForm f) throws SerializingException {
-		ControlUtils.debugMessage("formToXml( " + f + " )");
+//		ControlUtils.debugMessage("formToXml( " + f + " )");
 		Element result = serialRootDoc.createElement("form");
 		
 		if(! f.getTypeLines().isEmpty()) {

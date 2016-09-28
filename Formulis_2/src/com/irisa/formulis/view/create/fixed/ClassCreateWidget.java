@@ -33,7 +33,7 @@ public class ClassCreateWidget extends Composite implements HasClassCreationHand
 		initWidget(element);
 		
 		nameBox.addStyleName("input-block-level");
-		nameBox.getElement().setPropertyString("placeholder", "Property name");
+		nameBox.getElement().setPropertyString("placeholder", "Class name");
 		createButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {

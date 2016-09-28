@@ -67,7 +67,8 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		element.addValueChangeHandler(this);
 		element.addKeyDownHandler(this);
 		element.addClickHandler(this);
-		element.setWidth("100%");
+//		element.setWidth("100%");
+		element.addStyleName("input-block-level");
 		element.getElement().setPropertyString("autocomplete", "off");
 		element.addKeyUpHandler(new KeyUpHandler() {
 			@Override

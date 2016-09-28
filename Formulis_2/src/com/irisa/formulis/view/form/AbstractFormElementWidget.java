@@ -7,6 +7,7 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
+import com.irisa.formulis.view.event.ClassCreationEvent;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
@@ -17,6 +18,7 @@ import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
+import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
@@ -35,6 +37,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		implements FormEventChainHandler, HasFormEventChainHandlers {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
+	protected LinkedList<ClassCreationHandler> classCreationHandlers = new LinkedList<ClassCreationHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected LinkedList<FinishLineHandler> finishLineHandlers = new LinkedList<FinishLineHandler>();
@@ -88,6 +91,34 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
 		fireCompletionAskedEvent(event);
+	}
+	
+
+
+	@Override
+	public void addClassCreationHandler(ClassCreationHandler hand) {
+		this.classCreationHandlers.add(hand);
+	}
+
+	@Override
+	public void fireClassCreationEvent() {
+		ClassCreationEvent event = new ClassCreationEvent(this);
+		fireClassCreationEvent(event);
+	}
+
+	@Override
+	public void fireClassCreationEvent(ClassCreationEvent event) {
+		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireClassCreationEvent");
+		Iterator<ClassCreationHandler> itHand = this.classCreationHandlers.iterator();
+		while(itHand.hasNext()) {
+			ClassCreationHandler hand = itHand.next();
+			hand.onClassCreation(event);
+		}
+	}
+
+	@Override
+	public void onClassCreation(ClassCreationEvent event) {
+		fireClassCreationEvent(event);
 	}
 
 	@Override

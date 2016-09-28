@@ -19,8 +19,8 @@ public class NumericCreateWidget extends AbstractDataWidget implements ValueChan
 	private FluidRow element = new FluidRow();
 	private Column contentCol = new Column(12);
 	private FluidContainer typePanel = new FluidContainer();
-	private RadioButton integerRadio = new RadioButton("numericType", "Entier");
-	private RadioButton doubleRadio = new RadioButton("numericType", "Réel");
+	private RadioButton integerRadio = new RadioButton("numericType", "Integer");
+	private RadioButton doubleRadio = new RadioButton("numericType", "Real");
 	private IntegerBox integerBox = new IntegerBox();
 	private DoubleBox doubleBox = new DoubleBox();
 	

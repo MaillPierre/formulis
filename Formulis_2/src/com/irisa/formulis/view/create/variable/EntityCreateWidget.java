@@ -18,8 +18,8 @@ public class EntityCreateWidget extends AbstractDataWidget {
 		super(d);
 		initWidget(element);
 		
-		labelBox.setPlaceholder("Nom de l'entité (etiquette)");
-		uriBox.setPlaceholder("[OPTIONNEL] Adresse de l'entité (URI)");
+		labelBox.setPlaceholder("Entity name (label)");
+		uriBox.setPlaceholder("[OPTIONAL] Entity URI");
 		
 		element.add(labelBox);
 		element.add(uriBox);

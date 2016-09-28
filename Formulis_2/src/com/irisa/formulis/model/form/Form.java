@@ -233,7 +233,8 @@ public class Form extends FormComponent {
 			}
 		} else if(this.isAnonymous() ) {
 			result += " [ a thing ";
-			if(! otherlines.isEmpty()) {
+			// Si il y a quelque chose à venir après
+			if(! otherlines.isEmpty() || getParent() != null && getParent() instanceof FormLine) {
 				result += " ; ";
 			}
 		} else {
@@ -258,7 +259,7 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
-		if(getParent() != null && getParent() instanceof FormLine && selectedLine != null) {
+		if(getParent() != null && getParent() instanceof FormLine /*&& selectedLine != null*/) {
 			FormLine parentLine = (FormLine) getParent();
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();

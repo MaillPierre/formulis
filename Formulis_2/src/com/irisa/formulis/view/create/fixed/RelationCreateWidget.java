@@ -32,14 +32,14 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 		parent = par;
 		initWidget(element);
 		
-		nameBox.addStyleName("weblis-max-width");
-		nameBox.getElement().setPropertyString("placeholder", "Nom de la propriété");
+		nameBox.addStyleName("input-block-level");
+		nameBox.getElement().setPropertyString("placeholder", "Property name");
 		createButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				if(!getTextValue().isEmpty()) {
 					fireRelationCreationEvent();
-					parent.putRelationCreationButton();
+					parent.putElementCreationButtons();
 				}
 			}
 		});

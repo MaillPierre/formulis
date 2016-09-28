@@ -49,6 +49,7 @@ import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
+import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.interfaces.*;
@@ -63,7 +64,7 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
  *
  */
 
-public final class Controller implements EntryPoint, ClickHandler, FormEventChainHandler, StatementFocusChangeHandler/*, TypeLineSetHandler*/, ValueChangeHandler<Integer> {
+public final class Controller implements EntryPoint, ClickHandler, FormEventChainHandler, StatementFocusChangeHandler, ValueChangeHandler<Integer> {
 
 	private HashMap<String, Store> storeMapByName = new HashMap<String, Store>();
 	private HashMap<String, Store> storeMapByLabel = new HashMap<String, Store>();
@@ -73,7 +74,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private static String uriBaseAdress = "http://www.irisa.fr/LIS";
 	
 	private static String serverAdress = "http://127.0.0.1:9999/";
-	//	private String serverAdress = "http://lisfs2008.irisa.fr:9999/"; // TODO Rendre adresse serveur configurable
 //	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
 	private static String logServerAdress = "http://servolis.irisa.fr:3941";
 	private String userLogin = "anonymous";
@@ -81,7 +81,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Store currentStore = null;
 	private Place place = null;
 	private Form form = null;
-	private LinkedList<String> historyPlaceStack = new LinkedList<String>();
 
 	private String cookiesProfilesIndex = "FormulisProfile";
 	private String cookiesUserLogin = "FormulisUserLogin";
@@ -107,6 +106,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	private void setCurrentStore(String selectValue) {
+		if(currentStore != null && ! selectValue.equals(currentStore.getName())) {
+			this.form.clear();
+			this.mainPage.formWidget.reload();
+		}
 		currentStore = storeMapByName.get(selectValue);
 	}
 	
@@ -238,44 +241,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		navBar.adminPanel.profileEditReload.click(); // SALE
 	}
 
-
-
-
-
-
-//	public void backHistory() {
-//		ControlUtils.debugMessage("backHistory");
-//		History.back();
-//		String backId = History.getToken();
-//		if(this.historyPlaceStack.containsKey(backId)) {
-//			if(this.historyPlaceStack.get(backId) != null) {
-//				place = this.historyPlaceStack.get(backId);
-//				ControlUtils.debugMessage("place = " + backId);
-//				//				refreshPlace();
-//			} else {
-//				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(backId));
-//			}
-//		} else {
-//			ControlUtils.debugMessage("backId: " + backId);
-//		}
-//	}
-
-//	public void forwardHistory() {
-//		ControlUtils.debugMessage("forwardHistory");
-//		History.forward();
-//		String forwardId = History.getToken();
-//		if(this.historyPlaceStack.containsKey(forwardId)) {
-//			if(this.historyPlaceStack.get(forwardId) != null) {
-//				place = this.historyPlaceStack.get(forwardId);
-//				ControlUtils.debugMessage("place = " + forwardId);
-//				//				refreshPlace();
-//			} else {
-//				ControlUtils.debugMessage("newPlace: " + this.historyPlaceStack.get(forwardId));
-//			}
-//		} else {
-//			ControlUtils.debugMessage("forwardId: " + forwardId);
-//		}
-//	}
 
 	/**
 	 * Ping request
@@ -1750,15 +1715,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Interroge la base, crée un profile de base pour la classe, hors rdfs/owl, qui a le plus d'élements
 	 */
 	public Profile formToProfile() {
-		ControlUtils.debugMessage("Controller formToProfile " + this.mainPage.formWidget.getData());
+//		ControlUtils.debugMessage("Controller formToProfile " + this.mainPage.formWidget.getData());
 		if(currentStore != null) {
 			Profile pro = new Profile(this.currentStore.getName(), this.currentStore.getName());
 			pro.setForm(this.mainPage.formWidget.getData().toProfileForm());
 
-			ControlUtils.debugMessage("Controller formToProfile FIN " + pro);
+//			ControlUtils.debugMessage("Controller formToProfile FIN " + pro);
 			return pro;
 		}
-		ControlUtils.debugMessage("Controller formToProfile FIN null");
+//		ControlUtils.debugMessage("Controller formToProfile FIN null");
 		return null;
 	}
 
@@ -2100,6 +2065,27 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		incrementNumberOfActions();
 	}
+
+	@Override
+	public void onClassCreation(ClassCreationEvent event) {
+		ControlUtils.debugMessage("Controller onClassCreation");
+		if(event.getSource() instanceof ClassCreateWidget) {
+			ClassCreateWidget widSource = (ClassCreateWidget) event.getSource();
+			FormWidget parentWidSource = widSource.getParentWidget();
+			
+			String uri = newElementUri(widSource.getTextValue());
+			String label = widSource.getTextValue();
+			
+			URI uriObj = new URI(uri, URI.KIND.CLASS, label);
+			
+			FormClassLine newLine = new FormClassLine(parentWidSource.getData(), uriObj);
+			newLine.setAsNew(true);
+			parentWidSource.getData().addTypeLine(newLine);
+			parentWidSource.reload();
+ 		}
+
+		incrementNumberOfActions();
+	}
 	
 	
 	
@@ -2134,49 +2120,55 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public void loadFormContent(FormWidget widSource) {
-		ControlUtils.debugMessage("loadFormContent " + widSource);
+		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
+		if(this.currentStore != null) {
+			widSource.setStoreIsSet(true);
+		}
 
-		if(this.isFormContentLoadable(widSource) &&  widSource.getData() != null) {
-
-			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
-			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
-			Collections.sort(relationLines, new FormLineComparator());
-			Collections.sort(classLines, new FormLineComparator());
-
-			// Si il n'y a qu'un seul type proposé, alors il faut qu'il soit selectionné et placé dans le statement 
-			// pour que les relations proposées soient les bonnes
-//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
-			if(! (widSource.getData().getTypeLines().size() == classLines.size() 
-					&& widSource.getData().getTypeLines().containsAll(classLines) ) ) {
-				
-				
-				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
-				widSource.getData().clear();
-				
-				widSource.getData().addAllTypeLines(classLines);
-				
-				// Si il n'y a qu'un type proposé, on change le statement vers ce type
-				if(widSource.getData().isTyped()) {
-						ControlUtils.debugMessage("Controller loadFormContent typé" );
-						String queryString = lispqlStatementQuery(widSource.getData());
-						relationLines.clear();
-						this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));
+		if( widSource.getData() != null) {
+			if(this.isFormContentLoadable(widSource)) {
+	
+				LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+				LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
+				Collections.sort(relationLines, new FormLineComparator());
+				Collections.sort(classLines, new FormLineComparator());
+	
+				// Si il n'y a qu'un seul type proposé, alors il faut qu'il soit selectionné et placé dans le statement 
+				// pour que les relations proposées soient les bonnes
+	//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
+				if(! (widSource.getData().getTypeLines().size() == classLines.size() 
+						&& widSource.getData().getTypeLines().containsAll(classLines) ) ) {
+					
+					
+	//				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
+					widSource.getData().clear();
+					
+					widSource.getData().addAllTypeLines(classLines);
+					
+					// Si il n'y a qu'un type proposé, on change le statement vers ce type
+					if(widSource.getData().isTyped()) {
+	//						ControlUtils.debugMessage("Controller loadFormContent typé" );
+							String queryString = lispqlStatementQuery(widSource.getData());
+							relationLines.clear();
+							this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));
+					}
+				} 
+					
+				if(widSource.getData().isTyped() || widSource.getData().isAnonymous()) {
+	//				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
+					int nbLines = relationLines.size();
+					Iterator<FormRelationLine> itRelLines = relationLines.iterator();
+					while(itRelLines.hasNext()) {
+						FormRelationLine relLine = itRelLines.next();
+						relLine.setWeight(nbLines);
+						nbLines--;
+					}
+					
+					widSource.getData().addAllLines(relationLines);
 				}
-			} 
-				
-			if(widSource.getData().isTyped() || widSource.getData().isAnonymous()) {
-				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
-				int nbLines = relationLines.size();
-				Iterator<FormRelationLine> itRelLines = relationLines.iterator();
-				while(itRelLines.hasNext()) {
-					FormRelationLine relLine = itRelLines.next();
-					relLine.setWeight(nbLines);
-					nbLines--;
-				}
-				
-				widSource.getData().addAllLines(relationLines);
+	
 			}
-
+			widSource.clear();
 			widSource.reload();
 		}
 
@@ -2215,12 +2207,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
+//		return (widSource.getData().isAnonymous()
+//				&& ! classLines.isEmpty()
+//				&& (classLines.size() == 1 
+//				&& classLines.getFirst() instanceof FormClassLine)
+//				|| (! classLines.isEmpty())) 
+//				|| ! relationLines.isEmpty();
 		return (widSource.getData().isAnonymous()
-				&& ! classLines.isEmpty()
-				&& (classLines.size() == 1 
-				&& classLines.getFirst() instanceof FormClassLine)
-				|| (! classLines.isEmpty())) 
-				|| ! relationLines.isEmpty();
+				|| widSource.getData().isTyped()
+				|| widSource.getData().isTypeList() 
+				|| ! widSource.getData().isEmpty());
 	}
 
 	private void setProfile(Profile pro) {
