@@ -108,7 +108,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireClassCreationEvent(ClassCreationEvent event) {
-		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireClassCreationEvent");
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireClassCreationEvent");
 		Iterator<ClassCreationHandler> itHand = this.classCreationHandlers.iterator();
 		while(itHand.hasNext()) {
 			ClassCreationHandler hand = itHand.next();
@@ -196,7 +196,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireFinishFormEvent(FinishFormEvent event) {
-		ControlUtils.debugMessage("fireFinishFormEvent " + this.getClass());
+//		ControlUtils.debugMessage("fireFinishFormEvent " + this.getClass());
 		Iterator<FinishFormHandler> itHand = this.finishFormHandlers.iterator();
 		while(itHand.hasNext()) {
 			FinishFormHandler hand = itHand.next();
@@ -271,7 +271,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireMoreCompletionsEvent(MoreCompletionsEvent event) {
-		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreCompletionsEvent");
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreCompletionsEvent");
 		Iterator<MoreCompletionsHandler> itHand = this.moreCompletionsHandlers.iterator();
 		while(itHand.hasNext()) {
 			MoreCompletionsHandler hand = itHand.next();
@@ -296,7 +296,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
-		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireLessCompletionsEvent");
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireLessCompletionsEvent");
 		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
 		while(itHand.hasNext()) {
 			LessCompletionsHandler hand = itHand.next();

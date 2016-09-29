@@ -141,7 +141,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onClick(ClickEvent event) {
-		ControlUtils.debugMessage("CustomSuggestionWidget onClick " );
+//		ControlUtils.debugMessage("CustomSuggestionWidget onClick " );
 //		fireCompletionAskedEvent();
 		this.getParentWidget().fireLineSelectionEvent(this.getSetCallback());
 	}
@@ -188,7 +188,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 
 	public void fireLessCompletionsEvent() {
-		ControlUtils.debugMessage("CustomSuggestionWidget fireLessCompletionsEvent");
+//		ControlUtils.debugMessage("CustomSuggestionWidget fireLessCompletionsEvent");
 		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, this.getSetCallback()));
 	}
 

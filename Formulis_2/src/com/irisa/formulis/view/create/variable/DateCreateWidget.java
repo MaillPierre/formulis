@@ -129,7 +129,7 @@ public class DateCreateWidget extends AbstractDataWidget implements ValueChangeH
 				dateFormat = format;
 			}
 		}
-		ControlUtils.debugMessage("DateCreateWidget onValueChange " + dateFormat + " " +datatype.getUri() );
+//		ControlUtils.debugMessage("DateCreateWidget onValueChange " + dateFormat + " " +datatype.getUri() );
 	}
 	
 

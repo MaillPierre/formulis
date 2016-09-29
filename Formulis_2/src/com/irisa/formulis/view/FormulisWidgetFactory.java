@@ -123,15 +123,15 @@ public class FormulisWidgetFactory {
 		if(elem != null && elem instanceof BasicElement) {
 			return getWidget((BasicElement)elem, par);
 		} else if(elem != null && elem instanceof FormComponent) {
-			ControlUtils.debugMessage("getWidget " + elem);
+//			ControlUtils.debugMessage("getWidget " + elem);
 			if(elem instanceof Form) {
-				ControlUtils.debugMessage("getWidget Form " + elem);
+//				ControlUtils.debugMessage("getWidget Form " + elem);
 				return new FormWidget((Form) elem, par);
 			} else if(elem instanceof FormRelationLine && par instanceof FormWidget) {
-				ControlUtils.debugMessage("getWidget FormRelationLine " + elem);
+//				ControlUtils.debugMessage("getWidget FormRelationLine " + elem);
 				return new FormRelationLineWidget((FormRelationLine)elem, (FormWidget) par);
 			} else if(elem instanceof FormClassLine && par instanceof FormWidget && ! ((FormClassLine) elem).isAnonymous()) {
-				ControlUtils.debugMessage("getWidget FormClassLine " + elem);
+//				ControlUtils.debugMessage("getWidget FormClassLine " + elem);
 				return new FormClassLineWidget((FormClassLine) elem, (FormWidget)par);
 			} else {
 				ControlUtils.debugMessage("getWidget INCONNU " + elem);

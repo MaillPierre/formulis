@@ -1967,14 +1967,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onElementCreation(ElementCreationEvent event) {
 		// CREATION D'UN NOUVEL ELEMENT
-		ControlUtils.debugMessage("onElementCreation");
+		ControlUtils.debugMessage("Controller onElementCreation");
 		FormLineWidget widSource = event.getSource();
 		FormLine dataSource = widSource.getFormLine();
 		Form newDataForm = new Form(dataSource);
 		FormWidget newFormWid = new FormWidget(newDataForm, widSource);
-		//		boolean newFormFilled = loadFormContent(newFormWid);
+		//	boolean newFormFilled = loadFormContent(newFormWid);
 		boolean newFormFilled = this.isFormContentLoadable(newFormWid);
-		if(newFormFilled) {			
+		if(newFormFilled && !newDataForm.isEmpty()) {	
 			widSource.setLineState(LINE_STATE.GUIDED_CREATION);
 			dataSource.setVariableElement(newDataForm);
 			widSource.setVariableElement(newFormWid);
@@ -2180,7 +2180,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(this.isFormContentLoadable(widSource)) {
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
-			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
+//			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
 			if(widSource.getData().getTypeLines().isEmpty()) {
 				widSource.getData().addAllLines(classLines);
 			} else {
@@ -2203,9 +2203,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
-		ControlUtils.debugMessage("isFormContentLoadable " + widSource);
-		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
-		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
+//		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
+//		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+//		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
 //		return (widSource.getData().isAnonymous()
 //				&& ! classLines.isEmpty()
@@ -2284,7 +2284,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Iterator<Increment> itIncre = place.getSuggestions().entityIterator();
 		while(itIncre.hasNext()) {
 			Increment incre = itIncre.next();
-			ControlUtils.debugMessage(incre.toString());
+//			ControlUtils.debugMessage(incre.toString());
 			if(incre.getKind() == KIND.SOMETHING) {
 				LinkedList<BasicElement> newElemList = DataUtils.getFirstDisplayableElements(incre.getDisplayElement());
 				if(newElemList.size() == 1) {

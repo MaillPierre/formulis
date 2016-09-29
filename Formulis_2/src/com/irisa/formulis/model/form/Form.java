@@ -122,7 +122,7 @@ public class Form extends FormComponent {
 	}
 	
 	public void removeRelationLine(FormLine l) {
-		ControlUtils.debugMessage("Form removeRelationLine( " + l + " )");
+//		ControlUtils.debugMessage("Form removeRelationLine( " + l + " )");
 		if(l != null && this.relationLines.contains(l)) {
 			this.relationLines.remove(l);
 		}
