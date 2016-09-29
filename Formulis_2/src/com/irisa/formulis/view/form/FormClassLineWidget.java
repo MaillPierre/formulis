@@ -57,6 +57,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		super(l, par);
 		
 		labelUriBox.setWidth("100%");
+		labelUriBox.addStyleName("input-block-level");
 		labelUriBox.setPlaceholder("Name of this new element (Random by default)");
 		labelUriBox.addValueChangeHandler(this);
 		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
@@ -84,23 +85,36 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			}
 		}
 
-		elementRow.add(fixedElement);
-		elementRow.add(labelUriBox);
+//		elementRow.add(fixedElement);
+//		elementRow.add(labelUriBox);
 		elementRow.setWidth("100%");
 		elementRow.setCellWidth(labelUriBox, "100%");
 		elementRow.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 		contentRow.add(elementCol);
-		labelUriBox.addStyleName("input-block-level");
 		
 		this.repeatLineButton.setEnabled(false);
 
-		this.setLineState(LINE_STATE.FINISHED);
-		this.hideLabelBox();
+//		this.setLineState(LINE_STATE.FINISHED);
+//		this.hideLabelBox();
+		reload();
 	}
 
 	@Override
 	public FormClassLine getFormLine() {
 		return (FormClassLine) super.getFormLine();
+	}
+	
+	protected void reload() {
+		elementRow.clear();
+		elementRow.add(fixedElement);
+		if(this.getData().isFinished()) {
+			setLineState(LINE_STATE.FINISHED);
+		} else {
+			setLineState(LINE_STATE.SUGGESTIONS);
+		}
+		if(this.getParentWidget().getData().isTypeList()){
+			hideLabelBox();
+		}
 	}
 	
 	public void hideLabelBox() {
@@ -112,6 +126,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			if(labelWid != null) {
 				elementRow.add(labelWid);
 				elementRow.setCellWidth(labelWid, "100%");
+//				fireFinishLineEvent(this.getFormLine().isFinished());
 			}
 		}
 	}
@@ -155,7 +170,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		if(event.getSource() == this.resetElementButton) {
 			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishLineEvent(false);
+			this.fireFinishLineEvent(this.getFormLine().isFinished());
 		} else if(event.getSource() == this.removeLineButton) {
 			ControlUtils.debugMessage("FormClassLine onClick remove");
 			fireRemoveLineEvent();

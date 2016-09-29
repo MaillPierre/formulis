@@ -210,7 +210,9 @@ public class FormWidget extends AbstractFormElementWidget {
 					FormLineWidget line = itFo.next();
 					addLine(line);
 				}
-				newRelationButton.setEnabled(true);
+//				newRelationButton.setEnabled(true);
+
+				this.setFinishButtonState(this.getData().isFinished());
 			} 
 	
 			
@@ -245,20 +247,23 @@ public class FormWidget extends AbstractFormElementWidget {
 		while(itClassL.hasNext()) {
 			FormClassLine line = itClassL.next();
 			if(! line.isAnonymous()) {
-				FormClassLineWidget nClassLine = new FormClassLineWidget((FormClassLine) line, this);
+				FormClassLineWidget nClassLine = new FormClassLineWidget(line, this);
 				nClassLine.setProfileMode(this.profileMode);
 				result.add(nClassLine);
-				if(this.getData().isTyped()) {
-					nClassLine.setLineState(LINE_STATE.FINISHED);
-					nClassLine.showLabelBox();
-				}
+//				if(this.getData().isTyped() ) {
+//					if(line.isFinished()) {
+//						nClassLine.setLineState(LINE_STATE.FINISHED);
+//					} else {
+//						nClassLine.showLabelBox();
+//					}
+//				}
 			}
 		}
 
 		Iterator<FormRelationLine> itRelL = getData().relationLinesIterator();
 		while(itRelL.hasNext()) {
-			FormLine line = itRelL.next();
-			FormRelationLineWidget nRelLine = new FormRelationLineWidget((FormRelationLine) line, this);
+			FormRelationLine line = itRelL.next();
+			FormRelationLineWidget nRelLine = new FormRelationLineWidget(line, this);
 			nRelLine.setProfileMode(this.profileMode);
 			result.add(nRelLine);
 		}

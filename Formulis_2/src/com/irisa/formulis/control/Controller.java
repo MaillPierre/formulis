@@ -1969,25 +1969,27 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		// CREATION D'UN NOUVEL ELEMENT
 		ControlUtils.debugMessage("Controller onElementCreation");
 		FormLineWidget widSource = event.getSource();
-		FormLine dataSource = widSource.getFormLine();
-		Form newDataForm = new Form(dataSource);
-		FormWidget newFormWid = new FormWidget(newDataForm, widSource);
-		//	boolean newFormFilled = loadFormContent(newFormWid);
-		boolean newFormFilled = this.isFormContentLoadable(newFormWid);
-		if(newFormFilled && !newDataForm.isEmpty()) {	
-			widSource.setLineState(LINE_STATE.GUIDED_CREATION);
-			dataSource.setVariableElement(newDataForm);
-			widSource.setVariableElement(newFormWid);
-			newFormWid.addClickWidgetEventHandler(widSource);
-//			ViewUtils.connectFormEventChain(newFormWid, widSource);
-
-			String queryLineLispql = lispqlStatementQuery(dataSource);
-			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getLoadCallback()));
-		} else {
-			widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget())));
+		if(widSource instanceof FormRelationLineWidget) {
+			FormLine dataSource = widSource.getFormLine();
+			Form newDataForm = new Form(dataSource);
+			FormWidget newFormWid = new FormWidget(newDataForm, widSource);
+			//	boolean newFormFilled = loadFormContent(newFormWid);
+			boolean newFormFilled = this.isFormContentLoadable(newFormWid);
+			if(newFormFilled && !newDataForm.isEmpty()) {	
+				widSource.setLineState(LINE_STATE.GUIDED_CREATION);
+				dataSource.setVariableElement(newDataForm);
+				widSource.setVariableElement(newFormWid);
+				newFormWid.addClickWidgetEventHandler(widSource);
+	//			ViewUtils.connectFormEventChain(newFormWid, widSource);
+	
+				String queryLineLispql = lispqlStatementQuery(dataSource);
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getLoadCallback()));
+			} else {
+				widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget())));
+			}
+	
+			incrementNumberOfActions();
 		}
-
-		incrementNumberOfActions();
 	}
 
 	@Override
