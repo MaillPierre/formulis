@@ -1975,7 +1975,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			FormWidget newFormWid = new FormWidget(newDataForm, widSource);
 			//	boolean newFormFilled = loadFormContent(newFormWid);
 			boolean newFormFilled = this.isFormContentLoadable(newFormWid);
-			if(newFormFilled && !newDataForm.isEmpty()) {	
+			ControlUtils.debugMessage("Controller onElementCreation " + newFormFilled + " " + newDataForm .isEmpty());
+			if(newFormFilled /*&& !newDataForm.isEmpty()*/) {	
 				widSource.setLineState(LINE_STATE.GUIDED_CREATION);
 				dataSource.setVariableElement(newDataForm);
 				widSource.setVariableElement(newFormWid);
@@ -2206,8 +2207,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
 //		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
-//		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
-//		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
+		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
+		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
 //		return (widSource.getData().isAnonymous()
 //				&& ! classLines.isEmpty()
@@ -2215,10 +2216,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //				&& classLines.getFirst() instanceof FormClassLine)
 //				|| (! classLines.isEmpty())) 
 //				|| ! relationLines.isEmpty();
-		return (widSource.getData().isAnonymous()
-				|| widSource.getData().isTyped()
-				|| widSource.getData().isTypeList() 
-				|| ! widSource.getData().isEmpty());
+//		return (widSource.getData().isAnonymous()
+//				|| widSource.getData().isTyped()
+//				|| widSource.getData().isTypeList() )
+//				&& ! widSource.getData().isEmpty();
+		return ! classLines.isEmpty() || ! relationLines.isEmpty();
 	}
 
 	private void setProfile(Profile pro) {

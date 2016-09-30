@@ -115,6 +115,9 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		if(this.getParentWidget().getData().isTypeList()){
 			hideLabelBox();
 		}
+		if(this.getData().getParent().isTypeList() || this.getData().getParent().isTyped()) {
+			this.removeLineButton.setEnabled(false);
+		}
 	}
 	
 	public void hideLabelBox() {
