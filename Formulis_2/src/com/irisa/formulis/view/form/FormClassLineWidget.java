@@ -183,7 +183,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
-			getFormLine().setEntityLabel(SafeHtmlUtils.htmlEscape(event.getValue()));
+			getFormLine().setEntityLabel(event.getValue());
 			this.fireFinishLineEvent(this.getFormLine().isFinished());
 		}
 	}

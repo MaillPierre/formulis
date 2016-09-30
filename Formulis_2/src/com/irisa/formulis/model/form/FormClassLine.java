@@ -70,7 +70,7 @@ public class FormClassLine extends FormLine {
 	}
 
 	public void setEntityUri(String elementUri) {
-//		ControlUtils.debugMessage("setElementUri : " + elementUri);
+		ControlUtils.debugMessage("setElementUri : " + elementUri);
 		this.elementUri = elementUri;
 	}
 
@@ -80,8 +80,7 @@ public class FormClassLine extends FormLine {
 
 	public void setEntityLabel(String label) {
 		this.elementLabel = label;
-		String traitedLabel = UriUtils.encode(label).replace(" ", "_");
-		setEntityUri(Controller.newElementUri(traitedLabel));
+		setEntityUri(Controller.newElementUri(label));
 	}
 	
 	@Override

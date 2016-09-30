@@ -71,7 +71,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private MainPage mainPage;
 	private MainNavigationBar navBar = new MainNavigationBar();
 
-	private static String uriBaseAdress = "http://www.irisa.fr/LIS";
+	private static String uriBaseAdress = "http://www.irisa.fr/LIS/sewelis/";
 	
 	private static String serverAdress = "http://127.0.0.1:9999/";
 //	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
@@ -92,9 +92,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	private int numberOfActions = 0;
 	private Date startEditDate = new Date();
+	
+	public static Controller _instance = null;
 
-	public Controller instance() {
-		return this;
+	public static Controller instance() {
+		return _instance;
 	}
 
 	public void setServer(String adress) {
@@ -1598,6 +1600,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onModuleLoad() {
+		// Init de singleton
+		_instance = this;
+		
 		Parser.setControl(this);
 		initializeProfilesFromCookie();
 		form = new Form(null);
@@ -2310,25 +2315,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public static String newElementUri(String label) {
-		String result = uriBaseAdress + /*"/" + currentStore.getName() +*/ "#";
-//		int uriMinSize = 8;
-//		if(label != null && label.length() > uriMinSize) {
-			result += label;
-//		} else {
-//			if(label != null && label.length() < uriMinSize) {
-//				result += label + "_";
-//			}
-//			// CTRL-C CTRL-V de http://stackoverflow.com/questions/20536566/creating-a-random-string-with-a-z-and-0-9-in-java
-//			String RANDCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-//			StringBuilder randBuilder = new StringBuilder();
-//			int randSize = uriMinSize - label.length();
-//			while (randBuilder.length() < randSize) {
-//				int index = (Random.nextInt(RANDCHARS.length()));
-//				randBuilder.append(RANDCHARS.charAt(index));
-//			}
-//			String randString = randBuilder.toString();
-//			result += randString;
-//		}
+		String result = uriBaseAdress + instance().currentStore.getName() + "#";
+		String sanitizedLabel = label.replace(" ", "_").replace("<","_").replace(">","_").replace("#","_").replace("%","_").replace("\"","_").replace(",","_").replace(")","_").replace("{","_").replace("}","_").replace("|","_").replace("\\","_").replace("^","_").replace("'","_").replace(";","_").replace("/","_").replace("?","_").replace(":","_").replace("@","_").replace("&","_").replace("=","_").replace("+","_").replace("$","_").replace(",", "_");
+		result += sanitizedLabel;
 		return result;
 	}
 
