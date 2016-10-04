@@ -42,6 +42,7 @@ public class CustomSuggestionPopover extends PopupPanel {
 		this.suggestionBar.addStyleName("weblis-suggestion-frame");
 		
 		refreshSuggestion();
+		hide();
 	}
 	
 	public void setCanCreateNewElement(boolean can) {
