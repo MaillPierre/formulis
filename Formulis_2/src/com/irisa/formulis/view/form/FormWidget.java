@@ -1,5 +1,7 @@
 package com.irisa.formulis.view.form;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -19,6 +21,7 @@ import com.irisa.formulis.control.profile.ProfileForm;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormLine;
+import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
@@ -268,6 +271,18 @@ public class FormWidget extends AbstractFormElementWidget {
 			result.add(nRelLine);
 		}
 
+		Collections.sort(result, new Comparator<FormLineWidget>(){
+			@Override
+			public int compare(FormLineWidget o1, FormLineWidget o2) {
+				if(o1 != null && o2 != null) {
+					FormLineComparator comp = new FormLineComparator();
+					return comp.compare(o1.getData(), o2.getData());
+				} else {
+					return 0;
+				}
+			}
+		});
+		
 		return result;
 	}
 	

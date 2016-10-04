@@ -1638,16 +1638,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		
 
 //		// handlers attribution
-//
-//		navBar.adminPanel.profileModeButton.addClickHandler(this);
-//		navBar.adminPanel.profileCreateButton.addClickHandler(this);
-//		navBar.adminPanel.profileClearButton.addClickHandler(this);
-//		navBar.adminPanel.profileGoButton.addClickHandler(this);
-//		navBar.adminPanel.profileDeleteButton.addClickHandler(this);
-//		navBar.adminPanel.profileEditSave.addClickHandler(this);
-//		navBar.adminPanel.profileEditClear.addClickHandler(this);
-//		navBar.adminPanel.profileEditReload.addClickHandler(this);
-//		navBar.adminPanel.namespaceDefineButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
+		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
+		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
+		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
+		mainPage.getSettingsWidget().namespaceDefineButton.addClickHandler(this);
 		
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
 			@Override
@@ -1793,39 +1792,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
-//		if(event.getSource() == navBar.adminPanel.profileModeButton) {
-//			this.mainPage.formWidget.toggleProfileMode();
-//
-//		} else if(event.getSource() == navBar.adminPanel.profileCreateButton) {
-//			if(this.mainPage.formWidget.isInProfileMode()) {
-//				Profile pro = formToProfile();
-//				pro.setName(navBar.adminPanel.profileNameBox.getValue());
-//				addProfile(pro);
-//				reloadNavbarProfileList();
-//			}
-//
-//		} else if(event.getSource() == navBar.adminPanel.profileClearButton) {
-//			this.clearProfiles();
-//			reloadNavbarProfileList();
-//
-//		}else if(event.getSource() == navBar.adminPanel.profileGoButton) {
-//			String select = navBar.adminPanel.profileList.getSelectedValue();
-//			setProfile(findProfile(profiles, select));
-//
-//		}else if(event.getSource() == navBar.adminPanel.profileDeleteButton) {
-//			String select = navBar.adminPanel.profileList.getSelectedValue();
-//			Profile pro = findProfile(profiles, select);
-//			if(pro != null) {
-//				removeProfile(pro);
-//			}
-//			
-//			reloadNavbarProfileList();
-//		}else if(event.getSource() == navBar.adminPanel.namespaceDefineButton) {
-//			if(navBar.adminPanel.namespacePrefixBox.getValue() != "" && navBar.adminPanel.namespaceUriBox.getValue() != "") {
-//				this.sewelisDefineNamespace(navBar.adminPanel.namespacePrefixBox.getValue(), navBar.adminPanel.namespaceUriBox.getValue());
-//			}
+		if(event.getSource() == mainPage.getSettingsWidget().profileModeButton) {
+			this.mainPage.formWidget.toggleProfileMode();
 
-//		} else 
+		} else if(event.getSource() == mainPage.getSettingsWidget().profileCreateButton) {
+			if(this.mainPage.formWidget.isInProfileMode()) {
+				Profile pro = formToProfile();
+				pro.setName(mainPage.getSettingsWidget().profileNameBox.getValue());
+				addProfile(pro);
+				reloadNavbarProfileList();
+			}
+
+		} else if(event.getSource() == mainPage.getSettingsWidget().profileClearButton) {
+			this.clearProfiles();
+			reloadNavbarProfileList();
+
+		}else if(event.getSource() == mainPage.getSettingsWidget().profileGoButton) {
+			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+			setProfile(findProfile(profiles, select));
+
+		}else if(event.getSource() == mainPage.getSettingsWidget().profileDeleteButton) {
+			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+			Profile pro = findProfile(profiles, select);
+			if(pro != null) {
+				removeProfile(pro);
+			}
+			
+			reloadNavbarProfileList();
+		}else if(event.getSource() == mainPage.getSettingsWidget().namespaceDefineButton) {
+			if(mainPage.getSettingsWidget().namespacePrefixBox.getValue() != "" && mainPage.getSettingsWidget().namespaceUriBox.getValue() != "") {
+				this.sewelisDefineNamespace(mainPage.getSettingsWidget().namespacePrefixBox.getValue(), mainPage.getSettingsWidget().namespaceUriBox.getValue());
+			}
+
+		} else 
 			if(event.getSource() == navBar.loginWid.notLoggedLoginButton) {
 			String login = this.navBar.loginWid.notLoggedLoginTextbox.getText();
 			String password = this.navBar.loginWid.notLoggedPasswdTextBox.getText();

@@ -70,7 +70,6 @@ public class FormClassLine extends FormLine {
 	}
 
 	public void setEntityUri(String elementUri) {
-		ControlUtils.debugMessage("setElementUri : " + elementUri);
 		this.elementUri = elementUri;
 	}
 

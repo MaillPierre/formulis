@@ -9,7 +9,9 @@ import com.github.gwtbootstrap.client.ui.FluidRow;
 
 public class MainPage extends Composite {
 	
-	private FluidRow mainPanel = new FluidRow();
+	private FluidRow element = new FluidRow();
+	private Column contentCol = new Column(12);
+	private FluidRow formulisRow = new FluidRow(); 
 
 	// Content
 	public FormWidget formWidget;
@@ -17,11 +19,12 @@ public class MainPage extends Composite {
 	public AnswersWidget ansWidget = new AnswersWidget();
 	private Column ansWidgetCol;
 	private Controller control;
+	private AdminPanel settings = new AdminPanel();
 	
 	public MainPage(Controller c) {
 		try {
 			
-			initWidget(mainPanel);
+			initWidget(element);
 			
 			control = c;
 			
@@ -35,9 +38,12 @@ public class MainPage extends Composite {
 			ansWidget.setWidth("100%");
 			
 			// Contenu
-			mainPanel.add(formWidgetCol);
-			mainPanel.add(ansWidgetCol);
-			mainPanel.addStyleName("mainPage");
+			formulisRow.add(formWidgetCol);
+			formulisRow.add(ansWidgetCol);
+			contentCol.add(formulisRow);
+			contentCol.add(settings);
+			element.add(contentCol);
+			element.addStyleName("mainPage");
 		} catch(Exception e) {
 			ControlUtils.exceptionMessage(e);
 		}
@@ -46,6 +52,14 @@ public class MainPage extends Composite {
 	public void setFormWidget(FormWidget wid) {
 		formWidget = wid;
 		ViewUtils.connectFormEventChain(formWidget, control);
+	}
+
+	public AdminPanel getSettingsWidget() {
+		return settings;
+	}
+
+	public void setSettingsWidget(AdminPanel settings) {
+		this.settings = settings;
 	}
 
 }

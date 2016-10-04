@@ -22,12 +22,12 @@ public class FormLineComparator implements Comparator<FormLine> {
 					return l0.getFixedElement().toString().compareTo(l1.getFixedElement().toString());
 				}
 			} else {
-				return l1.getWeight() - l0.getWeight();
+				return Integer.compare(l1.getWeight(), l0.getWeight());
 			}
 		} else if(l0 instanceof FormClassLine) {
-			return 1;
-		} else {
 			return -1;
+		} else {
+			return 1;
 		}
 	}
 

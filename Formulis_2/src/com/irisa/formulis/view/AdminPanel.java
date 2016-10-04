@@ -22,7 +22,7 @@ public class AdminPanel extends Composite  {
 	
 	public TextBox namespacePrefixBox = new TextBox();
 	public TextBox namespaceUriBox = new TextBox();
-	public Button namespaceDefineButton = new Button("Définir préfixe");
+	public Button namespaceDefineButton = new Button("Define prefix");
 	
 	
 	private HorizontalPanel limitProfilePanel = new HorizontalPanel();
@@ -32,27 +32,27 @@ public class AdminPanel extends Composite  {
 	private NavText limitLabel = new NavText("Nb. sugg. max: ");
 	
 	private HorizontalPanel profilePanel = new HorizontalPanel();
-	public Button profileModeButton = new Button("Mode profile");
-	public Button profileCreateButton = new Button("Créer profile");
+	public Button profileModeButton = new Button("Profile mode");
+	public Button profileCreateButton = new Button("Create profile");
 	public TextBox profileNameBox = new TextBox();
 	public Button profileGoButton = new Button("Go");
-	public Button profileDeleteButton = new Button("Suppr.");
-	public Button profileClearButton = new Button("Suppr. tous");
+	public Button profileDeleteButton = new Button("Delete");
+	public Button profileClearButton = new Button("Delete all");
 	
-	public DisclosurePanel profileEditDiscPanel = new DisclosurePanel("Edition directe des profiles");
+	public DisclosurePanel profileEditDiscPanel = new DisclosurePanel("Profiles direct edition");
 	public VerticalPanel profileEditPanel = new VerticalPanel();
 	public TextArea profileEditArea = new TextArea();
 	private HorizontalPanel profileEditButtonPanel = new HorizontalPanel();
-	public Button profileEditSave = new Button("Sauvegarder");
-	public Button profileEditClear = new Button("Effacer");
-	public Button profileEditReload = new Button("Recharger");
+	public Button profileEditSave = new Button("Save");
+	public Button profileEditClear = new Button("Delete");
+	public Button profileEditReload = new Button("Reload");
 	
 	public ListBox profileList = new ListBox();
 	
 	public AdminPanel() {
 		initWidget(element);
 		
-		element.setHeader(new Paragraph("Gestion"));
+		element.setHeader(new Paragraph("Settings"));
 		element.setContent(content);
 		
 		
@@ -61,7 +61,7 @@ public class AdminPanel extends Composite  {
 		limitLabel.addStyleName("weblis-navbar-text");
 		
 		profileNameBox.addStyleName("weblis-navbar-textbox");
-		profileNameBox.setPlaceholder("Nom du profile");
+		profileNameBox.setPlaceholder("Profile name");
 		profileNameBox.setWidth("120px");
 		profileList.addStyleName("weblis-navbar-textbox");
 		profileList.addItem("");
@@ -74,7 +74,7 @@ public class AdminPanel extends Composite  {
 		profileEditButtonPanel.add(profileEditReload);
 		
 		
-		namespacePrefixBox.setPlaceholder("Préfixe");
+		namespacePrefixBox.setPlaceholder("Prefix");
 		namespacePrefixBox.setWidth("100px");
 		namespacePrefixBox.addStyleName("weblis-navbar-textbox");
 		namespaceUriBox.setPlaceholder("Uri");

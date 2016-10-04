@@ -117,6 +117,8 @@ public class Form extends FormComponent {
 		if(relationLines.contains(l)) {
 			int index = relationLines.indexOf(l);
 			FormRelationLine newLine = new FormRelationLine( l.getParent(), l.getFixedElement(), l.getVariableElement());
+			newLine.setInfo(l.getInfo());
+			newLine.setWeight(l.getWeight());
 			relationLines.add(index+1, newLine);
 		}
 	}

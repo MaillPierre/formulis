@@ -35,11 +35,11 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 	protected Button repeatLineButton = new Button("", IconType.PLUS);
 	protected Button removeLineButton = new Button("", IconType.REMOVE);
 	
-	protected CheckBox profileCheckbox = new CheckBox();
 	protected HorizontalPanel profileRow = new HorizontalPanel();
 	protected Button profileIndexPlus = new Button("+");
 	protected Button profileIndexMinus = new Button("-");
 	protected IntegerBox profileIndexBox = new IntegerBox();
+	protected CheckBox profileCheckbox = new CheckBox();
 	
 	protected LINE_STATE currentState = LINE_STATE.SUGGESTIONS;
 	
@@ -125,7 +125,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		});
 		profileIndexBox.setReadOnly(true);
 		profileIndexBox.setMaxLength(2);
-		profileIndexBox.setWidth("100%");
+//		profileIndexBox.setWidth("100%");
 		profileIndexBox.setValue(getData().getWeight());
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
