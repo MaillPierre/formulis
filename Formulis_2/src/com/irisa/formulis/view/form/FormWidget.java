@@ -12,6 +12,20 @@ import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.DragEndEvent;
+import com.google.gwt.event.dom.client.DragEndHandler;
+import com.google.gwt.event.dom.client.DragEnterEvent;
+import com.google.gwt.event.dom.client.DragEnterHandler;
+import com.google.gwt.event.dom.client.DragEvent;
+import com.google.gwt.event.dom.client.DragHandler;
+import com.google.gwt.event.dom.client.DragLeaveEvent;
+import com.google.gwt.event.dom.client.DragLeaveHandler;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragOverHandler;
+import com.google.gwt.event.dom.client.DragStartEvent;
+import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.irisa.formulis.control.ControlUtils;
@@ -23,6 +37,7 @@ import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
+import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
@@ -35,7 +50,8 @@ import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
  * @author pmaillot
  *
  */
-public class FormWidget extends AbstractFormElementWidget {
+public class FormWidget extends AbstractFormElementWidget implements DragEndHandler, DragEnterHandler, DragLeaveHandler, DragHandler, DragOverHandler, 
+DragStartHandler, DropHandler {
 
 	private FluidRow element = new FluidRow();
 	private Column linesCol = new Column(11);
@@ -303,6 +319,15 @@ public class FormWidget extends AbstractFormElementWidget {
 		linesCol.add(line);
 		linesWidgets.addLast(line);
 		ViewUtils.connectFormEventChain(line, this);
+		if(line instanceof FormRelationLineWidget) {
+			((FormRelationLineWidget) line).addDragStartHandler(this);
+			((FormRelationLineWidget) line).addDragEndHandler(this);
+			((FormRelationLineWidget) line).addDragEnterHandler(this);
+			((FormRelationLineWidget) line).addDragHandler(this);
+			((FormRelationLineWidget) line).addDragLeaveHandler(this);
+			((FormRelationLineWidget) line).addDragOverHandler(this);
+			((FormRelationLineWidget) line).addDropHandler(this);
+		}
 	}
 
 	public void setData(Form form) {
@@ -404,6 +429,47 @@ public class FormWidget extends AbstractFormElementWidget {
 			return this.source;
 		}
 		
+	}
+
+	@Override
+	public void onDragStart(DragStartEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragStart");
+		if(event.getSource() instanceof FormRelationLineWidget) {
+			ControlUtils.debugMessage(((FormRelationLineWidget) event.getSource()).getData());
+			event.setData("text", ((FormRelationLineWidget) event.getSource()).getData().toString());
+			event.getDataTransfer().setDragImage(((FormRelationLineWidget)event.getSource()).getElement(), 10, 10);
+		}
+	}
+
+	@Override
+	public void onDrop(DropEvent event) {
+		ControlUtils.debugMessage("FormWidget onDrop");
+	}
+
+	@Override
+	public void onDragOver(DragOverEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragOver");
+		//TODO Create placeholder line to figure le new place of the line, reordering mechanism
+	}
+
+	@Override
+	public void onDrag(DragEvent event) {
+//		ControlUtils.debugMessage("FormWidget onDrag");
+	}
+
+	@Override
+	public void onDragLeave(DragLeaveEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragLeave");
+	}
+
+	@Override
+	public void onDragEnter(DragEnterEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragEnter");
+	}
+
+	@Override
+	public void onDragEnd(DragEndEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragEnd");
 	}
 	
 }

@@ -1,7 +1,27 @@
 package com.irisa.formulis.view.form;
 
+import java.util.LinkedList;
+
 import com.github.gwtbootstrap.client.ui.Column;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.DragEndEvent;
+import com.google.gwt.event.dom.client.DragEndHandler;
+import com.google.gwt.event.dom.client.DragEnterEvent;
+import com.google.gwt.event.dom.client.DragEnterHandler;
+import com.google.gwt.event.dom.client.DragEvent;
+import com.google.gwt.event.dom.client.DragHandler;
+import com.google.gwt.event.dom.client.DragLeaveEvent;
+import com.google.gwt.event.dom.client.DragLeaveHandler;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragOverHandler;
+import com.google.gwt.event.dom.client.DragStartEvent;
+import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
+import com.google.gwt.event.dom.client.HasAllDragAndDropHandlers;
+import com.google.gwt.event.dom.client.HasDragStartHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
@@ -23,7 +43,7 @@ import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 
-public class FormRelationLineWidget extends FormLineWidget implements SuggestionSelectionHandler {
+public class FormRelationLineWidget extends FormLineWidget implements SuggestionSelectionHandler, HasAllDragAndDropHandlers {
 
 	protected Column fixedElementCol = new Column(3); 
 	protected Column variableElementCol = new Column(9);
@@ -35,6 +55,8 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 	public FormRelationLineWidget(FormRelationLine l, FormWidget par) {
 		super(l, par);
+		
+		getElement().setDraggable(Element.DRAGGABLE_TRUE);
 		variableElementCol.setSize(8); 
 
 		try {
@@ -238,6 +260,41 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 	@Override
 	public AbstractFormulisWidget getVariableElement() {
 		return this.variableElement;
+	}
+
+	@Override
+	public HandlerRegistration addDragStartHandler(DragStartHandler handler) {
+		return addDomHandler(handler, DragStartEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDragEndHandler(DragEndHandler handler) {
+		return addDomHandler(handler, DragEndEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDragEnterHandler(DragEnterHandler handler) {
+		return addDomHandler(handler, DragEnterEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDragLeaveHandler(DragLeaveHandler handler) {
+		return addDomHandler(handler, DragLeaveEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDragHandler(DragHandler handler) {
+		return addDomHandler(handler, DragEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDragOverHandler(DragOverHandler handler) {
+		return addDomHandler(handler, DragOverEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addDropHandler(DropHandler handler) {
+		return addDomHandler(handler, DropEvent.getType());
 	}
 
 }

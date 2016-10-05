@@ -1,6 +1,6 @@
 package com.irisa.formulis.model.form;
 
-public abstract class FormLine extends FormComponent{
+public abstract class FormLine extends FormComponent {
 	
 	protected FormElement fixedElement;
 	protected FormElement variableElement;
