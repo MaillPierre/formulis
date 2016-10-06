@@ -113,6 +113,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			this.mainPage.formWidget.reload();
 		}
 		currentStore = storeMapByName.get(selectValue);
+		sewelisStoreXmlns();
 	}
 	
 	private void incrementNumberOfActions() {
@@ -241,6 +242,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		}
 //		
 //		navBar.adminPanel.profileEditReload.click(); // SALE
+	}
+	
+	public void refreshNamespaceList() {
+		this.mainPage.getSettingsWidget().getNsListBox().clear();
+		Iterator<String> itNs = currentStore.getNamespaceIterator();
+		while(itNs.hasNext()) {
+			String ns = itNs.next();
+			if(currentStore.getNamespacePrefix(ns) != null) {
+				String line = currentStore.getNamespacePrefix(ns) + " " + ns;
+				this.mainPage.getSettingsWidget().getNsListBox().addItem(line);
+			}
+		}
 	}
 
 
@@ -532,12 +545,62 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	//
 	//	}
 	//
-	//	/**
-	//	 * Utilité inconnue
-	//	 */
-	//	public void storeXmlns() {
-	//
-	//	}
+		/**
+		 * Rafraichit la liste des namespaces pour le store
+		 */
+		public void sewelisStoreXmlns() {
+			if(this.currentStore != null) {
+			try {
+				String storeXmlnsRequestString = serverAdress + "/storeXmlns?";
+				storeXmlnsRequestString += "userKey=" + userKey;
+				storeXmlnsRequestString += "&storeName=" + currentStore.getName();
+				RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(storeXmlnsRequestString));
+				navBar.setServerStatusMessage("Retrieving namespaces...");
+				builder.sendRequest(null, new RequestCallback() {			
+					@Override
+					public void onError(Request request, Throwable exception) {
+					}
+
+					@Override
+					public void onResponseReceived(Request request, Response response) {
+						if (200 == response.getStatusCode()) {
+							Document storeListDoc = XMLParser.parse(response.getText());
+							Element docElement = storeListDoc.getDocumentElement();
+							String status = docElement.getAttribute("status");
+							navBar.setServerStatusMessage(status);
+							if(status != "ok") {
+								navBar.setServerStatusMessage(docElement.getAttribute("status"));
+								if(docElement.getFirstChild().getNodeName() == "message") {
+									ControlUtils.debugMessage( docElement.getFirstChild().toString());
+									navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+								}
+							} else {
+								if(docElement.getNodeName().equals("storeXmlnsResponse")) {
+									NodeList childs = docElement.getChildNodes();
+									for(int i = 0; i < childs.getLength(); i++) {
+										Node child = childs.item(i);
+										if(child.getNodeName().equals("namespaceDefinition")) {
+											String ns = child.getAttributes().getNamedItem("namespace").getNodeValue();
+											String prefix = child.getAttributes().getNamedItem("prefix").getNodeValue();
+											currentStore.addNamespace(prefix, ns);
+										}
+									}
+									refreshNamespaceList();
+								}
+							}
+
+						} else {
+							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						}
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ControlUtils.exceptionMessage(e);
+			}
+			}
+		}
 	//
 	//	/**
 	//	 * Utilité inconnue (Genre d'entité ? Class, property, etc ... )
@@ -1638,15 +1701,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		
 
 //		// handlers attribution
-		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
-		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
-		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
-		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
-		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
-		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
-		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
-		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
-		mainPage.getSettingsWidget().namespaceDefineButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
+//		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
+		mainPage.getSettingsWidget().getNamespaceDefineButton().addClickHandler(this);
+		
 		
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
 			@Override
@@ -1792,36 +1856,37 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
-		if(event.getSource() == mainPage.getSettingsWidget().profileModeButton) {
-			this.mainPage.formWidget.toggleProfileMode();
-
-		} else if(event.getSource() == mainPage.getSettingsWidget().profileCreateButton) {
-			if(this.mainPage.formWidget.isInProfileMode()) {
-				Profile pro = formToProfile();
-				pro.setName(mainPage.getSettingsWidget().profileNameBox.getValue());
-				addProfile(pro);
-				reloadNavbarProfileList();
-			}
-
-		} else if(event.getSource() == mainPage.getSettingsWidget().profileClearButton) {
-			this.clearProfiles();
-			reloadNavbarProfileList();
-
-		}else if(event.getSource() == mainPage.getSettingsWidget().profileGoButton) {
-			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
-			setProfile(findProfile(profiles, select));
-
-		}else if(event.getSource() == mainPage.getSettingsWidget().profileDeleteButton) {
-			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
-			Profile pro = findProfile(profiles, select);
-			if(pro != null) {
-				removeProfile(pro);
-			}
-			
-			reloadNavbarProfileList();
-		}else if(event.getSource() == mainPage.getSettingsWidget().namespaceDefineButton) {
-			if(mainPage.getSettingsWidget().namespacePrefixBox.getValue() != "" && mainPage.getSettingsWidget().namespaceUriBox.getValue() != "") {
-				this.sewelisDefineNamespace(mainPage.getSettingsWidget().namespacePrefixBox.getValue(), mainPage.getSettingsWidget().namespaceUriBox.getValue());
+//		if(event.getSource() == mainPage.getSettingsWidget().profileModeButton) {
+//			this.mainPage.formWidget.toggleProfileMode();
+//
+//		} else if(event.getSource() == mainPage.getSettingsWidget().profileCreateButton) {
+//			if(this.mainPage.formWidget.isInProfileMode()) {
+//				Profile pro = formToProfile();
+//				pro.setName(mainPage.getSettingsWidget().profileNameBox.getValue());
+//				addProfile(pro);
+//				reloadNavbarProfileList();
+//			}
+//
+//		} else if(event.getSource() == mainPage.getSettingsWidget().profileClearButton) {
+//			this.clearProfiles();
+//			reloadNavbarProfileList();
+//
+//		} else if(event.getSource() == mainPage.getSettingsWidget().profileGoButton) {
+//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+//			setProfile(findProfile(profiles, select));
+//
+//		} else if(event.getSource() == mainPage.getSettingsWidget().profileDeleteButton) {
+//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+//			Profile pro = findProfile(profiles, select);
+//			if(pro != null) {
+//				removeProfile(pro);
+//			}
+//			
+//			reloadNavbarProfileList();
+//		} else 
+		if(event.getSource() == mainPage.getSettingsWidget().getNamespaceDefineButton()) {
+			if(mainPage.getSettingsWidget().getNamespacePrefixBox().getValue() != "" && mainPage.getSettingsWidget().getNamespaceUriBox().getValue() != "") {
+				this.sewelisDefineNamespace(mainPage.getSettingsWidget().getNamespacePrefixBox().getValue(), mainPage.getSettingsWidget().getNamespaceUriBox().getValue());
 			}
 
 		} else 

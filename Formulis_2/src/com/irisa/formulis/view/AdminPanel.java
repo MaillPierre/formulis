@@ -1,11 +1,10 @@
 package com.irisa.formulis.view;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.IntegerBox;
+import com.github.gwtbootstrap.client.ui.Column;
+import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.ListBox;
-import com.github.gwtbootstrap.client.ui.NavText;
 import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -18,86 +17,68 @@ public class AdminPanel extends Composite  {
 	private VerticalPanel content = new VerticalPanel();
 	
 	
-	private HorizontalPanel namespacePanel = new HorizontalPanel();
+	private FluidRow namespacePanel = new FluidRow();
+	private FluidRow nsListRow = new FluidRow();
+	private Column nsListCol = new Column(6, nsListRow);
+	private HorizontalPanel nsCreateRow = new HorizontalPanel();
+	private Column nsCreateCol = new Column(6, nsCreateRow);
 	
-	public TextBox namespacePrefixBox = new TextBox();
-	public TextBox namespaceUriBox = new TextBox();
-	public Button namespaceDefineButton = new Button("Define prefix");
-	
-	
-	private HorizontalPanel limitProfilePanel = new HorizontalPanel();
-	
-	private HorizontalPanel limitPanel = new HorizontalPanel();
-	public IntegerBox limitBox = new IntegerBox();
-	private NavText limitLabel = new NavText("Nb. sugg. max: ");
-	
-	private HorizontalPanel profilePanel = new HorizontalPanel();
-	public Button profileModeButton = new Button("Profile mode");
-	public Button profileCreateButton = new Button("Create profile");
-	public TextBox profileNameBox = new TextBox();
-	public Button profileGoButton = new Button("Go");
-	public Button profileDeleteButton = new Button("Delete");
-	public Button profileClearButton = new Button("Delete all");
-	
-	public DisclosurePanel profileEditDiscPanel = new DisclosurePanel("Profiles direct edition");
-	public VerticalPanel profileEditPanel = new VerticalPanel();
-	public TextArea profileEditArea = new TextArea();
-	private HorizontalPanel profileEditButtonPanel = new HorizontalPanel();
-	public Button profileEditSave = new Button("Save");
-	public Button profileEditClear = new Button("Delete");
-	public Button profileEditReload = new Button("Reload");
-	
-	public ListBox profileList = new ListBox();
+	private TextBox namespacePrefixBox = new TextBox();
+	private TextBox namespaceUriBox = new TextBox();
+	private Button namespaceDefineButton = new Button("Define prefix");
+	private ListBox nsListBox = new ListBox();
 	
 	public AdminPanel() {
 		initWidget(element);
 		
 		element.setHeader(new Paragraph("Settings"));
 		element.setContent(content);
+		element.setWidth("100%");
+		content.setWidth("100%");
 		
 		
-		limitBox.setWidth("15px");
-		limitBox.addStyleName("weblis-navbar-textbox");
-		limitLabel.addStyleName("weblis-navbar-text");
+		getNamespacePrefixBox().setPlaceholder("Prefix");
+		getNamespacePrefixBox().setWidth("100px");
+		getNamespaceUriBox().setPlaceholder("Uri");
+		getNamespaceUriBox().setWidth("100px");
+		nsListBox.setVisibleItemCount(5);
+		nsListBox.setWidth("100%");
 		
-		profileNameBox.addStyleName("weblis-navbar-textbox");
-		profileNameBox.setPlaceholder("Profile name");
-		profileNameBox.setWidth("120px");
-		profileList.addStyleName("weblis-navbar-textbox");
-		profileList.addItem("");
-		profileList.setWidth("150px");
-		profileEditDiscPanel.add(profileEditPanel);
-		profileEditPanel.add(profileEditArea);
-		profileEditPanel.add(profileEditButtonPanel);
-		profileEditButtonPanel.add(profileEditSave);
-		profileEditButtonPanel.add(profileEditClear);
-		profileEditButtonPanel.add(profileEditReload);
-		
-		
-		namespacePrefixBox.setPlaceholder("Prefix");
-		namespacePrefixBox.setWidth("100px");
-		namespacePrefixBox.addStyleName("weblis-navbar-textbox");
-		namespaceUriBox.setPlaceholder("Uri");
-		namespaceUriBox.setWidth("100px");
-		namespaceUriBox.addStyleName("weblis-navbar-textbox");
-		
-		content.add(limitProfilePanel);
 		content.add(namespacePanel);
-		limitProfilePanel.add(limitPanel);
-		limitProfilePanel.add(profilePanel);
-		limitPanel.add(limitLabel);
-		limitPanel.add(limitBox);
-		profilePanel.add(profileModeButton);
-		profilePanel.add(profileCreateButton);
-		profilePanel.add(profileNameBox);
-		profilePanel.add(profileList);
-		profilePanel.add(profileGoButton);
-		profilePanel.add(profileDeleteButton);
-		profilePanel.add(profileClearButton);
-		namespacePanel.add(namespacePrefixBox);
-		namespacePanel.add(namespaceUriBox);
-		namespacePanel.add(namespaceDefineButton);
-		namespacePanel.add(profileEditDiscPanel);
+		namespacePanel.add(nsListCol);
+		namespacePanel.add(nsCreateCol);
+		nsCreateRow.add(getNamespacePrefixBox());
+		nsCreateRow.add(getNamespaceUriBox());
+		nsCreateRow.add(getNamespaceDefineButton());
+		nsListRow.add(nsListBox);
 		
+	}
+	
+	public ListBox getNsListBox() {
+		return this.nsListBox;
+	}
+
+	public Button getNamespaceDefineButton() {
+		return namespaceDefineButton;
+	}
+
+	public void setNamespaceDefineButton(Button namespaceDefineButton) {
+		this.namespaceDefineButton = namespaceDefineButton;
+	}
+
+	public TextBox getNamespacePrefixBox() {
+		return namespacePrefixBox;
+	}
+
+	public void setNamespacePrefixBox(TextBox namespacePrefixBox) {
+		this.namespacePrefixBox = namespacePrefixBox;
+	}
+
+	public TextBox getNamespaceUriBox() {
+		return namespaceUriBox;
+	}
+
+	public void setNamespaceUriBox(TextBox namespaceUriBox) {
+		this.namespaceUriBox = namespaceUriBox;
 	}
 }
