@@ -432,7 +432,7 @@ public class Parser {
 
 	public static Profile parseProfile(Node node) throws XMLParsingException {
 		//		Utils.debugMessage("parseProfile( " + node + " )");
-		if(node.getNodeName() == "profile") {
+		if(node.getNodeName().equals("profile")) {
 			String name = "";
 			if(node.getAttributes().getNamedItem("name") != null) {
 				name = node.getAttributes().getNamedItem("name").getNodeValue();
@@ -454,7 +454,7 @@ public class Parser {
 
 			return result;
 		} else {
-			throw new XMLParsingException("parseProfile expect <profile> root node, got : " + node);
+			throw new XMLParsingException("parseProfile expect <profile> root node, got : " + node.getNodeName());
 		}
 	}
 

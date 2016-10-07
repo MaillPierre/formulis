@@ -13,6 +13,7 @@ import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidContainer;
@@ -99,7 +100,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		profileRow.add(profileIndexMinus);
 		profileRow.add(profileIndexBox);
 		profileRow.add(profileCheckbox);
-		buttonsRow.add(profileRow);
+//		buttonsRow.add(profileRow);
 		
 		buttonsContainer.addStyleName("no-gutter");
 		contentCol.addStyleName("no-gutter");
@@ -138,6 +139,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		
 		element.add(contentCol);
 		element.add(buttonsCol);
+		
 	}
 	
 	public FormLine getFormLine() {

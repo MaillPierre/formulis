@@ -37,7 +37,15 @@
 	padding: 1% 1%;
     border-style: solid;
 	border-radius: 6px;
-    border-color: #ddd;
+    border-color: #cccccc;
+    border-width: 1px;
+}
+
+.weblis-line-frame {
+/* 	padding: 1% 1%; */
+    border-style: solid;
+	border-radius: 6px;
+    border-color: #e6e6e6;
     border-width: 1px;
 }
 

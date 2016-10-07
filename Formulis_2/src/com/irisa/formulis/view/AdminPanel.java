@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.irisa.formulis.control.ControlUtils;
 
 public class AdminPanel extends Composite  {
 	
@@ -17,11 +18,16 @@ public class AdminPanel extends Composite  {
 	private VerticalPanel content = new VerticalPanel();
 	
 	
-	private FluidRow namespacePanel = new FluidRow();
+	private FluidRow namespaceRow = new FluidRow();
 	private FluidRow nsListRow = new FluidRow();
 	private Column nsListCol = new Column(6, nsListRow);
 	private HorizontalPanel nsCreateRow = new HorizontalPanel();
 	private Column nsCreateCol = new Column(6, nsCreateRow);
+	
+	private FluidRow permalinkRow = new FluidRow();
+	private FluidRow permalinkBoxRow = new FluidRow();
+	private Column permalinkCol = new Column(12, permalinkBoxRow);
+	private TextBox permalinkBox = new TextBox();
 	
 	private TextBox namespacePrefixBox = new TextBox();
 	private TextBox namespaceUriBox = new TextBox();
@@ -44,9 +50,16 @@ public class AdminPanel extends Composite  {
 		nsListBox.setVisibleItemCount(5);
 		nsListBox.setWidth("100%");
 		
-		content.add(namespacePanel);
-		namespacePanel.add(nsListCol);
-		namespacePanel.add(nsCreateCol);
+		permalinkRow.add(permalinkCol);
+		permalinkBoxRow.add(permalinkBox);
+		permalinkBox.setReadOnly(true);
+		permalinkBox.setVisibleLength(500);
+//		permalinkBox.setEnabled(false);
+		
+		content.add(namespaceRow);
+		content.add(permalinkRow);
+		namespaceRow.add(nsListCol);
+		namespaceRow.add(nsCreateCol);
 		nsCreateRow.add(getNamespacePrefixBox());
 		nsCreateRow.add(getNamespaceUriBox());
 		nsCreateRow.add(getNamespaceDefineButton());
@@ -80,5 +93,10 @@ public class AdminPanel extends Composite  {
 
 	public void setNamespaceUriBox(TextBox namespaceUriBox) {
 		this.namespaceUriBox = namespaceUriBox;
+	}
+	
+	public void setStatePermalink(String link) {
+		ControlUtils.debugMessage("AdminPanel setStatePermalink ( "+ link + " )");
+		this.permalinkBox.setText(link);
 	}
 }

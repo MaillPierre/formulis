@@ -99,7 +99,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return _instance;
 	}
 
-	public void setServer(String adress) {
+	public static String getServerAdress() {
+		return serverAdress;
+	}
+
+	public static void setServerAdress(String adress) {
 		serverAdress = adress;
 	}
 
@@ -1690,10 +1694,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			public void onValueChange(ValueChangeEvent<String> event) {
 				String historyToken;
 				try {
-					historyToken = HistoryUtils.getHistoryToken(event.getValue());
+					historyToken = HistoryUtils.getProfileFromHistoryToken(event.getValue());
+					mainPage.getSettingsWidget().setStatePermalink(historyToken);
 					Profile newForm = Parser.parseProfile(XMLParser.parse(historyToken).getDocumentElement());
 					setProfile(newForm);
-				} catch (XMLParsingException|InvalidHistoryState e) {
+				} catch (XMLParsingException|InvalidHistoryState|NumberFormatException e) {
 					ControlUtils.exceptionMessage(e);
 				} 
 			}
@@ -1774,6 +1779,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		};
 		pingTimer.scheduleRepeating(30000);
+
+		
+		String winState = Window.Location.getParameter("state");
+		if(winState != null) {
+			String winProfileString = Crypto.deobfuscate(winState);
+			ControlUtils.debugMessage("State d'adresse de page : " + winProfileString);
+			try {
+				this.setProfile(Parser.parseProfile(XMLParser.parse(winProfileString+">").getDocumentElement()));
+			} catch (XMLParsingException e1) {
+				ControlUtils.exceptionMessage(e1);
+			}
+		}
 
 	}
 	
@@ -2005,6 +2022,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
 			if(! widSource.getData().isTypeList() && ! widSource.getData().isEmpty()) {
 				HistoryUtils.addHistoryToken(currentProfile);
+				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
 			}
 			event.getCallback().call(this);
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
@@ -2019,9 +2037,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 
 			HistoryUtils.addHistoryToken(currentProfile);
+			mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
 		}
 		refreshAnswers();
-		} catch (SerializingException e) {
+		} catch (SerializingException|InvalidHistoryState e) {
 			ControlUtils.exceptionMessage(e);
 		}
 		

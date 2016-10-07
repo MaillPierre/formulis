@@ -1,7 +1,5 @@
 package com.irisa.formulis.view.form;
 
-import java.util.LinkedList;
-
 import com.github.gwtbootstrap.client.ui.Column;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,7 +18,6 @@ import com.google.gwt.event.dom.client.DragStartHandler;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.HasAllDragAndDropHandlers;
-import com.google.gwt.event.dom.client.HasDragStartHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -40,7 +37,6 @@ import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 
 public class FormRelationLineWidget extends FormLineWidget implements SuggestionSelectionHandler, HasAllDragAndDropHandlers {
@@ -117,6 +113,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		elementRow.setWidth("100%");
 		elementRow.setCellWidth(variableElement, "100%");
 		elementRow.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
+//		element.addStyleName("weblis-line-frame");
 	}
 
 	@Override
