@@ -8,6 +8,7 @@ HasFinishLineHandler,
 HasLessCompletionsHandler,
 HasLineSelectionHandler,
 HasMoreCompletionsHandler,
+HasMoreFormLinesHandler,
 HasRelationCreationHandler, 
 HasRemoveLineHandler, 
 HasStatementChangeHandler {

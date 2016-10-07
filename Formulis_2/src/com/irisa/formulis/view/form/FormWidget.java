@@ -73,6 +73,8 @@ DragStartHandler, DropHandler {
 	
 	private Column finishCol = new Column(1);
 	private Button finishButton = new Button("", IconType.PENCIL);
+	private Button moreButton = new Button("", IconType.PLUS_SIGN);
+	private Button lessButton = new Button("", IconType.MINUS_SIGN);
 	
 	private boolean storeSet = false;
 	
@@ -102,6 +104,8 @@ DragStartHandler, DropHandler {
 		contentRow.add(linesCol);
 		contentRow.add(finishCol);
 		finishCol.add(finishButton);
+		finishCol.add(moreButton);
+		finishCol.add(lessButton);
 //		newRelationButton.addStyleName("weblis-max-width");
 //		newClassButton.addStyleName("weblis-max-width");
 		newRelationButton.setBlock(true);
@@ -119,7 +123,9 @@ DragStartHandler, DropHandler {
 		
 		finishButton.addClickHandler(this);
 		finishButton.setBlock(true);
-		setFinishButtonState(this.getData().isFinished());
+		setFinishButtonsState(this.getData().isFinished());
+		moreButton.setBlock(true);
+		lessButton.setBlock(true);
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -192,7 +198,7 @@ DragStartHandler, DropHandler {
 		newClassButton.setEnabled(false);
 		
 		this.finishButton.setVisible(! getData().isEmpty());
-		this.setFinishButtonState(true);
+		this.setFinishButtonsState(true);
 		this.finishButton.setEnabled(false);
 	}
 	
@@ -216,7 +222,7 @@ DragStartHandler, DropHandler {
 		linesCol.clear();
 		newRelationButton.setEnabled(false);
 		newClassButton.setEnabled(false);
-		setFinishButtonState(false);
+		setFinishButtonsState(false);
 	}
 	
 	public void reload() {
@@ -231,7 +237,7 @@ DragStartHandler, DropHandler {
 				}
 //				newRelationButton.setEnabled(true);
 
-				this.setFinishButtonState(this.getData().isFinished());
+				this.setFinishButtonsState(this.getData().isFinished());
 			} 
 	
 			
@@ -239,16 +245,18 @@ DragStartHandler, DropHandler {
 			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
 			
 			this.finishButton.setVisible(! getData().isEmpty());
+			this.moreButton.setVisible(! getData().isEmpty());
+			this.lessButton.setVisible(! getData().isEmpty());
 		}
 	}
 	
 	@Override
 	public void onFinishLine(FinishLineEvent event) {
 		super.onFinishLine(event);
-		this.setFinishButtonState(this.getData().isFinished());
+		this.setFinishButtonsState(this.getData().isFinished());
 	}
 	
-	public void setFinishButtonState(boolean finished) {
+	public void setFinishButtonsState(boolean finished) {
 		finishButton.setEnabled(finished);
 		if(finished) {
 			this.finishButton.setBaseIcon(IconType.CHECK);
@@ -344,8 +352,9 @@ DragStartHandler, DropHandler {
 		} else if(event.getSource() == finishButton) {
 			ControlUtils.debugMessage("FormWidget onClick finishButton");
 			fireFinishFormEvent(true, this.getSubmittedCallback());
+		} else if(event.getSource() == this.moreButton) {
+			fireMoreFormLinesEvent(getAppendCallback());
 		}
-//		fireClickWidgetEvent(new ClickWidgetEvent(this));s
 	}
 
 	@Override

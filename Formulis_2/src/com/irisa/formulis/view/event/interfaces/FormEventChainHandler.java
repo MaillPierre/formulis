@@ -8,6 +8,7 @@ FinishLineHandler,
 LessCompletionsHandler,
 LineSelectionHandler,
 MoreCompletionsHandler,
+MoreFormLinesHandler,
 RelationCreationHandler,
 RemoveLineHandler,
 StatementChangeHandler {

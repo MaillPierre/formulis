@@ -15,6 +15,7 @@ import com.irisa.formulis.view.event.FinishLineEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
+import com.irisa.formulis.view.event.MoreFormLinesEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
@@ -28,6 +29,7 @@ import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
+import com.irisa.formulis.view.event.interfaces.MoreFormLinesHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
@@ -44,6 +46,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
+	protected LinkedList<MoreFormLinesHandler> moreFormLinesHandlers = new LinkedList<MoreFormLinesHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
@@ -287,6 +290,31 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
 		fireMoreCompletionsEvent(event);
+	}
+
+	@Override
+	public void addMoreFormLinesHandler(MoreFormLinesHandler handler) {
+		this.moreFormLinesHandlers.add(handler);
+	}
+
+	@Override
+	public void fireMoreFormLinesEvent(MoreFormLinesEvent event) {
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreFormLinesEvent");
+		Iterator<MoreFormLinesHandler> itHand = this.moreFormLinesHandlers.iterator();
+		while(itHand.hasNext()) {
+			MoreFormLinesHandler hand = itHand.next();
+			hand.onMoreFormLines(event);
+		}
+	}
+
+	@Override
+	public void fireMoreFormLinesEvent(FormEventCallback cb) {
+		this.fireMoreFormLinesEvent(new MoreFormLinesEvent(this, cb));
+	}
+
+	@Override
+	public void onMoreFormLines(MoreFormLinesEvent event) {
+		fireMoreFormLinesEvent(event);
 	}
 
 	@Override

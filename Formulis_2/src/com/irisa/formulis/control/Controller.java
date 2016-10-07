@@ -1261,7 +1261,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisShowMore(null);
 	}
 	
-	public void sewelisShowMore(final MoreCompletionsEvent event) {
+	public void sewelisShowMore(final FormEvent event) {
 		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
@@ -1286,7 +1286,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
-								if(event != null && event instanceof MoreCompletionsEvent) {
+								if(event != null) {
 									event.getCallback().call(instance());
 								}
 							}
@@ -2487,6 +2487,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onFinishLine(FinishLineEvent event) {
 		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString());
+	}
+
+	/**
+	 * Doit recharger une généralistion des lignes du formulaire si possible et appeller le callback
+	 */
+	@Override
+	public void onMoreFormLines(MoreFormLinesEvent event) {
+		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
 	}
 
 }
