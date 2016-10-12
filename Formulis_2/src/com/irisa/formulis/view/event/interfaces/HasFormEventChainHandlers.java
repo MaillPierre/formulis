@@ -10,6 +10,7 @@ HasLineSelectionHandler,
 HasMoreCompletionsHandler,
 HasMoreFormLinesHandler,
 HasRelationCreationHandler, 
+HasReloadHandler,
 HasRemoveLineHandler, 
 HasStatementChangeHandler {
 

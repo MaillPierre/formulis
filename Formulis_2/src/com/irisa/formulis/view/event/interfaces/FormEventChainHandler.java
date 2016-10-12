@@ -10,6 +10,7 @@ LineSelectionHandler,
 MoreCompletionsHandler,
 MoreFormLinesHandler,
 RelationCreationHandler,
+ReloadHandler,
 RemoveLineHandler,
 StatementChangeHandler {
 

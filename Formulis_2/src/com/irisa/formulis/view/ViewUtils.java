@@ -239,6 +239,7 @@ public class ViewUtils {
 		emitter.addMoreCompletionsHandler(handler);
 		emitter.addMoreFormLinesHandler(handler);
 		emitter.addRelationCreationHandler(handler);
+		emitter.addReloadHandler(handler);
 		emitter.addRemoveLineHandler(handler);
 		emitter.addStatementChangeHandler(handler);
 	}

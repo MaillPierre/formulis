@@ -342,7 +342,7 @@ DragStartHandler, DropHandler {
 		} else if(event.getSource() == this.moreButton) {
 			fireMoreFormLinesEvent(getAppendCallback());
 		} else if(event.getSource() == this.reloadButton) {
-			reload();
+			fireReloadEvent(getAppendCallback());
 		}
 	}
 

@@ -17,6 +17,7 @@ import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.MoreFormLinesEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
+import com.irisa.formulis.view.event.ReloadEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
 import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
@@ -31,6 +32,7 @@ import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreFormLinesHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
+import com.irisa.formulis.view.event.interfaces.ReloadHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
@@ -48,6 +50,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
 	protected LinkedList<MoreFormLinesHandler> moreFormLinesHandlers = new LinkedList<MoreFormLinesHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
+	protected LinkedList<ReloadHandler> reloadHandlers = new LinkedList<ReloadHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
 	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
 	protected boolean profileMode = false;
@@ -393,6 +396,30 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		if(this instanceof FormWidget) {
 			fireRelationCreationEvent(new RelationCreationEvent(this));
 		}
+	}
+
+	@Override
+	public void onReload(ReloadEvent event) {
+		fireReloadEvent(event);
+	}
+
+	@Override
+	public void addReloadHandler(ReloadHandler handler) {
+		reloadHandlers.add(handler);
+	}
+
+	@Override
+	public void fireReloadEvent(ReloadEvent event) {
+		Iterator<ReloadHandler> itHand = this.reloadHandlers.iterator();
+		while(itHand.hasNext()) {
+			ReloadHandler hand = itHand.next();
+			hand.onReload(event);
+		}
+	}
+
+	@Override
+	public void fireReloadEvent(FormEventCallback cb) {
+			fireReloadEvent(new ReloadEvent(this, cb));
 	}
 	
 	public abstract ProfileElement toProfileElement();

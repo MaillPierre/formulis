@@ -45,6 +45,7 @@ import com.irisa.formulis.model.exception.*;
 import com.irisa.formulis.model.form.*;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
+import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
@@ -2501,6 +2502,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(this.getPlace().hasMore()) {
 			this.sewelisShowMore(event);
 		}
+	}
+
+	@Override
+	public void onReload(ReloadEvent event) {
+		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
+		sewelisGetPlaceStatement(queryString, event);
 	}
 
 }
