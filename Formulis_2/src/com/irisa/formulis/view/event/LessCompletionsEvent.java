@@ -5,12 +5,8 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
 
 public class LessCompletionsEvent extends CompletionEvent {
 
-	public LessCompletionsEvent(Widget src) {
-		super(src);
-	}
-
-	public LessCompletionsEvent(Widget widget, SuggestionCallback cb) {
-		super(widget, cb);
+	public LessCompletionsEvent(Widget src, SuggestionCallback formEventCallback) {
+		super(src, formEventCallback);
 	}
 
 }

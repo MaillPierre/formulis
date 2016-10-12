@@ -46,10 +46,10 @@ public class HistoryUtils {
 	}
 	
 	public static String getPermalink(String profile) throws InvalidHistoryState {
-		ControlUtils.debugMessage("HistoryUtils path "+ Window.Location.getPath());
-		ControlUtils.debugMessage("HistoryUtils host "+ Window.Location.getHost());
-		ControlUtils.debugMessage("HistoryUtils href "+ Window.Location.getHref());
-		ControlUtils.debugMessage("HistoryUtils parameter(state) "+ Window.Location.getParameter("state"));
+//		ControlUtils.debugMessage("HistoryUtils path "+ Window.Location.getPath());
+//		ControlUtils.debugMessage("HistoryUtils host "+ Window.Location.getHost());
+//		ControlUtils.debugMessage("HistoryUtils href "+ Window.Location.getHref());
+//		ControlUtils.debugMessage("HistoryUtils parameter(state) "+ Window.Location.getParameter("state"));
 		return "http://"+ Window.Location.getHost()+ "?state=" + Crypto.obfuscate(profile);
 	}
 	

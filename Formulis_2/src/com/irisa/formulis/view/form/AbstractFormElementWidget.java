@@ -240,6 +240,31 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
+	public void addLessCompletionsHandler(LessCompletionsHandler handler) {
+		this.lessCompletionsHandlers.add(handler);
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireLessCompletionsEvent");
+		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
+		while(itHand.hasNext()) {
+			LessCompletionsHandler hand = itHand.next();
+			hand.onLessCompletions(event);
+		}
+	}
+
+	@Override
+	public void fireLessCompletionsEvent(SuggestionCallback cb) {
+		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, cb));
+	}
+
+	@Override
+	public void onLessCompletions(LessCompletionsEvent event) {
+		fireLessCompletionsEvent(event);
+	}
+
+	@Override
 	public void addLineSelectionHandler(LineSelectionHandler handler) {
 		this.lineSelectionHandlers.add(handler);
 	}
@@ -299,7 +324,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireMoreFormLinesEvent(MoreFormLinesEvent event) {
-//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreFormLinesEvent");
+		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreFormLinesEvent");
 		Iterator<MoreFormLinesHandler> itHand = this.moreFormLinesHandlers.iterator();
 		while(itHand.hasNext()) {
 			MoreFormLinesHandler hand = itHand.next();
@@ -315,31 +340,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onMoreFormLines(MoreFormLinesEvent event) {
 		fireMoreFormLinesEvent(event);
-	}
-
-	@Override
-	public void addLessCompletionsHandler(LessCompletionsHandler handler) {
-		this.lessCompletionsHandlers.add(handler);
-	}
-
-	@Override
-	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
-//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireLessCompletionsEvent");
-		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
-		while(itHand.hasNext()) {
-			LessCompletionsHandler hand = itHand.next();
-			hand.onLessCompletions(event);
-		}
-	}
-
-	@Override
-	public void fireLessCompletionsEvent(SuggestionCallback cb) {
-		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, cb));
-	}
-
-	@Override
-	public void onLessCompletions(LessCompletionsEvent event) {
-		fireLessCompletionsEvent(event);
 	}
 
 	@Override

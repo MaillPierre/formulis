@@ -854,9 +854,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	/**
 	 * 
 	 * @param statString statement LispQL
-	 * @param followUp Event a emettre en cas de succès
+	 * @param event Event a emettre en cas de succès
 	 */
-	public void sewelisGetPlaceStatement(String statString, final FormEvent followUp) {
+	public void sewelisGetPlaceStatement(String statString, final FormEvent event) {
 		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
@@ -892,7 +892,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									try {
 										String focusedId = place.getStatement().getFocusedDisplay();
 										String targetFocusId = String.valueOf(Integer.valueOf(focusedId) - 1);
-										sewelisChangeFocus(targetFocusId, followUp);
+										sewelisChangeFocus(targetFocusId, event);
 									} catch(Exception e) {
 										ControlUtils.exceptionMessage( e);
 									}
@@ -1312,7 +1312,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisShowLess(null);
 	}
 
-	public void sewelisShowLess(final LessCompletionsEvent event) {
+	public void sewelisShowLess(final FormEvent event) {
 		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
@@ -1337,7 +1337,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
-								if(event != null && event instanceof LessCompletionsEvent) {
+								if(event != null && event.getCallback() != null /*&& event instanceof LessCompletionsEvent*/) {
 									event.getCallback().call(instance());
 								}
 							}
@@ -1457,8 +1457,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		try {
 			place = Parser.parsePlace(placeNode);
 			refreshAnswers();
-			ControlUtils.debugMessage("Place " + place.getSuggestions().getEntitySuggestions().size() + " answers " + place.getAnswers().getContentRows().size() + " entity suggestions " + place.getSuggestions().getRelationSuggestions().size() + " relations suggestions");
-			//this.historyPlaceStack.put(place.getId(), place);
+//			ControlUtils.debugMessage("Place " + place.getSuggestions().getEntitySuggestions().size() + " answers " + place.getAnswers().getContentRows().size() + " entity suggestions " + place.getSuggestions().getRelationSuggestions().size() + " relations suggestions");
 		} catch (XMLParsingException e) {
 			ControlUtils.exceptionMessage(e);
 		}
@@ -1550,7 +1549,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								loadPlace(placeNode);
 								if(followUp != null && followUp instanceof StatementChangeEvent) {
 									onStatementChange((StatementChangeEvent) followUp);
-								} else if(followUp != null && followUp instanceof MoreCompletionsEvent) {
+								} else if(followUp != null && followUp.getCallback() != null) {
 									followUp.getCallback().call(instance());
 								}
 							}
@@ -2106,20 +2105,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	@Override
-	public void onLessCompletions(LessCompletionsEvent event) {
-		ControlUtils.debugMessage("onLessCompletions");
-		if(this.getPlace().hasLess()) {
-			sewelisShowLess(event);
-		} else {
-			event.getSource().getParentWidget().fireLineSelectionEvent(event.getCallback());
-		}
-
-		incrementNumberOfActions();
-	}
-
-	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
-//		Utils.debugMessage("onMoreCompletions");
+//		ControlUtils.debugMessage("onMoreCompletions");
 //		if(this.getPlace().hasMore()) {
 //			sewelisShowMore(event);
 //		} else {
@@ -2128,6 +2115,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		}
 
 		incrementNumberOfActions();
+	}
+
+	@Override
+	public void onLessCompletions(LessCompletionsEvent event) {
+		ControlUtils.debugMessage("onLessCompletions");
+		if(this.getPlace().hasLess()) {
+			sewelisShowLess(event);
+		} else {
+			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData());
+			ControlUtils.debugMessage("onLessCompletions " + queryString);
+			sewelisGetPlaceStatement(queryString, event);	
+		}
 	}
 
 	@Override
@@ -2233,6 +2232,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					
 	//				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
 					widSource.getData().clear();
+
+					widSource.getData().setHasMore(this.place.hasMore());
 					
 					widSource.getData().addAllTypeLines(classLines);
 					
@@ -2273,10 +2274,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 //			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
 			if(widSource.getData().getTypeLines().isEmpty()) {
-				widSource.getData().addAllLines(classLines);
+				widSource.getData().appendAllLines(classLines);
 			} else {
-				widSource.getData().addAllLines(relationLines);
+				widSource.getData().appendAllLines(relationLines);
 			}
+
+			widSource.getData().setHasMore(this.place.hasMore());
 			widSource.reload();
 		}
 	}
@@ -2495,6 +2498,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onMoreFormLines(MoreFormLinesEvent event) {
 		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
+		if(this.getPlace().hasMore()) {
+			this.sewelisShowMore(event);
+		}
 	}
 
 }

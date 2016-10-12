@@ -50,11 +50,10 @@ public class AdminPanel extends Composite  {
 		nsListBox.setVisibleItemCount(5);
 		nsListBox.setWidth("100%");
 		
-		permalinkRow.add(permalinkCol);
-		permalinkBoxRow.add(permalinkBox);
-		permalinkBox.setReadOnly(true);
-		permalinkBox.setVisibleLength(500);
-//		permalinkBox.setEnabled(false);
+//		permalinkRow.add(permalinkCol);
+//		permalinkBoxRow.add(permalinkBox);
+//		permalinkBox.setReadOnly(true);
+//		permalinkBox.setVisibleLength(500);
 		
 		content.add(namespaceRow);
 		content.add(permalinkRow);
@@ -96,7 +95,7 @@ public class AdminPanel extends Composite  {
 	}
 	
 	public void setStatePermalink(String link) {
-		ControlUtils.debugMessage("AdminPanel setStatePermalink ( "+ link + " )");
+//		ControlUtils.debugMessage("AdminPanel setStatePermalink ( "+ link + " )");
 		this.permalinkBox.setText(link);
 	}
 }

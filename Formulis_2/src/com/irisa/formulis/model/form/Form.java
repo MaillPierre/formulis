@@ -21,6 +21,8 @@ public class Form extends FormComponent {
 	private LinkedList<FormRelationLine> relationLines = new LinkedList<FormRelationLine>();
 //	private FormClassLine typeLine = null;
 	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
+	private boolean hasMoreFlag = false;
+	private boolean hasLessFlag = false;
 
 	public Form(FormComponent par) {
 		super(par);
@@ -75,6 +77,17 @@ public class Form extends FormComponent {
 		}
 	}
 	
+	public void appendAllTypeLines(Collection<FormClassLine> c) {
+		this.typeLines.clear();
+		Iterator<FormClassLine> itClass = c.iterator();
+		while(itClass.hasNext()) {
+			FormClassLine lineC = itClass.next();
+			if(! this.typeLines.contains(lineC)) {
+				addTypeLine(lineC, false);
+			}
+		}
+	}
+	
 	public void addLine(FormLine line) {
 		if(line.getParent() != this) {
 			line.setParent(this);
@@ -92,6 +105,16 @@ public class Form extends FormComponent {
 		while(itC.hasNext()) {
 			FormLine line = itC.next();
 			this.addLine(line);
+		}
+	}
+
+	public void appendAllLines(Collection<? extends FormLine> c) {
+		Iterator<? extends FormLine> itC = c.iterator();
+		while(itC.hasNext()) {
+			FormLine line = itC.next();
+			if(! this.relationLines.contains(line)) {
+				this.addLine(line);
+			}
 		}
 	}
 	
@@ -386,6 +409,22 @@ public class Form extends FormComponent {
 			return this.relationLines.equals(((Form) o).relationLines) && this.typeLines.equals(((Form) o).typeLines);
 		}
 		return super.equals(o);
+	}
+
+	public boolean hasMore() {
+		return hasMoreFlag;
+	}
+
+	public void setHasMore(boolean hasMoreFlag) {
+		this.hasMoreFlag = hasMoreFlag;
+	}
+
+	public boolean hasLess() {
+		return hasLessFlag;
+	}
+
+	public void setHasLess(boolean hasLessFlag) {
+		this.hasLessFlag = hasLessFlag;
 	}
 
 }

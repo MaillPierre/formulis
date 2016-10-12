@@ -74,24 +74,9 @@ DragStartHandler, DropHandler {
 	private Column finishCol = new Column(1);
 	private Button finishButton = new Button("", IconType.PENCIL);
 	private Button moreButton = new Button("", IconType.PLUS_SIGN);
-	private Button lessButton = new Button("", IconType.MINUS_SIGN);
+	private Button reloadButton = new Button("", IconType.REFRESH);
 	
 	private boolean storeSet = false;
-	
-	public enum FORM_CALLBACK_MODE {
-		/**
-		 * Charger le contenu d'un formulaire vide
-		 */
-		LOAD,
-		/**
-		 * Ajouter du contenu à un formulaire prérempli
-		 */
-		APPEND,
-		/**
-		 * Ajouter une ligne nouvellement créée à un formulaire
-		 */
-		ADD
-	}
 	
 	public FormWidget(Form da, AbstractFormulisWidget fParent) {
 		super(da, fParent);
@@ -105,7 +90,7 @@ DragStartHandler, DropHandler {
 		contentRow.add(finishCol);
 		finishCol.add(finishButton);
 		finishCol.add(moreButton);
-		finishCol.add(lessButton);
+		finishCol.add(reloadButton);
 //		newRelationButton.addStyleName("weblis-max-width");
 //		newClassButton.addStyleName("weblis-max-width");
 		newRelationButton.setBlock(true);
@@ -125,7 +110,9 @@ DragStartHandler, DropHandler {
 		finishButton.setBlock(true);
 		setFinishButtonsState(this.getData().isFinished());
 		moreButton.setBlock(true);
-		lessButton.setBlock(true);
+		moreButton.addClickHandler(this);
+		reloadButton.setBlock(true);
+		reloadButton.addClickHandler(this);
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -245,8 +232,8 @@ DragStartHandler, DropHandler {
 			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
 			
 			this.finishButton.setVisible(! getData().isEmpty());
-			this.moreButton.setVisible(! getData().isEmpty());
-			this.lessButton.setVisible(! getData().isEmpty());
+			this.moreButton.setVisible(! getData().isEmpty() && getData().hasMore());
+			this.reloadButton.setVisible(! getData().isEmpty());
 		}
 	}
 	
@@ -354,6 +341,8 @@ DragStartHandler, DropHandler {
 			fireFinishFormEvent(true, this.getSubmittedCallback());
 		} else if(event.getSource() == this.moreButton) {
 			fireMoreFormLinesEvent(getAppendCallback());
+		} else if(event.getSource() == this.reloadButton) {
+			reload();
 		}
 	}
 
@@ -452,13 +441,13 @@ DragStartHandler, DropHandler {
 
 	@Override
 	public void onDrop(DropEvent event) {
-		ControlUtils.debugMessage("FormWidget onDrop");
+//		ControlUtils.debugMessage("FormWidget onDrop");
 	}
 
 	@Override
 	public void onDragOver(DragOverEvent event) {
-		ControlUtils.debugMessage("FormWidget onDragOver");
-		//TODO Create placeholder line to figure le new place of the line, reordering mechanism
+//		ControlUtils.debugMessage("FormWidget onDragOver");
+		//TODO Create placeholder line to figure the new place of the line, reordering mechanism
 	}
 
 	@Override
@@ -468,12 +457,12 @@ DragStartHandler, DropHandler {
 
 	@Override
 	public void onDragLeave(DragLeaveEvent event) {
-		ControlUtils.debugMessage("FormWidget onDragLeave");
+//		ControlUtils.debugMessage("FormWidget onDragLeave");
 	}
 
 	@Override
 	public void onDragEnter(DragEnterEvent event) {
-		ControlUtils.debugMessage("FormWidget onDragEnter");
+//		ControlUtils.debugMessage("FormWidget onDragEnter");
 	}
 
 	@Override

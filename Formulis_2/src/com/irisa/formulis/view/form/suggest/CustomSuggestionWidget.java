@@ -100,7 +100,6 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 	
 	public void setPlaceholder(String placeholder) {
-//		element.getElement().setPropertyString("placeholder", placeholder);
 		element.setPlaceholder(placeholder);
 	}
 	
