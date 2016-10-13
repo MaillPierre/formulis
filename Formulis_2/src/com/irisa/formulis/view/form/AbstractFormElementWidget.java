@@ -9,6 +9,7 @@ import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.ClassCreationEvent;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
+import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
 import com.irisa.formulis.view.event.FinishLineEvent;
@@ -22,6 +23,7 @@ import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
 import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
 import com.irisa.formulis.view.event.interfaces.FinishLineHandler;
@@ -42,6 +44,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
 	protected LinkedList<ClassCreationHandler> classCreationHandlers = new LinkedList<ClassCreationHandler>();
+	protected LinkedList<DescribeUriHandler> describeUriHandlers = new LinkedList<DescribeUriHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected LinkedList<FinishLineHandler> finishLineHandlers = new LinkedList<FinishLineHandler>();
@@ -98,8 +101,6 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	public void onCompletionAsked(CompletionAskedEvent event) {
 		fireCompletionAskedEvent(event);
 	}
-	
-
 
 	@Override
 	public void addClassCreationHandler(ClassCreationHandler hand) {
@@ -125,6 +126,32 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onClassCreation(ClassCreationEvent event) {
 		fireClassCreationEvent(event);
+	}
+
+	@Override
+	public void onDescribeUri(DescribeUriEvent event) {
+		fireDescribeUriEvent(event);
+	}
+
+	@Override
+	public void addDescribeUriHandler(DescribeUriHandler hand) {
+		this.describeUriHandlers.add(hand);
+	}
+
+	@Override
+	public void fireDescribeUriEvent(FormEventCallback cb) {
+		DescribeUriEvent event = new DescribeUriEvent(this, cb);
+		fireDescribeUriEvent(event);
+	}
+
+	@Override
+	public void fireDescribeUriEvent(DescribeUriEvent event) {
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireDescribeUriEvent");
+		Iterator<DescribeUriHandler> itHand = this.describeUriHandlers.iterator();
+		while(itHand.hasNext()) {
+			DescribeUriHandler hand = itHand.next();
+			hand.onDescribeUri(event);
+		}
 	}
 
 	@Override

@@ -28,6 +28,10 @@ public class DataUtils {
 	public static Keyword theKeyword = new Keyword("the");
 	public static Keyword thingKeyword = new Keyword("thing");
 	
+	
+	public static String getLangString() {
+		return "en";
+	}
 
 	/**
 	 * Simple classe utilitaire qui faire une traversée de l'arborescence donnée pour en extraire les premiers éléments qui ne sont pas des Focus ou des Display imbriqués

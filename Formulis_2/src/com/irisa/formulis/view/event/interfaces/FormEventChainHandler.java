@@ -2,6 +2,7 @@ package com.irisa.formulis.view.event.interfaces;
 
 public interface FormEventChainHandler extends CompletionAskedHandler,
 ClassCreationHandler,
+DescribeUriHandler,
 ElementCreationHandler,
 FinishFormHandler,
 FinishLineHandler,
