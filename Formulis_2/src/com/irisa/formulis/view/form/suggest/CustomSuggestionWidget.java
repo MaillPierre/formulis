@@ -226,7 +226,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	public void fireMoreCompletionsEvent() {
 		ControlUtils.debugMessage("CustomSuggestionWidget fireMoreCompletionsEvent");
-		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, this.getAddCallback()));
+		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, this.getSetCallback()));
 	}
 
 	@Override
@@ -288,9 +288,19 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 				Iterator<Increment> itInc = increments.iterator();
 				while(itInc.hasNext()) {
 					Increment inc = itInc.next();
+//					ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call " + inc);
 					this.source.oracle.add(new CustomSuggestion(inc));
 				}
-				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+				try {
+					Collection<CustomSuggestion> match = this.source.oracle.matchingIncrement(getValue(), limit);
+					popover.setContent(match);
+				}
+				catch(Exception e) {
+					ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call BOOM");
+					ControlUtils.exceptionMessage(e);
+				}
+				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call END");
 			}
 		};
 	}
@@ -310,7 +320,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 					this.source.oracle.add(new CustomSuggestion(inc));
 				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
-//				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
 			}
 		};
 	}

@@ -2107,13 +2107,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
-//		ControlUtils.debugMessage("onMoreCompletions");
-//		if(this.getPlace().hasMore()) {
-//			sewelisShowMore(event);
-//		} else {
+		ControlUtils.debugMessage("onMoreCompletions");
+		if(this.getPlace().hasMore()) {
+			ControlUtils.debugMessage("onMoreCompletions hasMore");
+			sewelisShowMore(event);
+		} else {
+			ControlUtils.debugMessage("onMoreCompletions has no More");
 			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
 			sewelisGetPlaceStatement(queryString, event);		
-//		}
+		}
 
 		incrementNumberOfActions();
 	}

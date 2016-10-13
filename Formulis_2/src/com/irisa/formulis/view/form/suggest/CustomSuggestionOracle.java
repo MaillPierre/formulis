@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
+
 public class CustomSuggestionOracle {
 
 	private LinkedList<CustomSuggestion> suggestions = new LinkedList<CustomSuggestion>();
@@ -20,13 +22,13 @@ public class CustomSuggestionOracle {
      */
 	public Collection<CustomSuggestion> matchingIncrement(String query, int limit) {
 		LinkedList<CustomSuggestion> matchingIncrement = new LinkedList<CustomSuggestion>();
-
 		if(! suggestions.isEmpty()) {
 			// rendu des valeurs uniques
 			LinkedList<CustomSuggestion> tmpSuggestions = new LinkedList<CustomSuggestion>(new HashSet<CustomSuggestion>(suggestions) );
+
 			// tri des suggestions par ratio left
 			Collections.sort(tmpSuggestions);
-             
+
 			// Nombre d'éléments suggérés
 			int count = 0;
 			// only begin to search after the user has type two characters
@@ -35,10 +37,13 @@ public class CustomSuggestionOracle {
 	 
 				int i = 0;
 
+
+				ControlUtils.debugMessage("Oracle matchingIncrement " + tmpSuggestions);
 				// Now we are at the start of the block of matching names. Add matching names till we
 				// run out of names, stop finding matches, or have enough matches.
 				while (count < limit && i < tmpSuggestions.size()) {
-					if(tmpSuggestions.get(i).getElement().toLispql().toLowerCase().contains(prefixToMatch)) {
+					if(tmpSuggestions.get(i).getElement() != null 
+							&& tmpSuggestions.get(i).getElement().toLispql().toLowerCase().contains(prefixToMatch)) {
 						matchingIncrement.add( tmpSuggestions.get(i) );
 						count++;
 					}
@@ -46,6 +51,7 @@ public class CustomSuggestionOracle {
 				}
 				Collections.sort(matchingIncrement);
 			}
+
 			// On remplit les places restantes dans la liste de suggestion avec celles qui apparaissent dans l'ordre
 			int index = 0;
 			while(count < limit && index < tmpSuggestions.size()) {

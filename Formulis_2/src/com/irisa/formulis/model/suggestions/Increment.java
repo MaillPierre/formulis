@@ -87,6 +87,9 @@ public class Increment implements Comparable<Increment>{
 		result += element.toString();
 		result += " (" + ratioRight + ") ";
 		result += kindToString(kind);
+		if(this.isNew) {
+			result += this.isNew;
+		}
 		
 		return result;
 	}

@@ -134,6 +134,7 @@ public class DataUtils {
 					result = DataUtils.pairToForm((Pair) elements.getFirst(), null);
 				
 				} else if(elements.size() == 2 && elements.getFirst().equals(theKeyword)) {
+					result = elements.getLast();
 				} else {
 					throw new FormElementConversionException("extractEntityFromIncrement expect element to be URI or keyword or Pair " + elements);
 				}
