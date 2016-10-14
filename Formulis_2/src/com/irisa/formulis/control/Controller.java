@@ -1449,7 +1449,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void sewelisDefineNamespace(String prefix, String adress) {
-		String showMoreRequestString = serverAdress + "defineNamespace?userKey=" + userKey ;
+		String showMoreRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&userkey=" + this.userKey;
 		showMoreRequestString += "&prefix=" + prefix;
@@ -1588,9 +1588,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
 								if(followUp != null && followUp instanceof StatementChangeEvent) {
 									onStatementChange((StatementChangeEvent) followUp);
-								} else if(followUp != null && followUp.getCallback() != null) {
+								} else if(followUp != null /*&& followUp.getCallback() != null*/) {
 									followUp.getCallback().call(instance());
 								}
 							}
@@ -2146,16 +2147,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	@Override
+	public void onDescribeUri(DescribeUriEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
-		ControlUtils.debugMessage("onMoreCompletions");
-		if(this.getPlace().hasMore()) {
-			ControlUtils.debugMessage("onMoreCompletions hasMore");
-			sewelisShowMore(event);
-		} else {
-			ControlUtils.debugMessage("onMoreCompletions has no More");
+//		ControlUtils.debugMessage("onMoreCompletions");
+//		if(this.getPlace().hasMore()) {
+//			sewelisShowMore(event);
+//		} else {
 			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
 			sewelisGetPlaceStatement(queryString, event);		
-		}
+//		}
 
 		incrementNumberOfActions();
 	}
@@ -2218,45 +2223,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
  		}
 
 		incrementNumberOfActions();
-	}
-
-	@Override
-	public void onFinishForm(FinishFormEvent event) {
-		ControlUtils.debugMessage("Controller onFinishForm " + ((FormWidget)event.getSource()).getData());
-		finish( ( (FormWidget)event.getSource()));
-		event.getCallback().call(this);
-	}
-
-	/**
-	 * Le controller est handler parce qu'il est en bout de FormEventCHain, mais il n'est pas sensé en faire quoi que ce soit.
-	 * @param event
-	 */
-	@Override
-	public void onFinishLine(FinishLineEvent event) {
-		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString());
-	}
-
-	/**
-	 * Doit recharger une généralistion des lignes du formulaire si possible et appeller le callback
-	 */
-	@Override
-	public void onMoreFormLines(MoreFormLinesEvent event) {
-		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
-		if(this.getPlace().hasMore()) {
-			this.sewelisShowMore(event);
-		}
-	}
-
-	@Override
-	public void onReload(ReloadEvent event) {
-		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
-		sewelisGetPlaceStatement(queryString, event);
-	}
-
-	@Override
-	public void onDescribeUri(DescribeUriEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	
@@ -2556,6 +2522,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} catch (RequestException e) {
 			ControlUtils.exceptionMessage(e);
 		}
+	}
+
+	@Override
+	public void onFinishForm(FinishFormEvent event) {
+		ControlUtils.debugMessage("Controller onFinishForm " + ((FormWidget)event.getSource()).getData());
+		finish( ( (FormWidget)event.getSource()));
+		event.getCallback().call(this);
+	}
+
+	/**
+	 * Le controller est handler parce qu'il est en bout de FormEventCHain, mais il n'est pas sensé en faire quoi que ce soit.
+	 * @param event
+	 */
+	@Override
+	public void onFinishLine(FinishLineEvent event) {
+		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString());
+	}
+
+	/**
+	 * Doit recharger une généralistion des lignes du formulaire si possible et appeller le callback
+	 */
+	@Override
+	public void onMoreFormLines(MoreFormLinesEvent event) {
+		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
+		if(this.getPlace().hasMore()) {
+			this.sewelisShowMore(event);
+		}
+	}
+
+	@Override
+	public void onReload(ReloadEvent event) {
+		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
+		sewelisGetPlaceStatement(queryString, event);
 	}
 
 }

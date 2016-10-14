@@ -91,6 +91,8 @@ DragStartHandler, DropHandler {
 		finishCol.add(finishButton);
 		finishCol.add(moreButton);
 		finishCol.add(reloadButton);
+//		newRelationButton.addStyleName("weblis-max-width");
+//		newClassButton.addStyleName("weblis-max-width");
 		newRelationButton.setBlock(true);
 		newClassButton.setBlock(true);
 		newElementRow.add(newRelationCol);
@@ -230,10 +232,8 @@ DragStartHandler, DropHandler {
 			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
 			
 			this.finishButton.setVisible(! getData().isEmpty());
-			this.moreButton.setVisible(! getData().isEmpty());
-			this.moreButton.setEnabled(getData().hasMore());
+			this.moreButton.setVisible(! getData().isEmpty() && getData().hasMore());
 			this.reloadButton.setVisible(! getData().isEmpty());
-			
 		}
 	}
 	

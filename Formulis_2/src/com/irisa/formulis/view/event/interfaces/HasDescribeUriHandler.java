@@ -6,9 +6,7 @@ import com.irisa.formulis.view.form.FormEventCallback;
 public interface HasDescribeUriHandler {
 
 	void fireDescribeUriEvent(DescribeUriEvent event);
-
 	void fireDescribeUriEvent(FormEventCallback cb);
-
 	void addDescribeUriHandler(DescribeUriHandler hand);
 
 }

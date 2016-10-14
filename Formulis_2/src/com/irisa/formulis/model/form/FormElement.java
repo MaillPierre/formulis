@@ -7,6 +7,4 @@ public interface FormElement {
 	
 	public boolean isFinished();
 	public String getTag();
-	
-	public boolean equals(Object o);
 }

@@ -32,6 +32,7 @@ import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FormulisWidgetFactory;
 import com.irisa.formulis.view.ViewUtils;
+import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
@@ -57,6 +58,9 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 
 		try {
 			this.fixedElement = FormulisWidgetFactory.getWidget(l.getFixedElement(), this, this);
+			if(this.fixedElement instanceof URIWidget) {
+				((URIWidget) this.fixedElement).addDescribeUriHandler(this);
+			}
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
 		}

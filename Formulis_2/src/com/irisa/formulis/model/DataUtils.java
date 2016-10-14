@@ -28,10 +28,6 @@ public class DataUtils {
 	public static Keyword theKeyword = new Keyword("the");
 	public static Keyword thingKeyword = new Keyword("thing");
 	
-	
-	public static String getLangString() {
-		return "en";
-	}
 
 	/**
 	 * Simple classe utilitaire qui faire une traversée de l'arborescence donnée pour en extraire les premiers éléments qui ne sont pas des Focus ou des Display imbriqués
@@ -138,7 +134,6 @@ public class DataUtils {
 					result = DataUtils.pairToForm((Pair) elements.getFirst(), null);
 				
 				} else if(elements.size() == 2 && elements.getFirst().equals(theKeyword)) {
-					result = elements.getLast();
 				} else {
 					throw new FormElementConversionException("extractEntityFromIncrement expect element to be URI or keyword or Pair " + elements);
 				}

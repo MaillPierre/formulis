@@ -284,7 +284,7 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
-		if(getParent() != null && getParent() instanceof FormLine && ! isFinalRequest/*&& selectedLine != null*/) {
+		if(getParent() != null && getParent() instanceof FormLine /*&& selectedLine != null*/) {
 			FormLine parentLine = (FormLine) getParent();
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();

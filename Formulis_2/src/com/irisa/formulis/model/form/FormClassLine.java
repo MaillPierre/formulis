@@ -5,7 +5,6 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileClassLine;
 import com.irisa.formulis.control.profile.ProfileElement;
-import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.basic.URI.KIND;
 
@@ -54,7 +53,7 @@ public class FormClassLine extends FormLine {
 				result += "a " + this.fixedElement.toLispql();
 			}
 			if(! this.anonymous && this.elementLabel != "" && isFinalRequest) {
-				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getEntityLabel() + "\"@" + DataUtils.getLangString(); 
+				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getEntityLabel() + "\"@fr"; 
 			}
 		}
 

@@ -101,6 +101,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	public void onCompletionAsked(CompletionAskedEvent event) {
 		fireCompletionAskedEvent(event);
 	}
+	
+
 
 	@Override
 	public void addClassCreationHandler(ClassCreationHandler hand) {
