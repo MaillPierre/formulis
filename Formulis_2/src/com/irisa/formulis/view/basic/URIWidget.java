@@ -131,6 +131,7 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 
 	@Override
 	public void fireDescribeUriEvent(DescribeUriEvent event) {
+		ControlUtils.debugMessage("URIWidget fireDescribeUriEvent");
 		Iterator<DescribeUriHandler> itHand = this.describeUriHandlers.iterator();
 		while(itHand.hasNext()) {
 			DescribeUriHandler hand = itHand.next();

@@ -356,7 +356,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireMoreFormLinesEvent(MoreFormLinesEvent event) {
-		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreFormLinesEvent");
+//		ControlUtils.debugMessage(this.getClass().getSimpleName() + " fireMoreFormLinesEvent");
 		Iterator<MoreFormLinesHandler> itHand = this.moreFormLinesHandlers.iterator();
 		while(itHand.hasNext()) {
 			MoreFormLinesHandler hand = itHand.next();

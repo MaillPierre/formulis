@@ -48,6 +48,7 @@ import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
+import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
@@ -82,6 +83,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Store currentStore = null;
 	private Place place = null;
 	private Form form = null;
+	private String lastRequestPlace = "";
 
 	private String cookiesProfilesIndex = "FormulisProfile";
 	private String cookiesUserLogin = "FormulisUserLogin";
@@ -771,7 +773,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * 
 	 * @param statString statement LispQL
 	 */
-	public Place sewelisGetPlaceStatementAlone(String statString) {
+	public Place sewelisGetPlaceStatementAlone(final String statString) {
 		ControlUtils.debugMessage("getPlaceStatementAlone( " + statString + " ) " );
 		Place result = null;
 		if(currentStore != null) {
@@ -857,7 +859,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param statString statement LispQL
 	 * @param event Event a emettre en cas de succès
 	 */
-	public void sewelisGetPlaceStatement(String statString, final FormEvent event) {
+	public void sewelisGetPlaceStatement(final String statString, final FormEvent event) {
 		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
@@ -885,6 +887,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								Node placeNode = homePlaceElem.getFirstChild();
 								if(placeNode.getNodeName() == "place") {
 									loadPlace(placeNode);
+									lastRequestPlace = statString;
 
 									// TODO Rustine pour gérer le focus renvoyé par getPlaceStatement = a étudier
 									// Le focused est placé à la racine du statement, ce qui ne permet pas d'avoir de suggestions pour l'objet qui nous interesse
@@ -1214,7 +1217,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		});
 //	}
 
-	public void sewelisShowMost() {
+	public void sewelisShowMost(final FormEvent event) {
 		String showMostRequestString = serverAdress + "/showMost?userKey=" + userKey ;
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
 		showMostRequestString += "&placeId=" + place.getId(); 
@@ -1239,6 +1242,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								if(event != null) {
+									event.getCallback().call(instance());
+								}
 							}
 						} else {
 							navBar.setServerStatusMessage(docElement.getAttribute("status"));
@@ -1287,6 +1293,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								
 								if(event != null) {
 									event.getCallback().call(instance());
 								}
@@ -1360,7 +1367,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-	public void sewelisShowLeast() {
+	public void sewelisShowLeast(final FormEvent event) {
 		String showLeastRequestString = serverAdress + "/showLeast?userKey=" + userKey ;
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
 		showLeastRequestString += "&placeId=" + place.getId(); 
@@ -1385,6 +1392,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
+								if(event != null) {
+									event.getCallback().call(instance());
+								}
 							}
 						} else {
 							navBar.setServerStatusMessage(docElement.getAttribute("status"));
@@ -1494,7 +1504,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	// DATA LOAD FUNCTIONS 
 	private void loadPlace(Node placeNode) {
-		//		displayDebugMessage("loadPlace " + placeNode.toString());
+//		ControlUtils.debugMessage("loadPlace " + placeNode.toString());
 		try {
 			place = Parser.parsePlace(placeNode);
 			refreshAnswers();
@@ -1502,7 +1512,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} catch (XMLParsingException e) {
 			ControlUtils.exceptionMessage(e);
 		}
-		//		displayDebugMessage("FIN loadPlace");
+//		ControlUtils.debugMessage("FIN loadPlace");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -1588,11 +1598,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
-								ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
-								if(followUp != null && followUp instanceof StatementChangeEvent) {
-									onStatementChange((StatementChangeEvent) followUp);
-								} else if(followUp != null /*&& followUp.getCallback() != null*/) {
-									followUp.getCallback().call(instance());
+								if(followUp != null) {
+									ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
+									if(followUp instanceof StatementChangeEvent) {
+										onStatementChange((StatementChangeEvent) followUp);
+									} else if(followUp.getCallback() != null) {
+										followUp.getCallback().call(instance());
+									}
 								}
 							}
 						} else {
@@ -1998,23 +2010,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource() + " )");
 		this.place.clearCurrentCompletions();
-		FormLineWidget widSource = null;
-		FormWidget widSourceParent = null;
-		FormLine dataSource = null;
-		Form dataSourceParent = null;
-		String queryLineLispql = null;
 		// La source est forcément une ligne
-		widSource = (FormLineWidget)event.getSource();
-		widSourceParent = widSource.getParentWidget();
-		dataSource = widSource.getFormLine();
-		dataSourceParent = dataSource.getParent();
-		try{
-		queryLineLispql = lispqlStatementQuery(dataSource);
-		} catch(Exception e) {
-			ControlUtils.debugMessage("Controller onLineSelection EXCEPTION ");
-			throw e;
-		}
-		
+		FormLineWidget widSource = (FormLineWidget)event.getSource();
+		FormWidget widSourceParent = widSource.getParentWidget();
+		FormLine dataSource = widSource.getFormLine();
+		Form dataSourceParent = dataSource.getParent();
+		String queryLineLispql = lispqlStatementQuery(dataSource);
 		
 		if(dataSource instanceof FormClassLine) { // Selection d'une classe
 			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
@@ -2035,7 +2036,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		} else if(dataSource instanceof FormRelationLine) { // selection d'une relation
 			ControlUtils.debugMessage("Controller onLineSelection BY A RELATION");
-			sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
+			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
+			}
 		}
 		incrementNumberOfActions();
 	}
@@ -2148,19 +2151,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onDescribeUri(DescribeUriEvent event) {
-		// TODO Auto-generated method stub
-		
+//		URIWidget widSource = event.getSource();
+//		URI dataSource = widSource.getData();
+		sewelisUriDescription(event);
 	}
 
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
 //		ControlUtils.debugMessage("onMoreCompletions");
-//		if(this.getPlace().hasMore()) {
-//			sewelisShowMore(event);
-//		} else {
+		if(this.getPlace().hasMore()) {
+			sewelisShowMost(event);
+		} else {
 			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
 			sewelisGetPlaceStatement(queryString, event);		
-//		}
+		}
 
 		incrementNumberOfActions();
 	}
@@ -2169,7 +2173,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onLessCompletions(LessCompletionsEvent event) {
 		ControlUtils.debugMessage("onLessCompletions");
 		if(this.getPlace().hasLess()) {
-			sewelisShowLess(event);
+			ControlUtils.debugMessage("onLessCompletions showLeast");
+			sewelisShowLeast(event);
 		} else {
 			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData());
 			ControlUtils.debugMessage("onLessCompletions " + queryString);

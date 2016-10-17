@@ -310,7 +310,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 					this.source.oracle.add(new CustomSuggestion(inc));
 				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
-//				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
 			}
 		};
 	}

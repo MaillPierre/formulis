@@ -67,8 +67,8 @@ public class Increment implements Comparable<Increment>{
 		return isNew;
 	}
 
-	public void setIsNew(boolean isNew) {
-		this.isNew = isNew;
+	public void setIsNew(boolean nw) {
+		this.isNew = nw;
 	}
 
 	public BasicElement getDisplayElement() {
@@ -87,6 +87,9 @@ public class Increment implements Comparable<Increment>{
 		result += element.toString();
 		result += " (" + ratioRight + ") ";
 		result += kindToString(kind);
+		if(isNew()) {
+			result += " new";
+		}
 		
 		return result;
 	}

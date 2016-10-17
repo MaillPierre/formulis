@@ -79,5 +79,9 @@ public class CustomSuggestionOracle {
         }
         return false;
     }
+    
+    public boolean contains(CustomSuggestion s) {
+    	return this.suggestions.contains(s);
+    }
 
 }

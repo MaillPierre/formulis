@@ -1,5 +1,6 @@
 package com.irisa.formulis.view.form.suggest;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;
@@ -14,7 +15,11 @@ public class CustomSuggestion implements Comparable<CustomSuggestion>{
 	public CustomSuggestion(Increment inc) {
 		elem = DataUtils.extractDisplayElementFromIncrement(inc);
 		support = inc.getRatioLeft();
-		htmlRepresentation = "<table> <tr> <td> " +ViewUtils.toSimpleHtml( elem).asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+		if(inc.isNew()) {
+			htmlRepresentation = "<table> <tr style:\"font-weight: bold;\"> <td> " +ViewUtils.toSimpleHtml( elem).asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+		} else {
+			htmlRepresentation = "<table> <tr> <td> " +ViewUtils.toSimpleHtml( elem).asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+		}
 	}
 	
 	public FormElement getElement() {
@@ -37,7 +42,7 @@ public class CustomSuggestion implements Comparable<CustomSuggestion>{
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof CustomSuggestion) {
-			return ((CustomSuggestion)o).hashCode() == this.hashCode();
+			return ((CustomSuggestion)o).getElement() == this.getElement();
 		}
 		return false;
 	}
