@@ -6,8 +6,9 @@ import com.google.gwt.user.client.ui.Grid;
 import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-public class TextCreateWidget extends AbstractDataWidget {
+public class TextCreateWidget extends AbstractCreateWidget {
 
 	private Grid element = new Grid( 1, 1);
 	private TextBox textBox = new TextBox();
@@ -23,6 +24,11 @@ public class TextCreateWidget extends AbstractDataWidget {
 	public Plain getData() {
 		String value = SafeHtmlUtils.htmlEscape(textBox.getText());
 		return new Plain(value, "en");
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		textBox.setValue(value);
 	}
 
 }

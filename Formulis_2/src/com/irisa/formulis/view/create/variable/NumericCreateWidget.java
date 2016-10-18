@@ -13,8 +13,9 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-public class NumericCreateWidget extends AbstractDataWidget implements ValueChangeHandler<Boolean> {
+public class NumericCreateWidget extends AbstractCreateWidget implements ValueChangeHandler<Boolean> {
 
 	private FluidRow element = new FluidRow();
 	private Column contentCol = new Column(12);
@@ -65,6 +66,11 @@ public class NumericCreateWidget extends AbstractDataWidget implements ValueChan
 				numberBox = integerBox;
 			}
 		}
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		numberBox.setValue(value);
 	}
 
 }

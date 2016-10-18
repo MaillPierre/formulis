@@ -139,6 +139,7 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 			sugg.addMoreCompletionsHandler(this);
 			sugg.addLessCompletionsHandler(this);
 			sugg.addCompletionAskedHandler(this);
+			sugg.addElementCreationHandler(this);
 			sugg.setPlaceholder("Value of " + this.getFormLine().getFixedElement().getLabel());
 			variableElement = sugg;
 			variableElement.addClickWidgetEventHandler(this);

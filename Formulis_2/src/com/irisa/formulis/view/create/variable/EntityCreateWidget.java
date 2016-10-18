@@ -7,8 +7,9 @@ import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.basic.URI.KIND;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-public class EntityCreateWidget extends AbstractDataWidget {
+public class EntityCreateWidget extends AbstractCreateWidget {
 
 	private HorizontalPanel element = new HorizontalPanel();
 	private TextBox labelBox = new TextBox();
@@ -33,6 +34,11 @@ public class EntityCreateWidget extends AbstractDataWidget {
 			safeUriText = SafeHtmlUtils.htmlEscape(uriBox.getText()).replace(" ", "").replace("\t", "").replace("\n", "");
 		}
 		return new URI(safeUriText, KIND.ENTITY, safeLabelText);
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		labelBox.setValue(value);
 	}
 
 }

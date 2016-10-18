@@ -15,19 +15,19 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractFormulisWidget;
-import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
+import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasLessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
@@ -43,6 +43,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	HasLessCompletionsHandler, 
 	HasMoreCompletionsHandler, 
 	HasSuggestionSelectionHandler, 
+	HasElementCreationHandler,
 	FocusHandler, 
 	KeyDownHandler {
 
@@ -159,6 +160,11 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	public void onValueChange(ValueChangeEvent<String> event) {
 		fireCompletionAskedEvent();
 	}
+
+	@Override
+	public void addElementCreationHandler(ElementCreationHandler handler) {
+		this.elementCreationHandlers.add(handler);
+	}
 	
 	@Override
 	public void addCompletionAskedHandler(CompletionAskedHandler handler) {
@@ -167,7 +173,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	@Override
 	public void fireCompletionAskedEvent() {
-		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent");
+//		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent");
 		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback());
 		fireCompletionAskedEvent(event);
 	}
@@ -225,7 +231,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 
 	public void fireMoreCompletionsEvent() {
-		ControlUtils.debugMessage("CustomSuggestionWidget fireMoreCompletionsEvent");
+//		ControlUtils.debugMessage("CustomSuggestionWidget fireMoreCompletionsEvent");
 		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, this.getAddCallback()));
 	}
 
@@ -248,10 +254,24 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	}
 
 	/**
-	 * Retransmet l'event à son widget parent
+	 * Retransmet l'event avec le getValue
 	 */
 	public void fireElementCreationEvent() {
-		this.getParentWidget().fireElementCreationEvent();
+		this.getParentWidget().fireElementCreationEvent(getValue());
+	}
+
+	@Override
+	public void fireElementCreationEvent(String value) {
+		this.fireElementCreationEvent(new ElementCreationEvent(this.getParentWidget(), getValue()));
+	}
+
+	@Override
+	public void fireElementCreationEvent(ElementCreationEvent event) {
+		Iterator<ElementCreationHandler> itHand = this.elementCreationHandlers.iterator();
+		while(itHand.hasNext()) {
+			ElementCreationHandler hand = itHand.next();
+			hand.onElementCreation(event);
+		}
 	}
 
 	@Override
@@ -269,7 +289,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 			this.popover.focus();
 		} if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 			if(element.getText() != "") {
-				
+				fireElementCreationEvent(element.getText());
 			}
 		}
 	}
@@ -282,7 +302,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		return new SuggestionCallback(this){
 			@Override
 			public void call(Controller control) {
-				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call");
+//				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call");
 				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
 				this.source.oracle.clear();
 				Iterator<Increment> itInc = increments.iterator();

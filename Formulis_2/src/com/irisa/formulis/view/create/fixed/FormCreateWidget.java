@@ -12,8 +12,9 @@ import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-public class FormCreateWidget extends AbstractDataWidget {
+public class FormCreateWidget extends AbstractCreateWidget {
 
 	private HorizontalPanel element = new HorizontalPanel();
 	private TextBox classNameBox = new TextBox();
@@ -68,5 +69,10 @@ public class FormCreateWidget extends AbstractDataWidget {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		classNameBox.setValue(value);
 	}
 }

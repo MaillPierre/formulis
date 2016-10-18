@@ -267,5 +267,9 @@ public class DataUtils {
 		}
 		return result;
 	}
+	
+	public static String defaultLang() {
+		return "en";
+	}
 
 }

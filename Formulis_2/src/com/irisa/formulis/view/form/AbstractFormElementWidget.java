@@ -187,9 +187,9 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireElementCreationEvent() {
+	public void fireElementCreationEvent(String value) {
 		if(this instanceof FormLineWidget) {
-			ElementCreationEvent event = new ElementCreationEvent((FormLineWidget) this);
+			ElementCreationEvent event = new ElementCreationEvent((FormLineWidget) this, value);
 			fireElementCreationEvent(event);
 		}
 	}

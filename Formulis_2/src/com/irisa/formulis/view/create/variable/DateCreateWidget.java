@@ -7,13 +7,17 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
+
+import java.util.Date;
+
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.datepicker.client.ui.DateBox;
 
-public class DateCreateWidget extends AbstractDataWidget implements ValueChangeHandler<Boolean>{
+public class DateCreateWidget extends AbstractCreateWidget implements ValueChangeHandler<Boolean>{
 	
 //	private Grid element = new Grid(2,1);
 	private FluidRow elementRow = new FluidRow();
@@ -130,6 +134,16 @@ public class DateCreateWidget extends AbstractDataWidget implements ValueChangeH
 			}
 		}
 //		ControlUtils.debugMessage("DateCreateWidget onValueChange " + dateFormat + " " +datatype.getUri() );
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		try {
+			dateBox.setValue(DateTimeFormat.getFormat(dateFormat).parse(value));
+		}
+		catch(IllegalArgumentException except) {
+			ControlUtils.debugMessage("DateCreateWidget setStartingValue(" + value + ") : Cannot parse to Date");
+		}
 	}
 	
 

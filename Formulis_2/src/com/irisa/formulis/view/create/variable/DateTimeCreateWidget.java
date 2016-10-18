@@ -9,8 +9,9 @@ import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-public class DateTimeCreateWidget extends AbstractDataWidget {
+public class DateTimeCreateWidget extends AbstractCreateWidget {
 
 	private FluidContainer element = new FluidContainer();
 	private DateTimeBox datetimeBox = new DateTimeBox();
@@ -27,6 +28,16 @@ public class DateTimeCreateWidget extends AbstractDataWidget {
 		Date selectedDatetime = datetimeBox.getValue();
 		String value = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.ISO_8601).format(selectedDatetime);
 		return new Typed(ControlUtils.LITTERAL_URIS.xsdDatetime.getUri(), value);
+	}
+
+	@Override
+	public void setStartingValue(String value) {
+		try {
+			datetimeBox.setValue(DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.ISO_8601).parse(value));
+		}
+		catch(IllegalArgumentException except) {
+			ControlUtils.debugMessage("DateCreateWidget setStartingValue(" + value + ") : Cannot parse to Date");
+		}
 	}
 
 }

@@ -18,9 +18,11 @@ public class CreationTypeOracle {
 	public HashMap<String, String> typeItemMap = new HashMap<String, String>();
 	
 	private String oracle = null;
+	protected String startValue = "";
 
-	public CreationTypeOracle(LinkedList<BasicLeafElement> linkedList) {
+	public CreationTypeOracle(LinkedList<BasicLeafElement> linkedList, String startVal) {
 		types = linkedList;
+		this.startValue = startVal;
 
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#string", "text");
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#integer", "number");
@@ -84,6 +86,10 @@ public class CreationTypeOracle {
 
 	public String getMostLikelyLiteralType() {
 		return oracle;
+	}
+	
+	public String getStartValue() {
+		return startValue;
 	}
 	
 }

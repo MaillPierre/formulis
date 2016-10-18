@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.user.client.ui.Grid;
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
@@ -26,11 +27,13 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	private Grid element = new Grid(3, 1);
 	private ListBox typeList = new ListBox();
 	private HashMap<String, Integer> typeIndexMap = new HashMap<String, Integer>();
-	private AbstractDataWidget createWid = null;
+	private AbstractCreateWidget createWid = null;
 	private Button createButton = new Button("Create");
 	private int selectTypeIndex = 0;
 	private int createWidgetIndex = 1;
 	private int createButtonIndex = 2;
+	
+	private CreationTypeOracle oracle = null;
 	
 	public SelectCreateWidget( AbstractFormulisWidget fParent) {
 		this(fParent, null);
@@ -39,6 +42,8 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	public SelectCreateWidget(AbstractFormulisWidget fParent, CreationTypeOracle oracl) {
 		super(null, fParent);
 		initWidget(element);
+		
+		oracle = oracl;
 		
 		element.setWidget(selectTypeIndex, 0, typeList);
 		element.setWidget(createButtonIndex, 0, createButton);
@@ -100,6 +105,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	}
 	
 	public void setCreationType(String type) {
+//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
 		if(type == "date") {
 			this.createWid = new DateCreateWidget(null);
 		} else if(type == "time") {
@@ -115,6 +121,10 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 		} else if(type == "form") {
 			this.createWid = new FormCreateWidget(null);
 		}
+		if(this.oracle != null) {
+			this.createWid.setStartingValue(this.oracle.getStartValue());
+		}
+//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") FIN");
 	}
 
 }

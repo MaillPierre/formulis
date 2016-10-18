@@ -2099,7 +2099,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onElementCreation(ElementCreationEvent event) {
 		// CREATION D'UN NOUVEL ELEMENT
-		ControlUtils.debugMessage("Controller onElementCreation");
+//		ControlUtils.debugMessage("Controller onElementCreation");
 		FormLineWidget widSource = event.getSource();
 		if(widSource instanceof FormRelationLineWidget) {
 			FormLine dataSource = widSource.getFormLine();
@@ -2107,8 +2107,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			FormWidget newFormWid = new FormWidget(newDataForm, widSource);
 			//	boolean newFormFilled = loadFormContent(newFormWid);
 			boolean newFormFilled = this.isFormContentLoadable(newFormWid);
-			ControlUtils.debugMessage("Controller onElementCreation " + newFormFilled + " " + newDataForm .isEmpty());
-			if(newFormFilled /*&& !newDataForm.isEmpty()*/) {	
+//			ControlUtils.debugMessage("Controller onElementCreation " + newFormFilled + " " + newDataForm .isEmpty());
+			if(newFormFilled ) {	
 				widSource.setLineState(LINE_STATE.GUIDED_CREATION);
 				dataSource.setVariableElement(newDataForm);
 				widSource.setVariableElement(newFormWid);
@@ -2118,7 +2118,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				String queryLineLispql = lispqlStatementQuery(dataSource);
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getLoadCallback()));
 			} else {
-				widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget())));
+				widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget()), event.getValue()));
 			}
 	
 			incrementNumberOfActions();

@@ -33,7 +33,7 @@ public class CustomSuggestionPopover extends PopupPanel {
 			@Override
 			public void execute() {
 				hide();
-				source.fireElementCreationEvent();
+				source.fireElementCreationEvent(source.getValue());
 			}
 		});
 		
