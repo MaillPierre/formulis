@@ -41,7 +41,12 @@ public class TimeCreateWidget extends AbstractCreateWidget {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void setStartingValue(String value) {
-		timeBox.setValue(new Date(Date.parse(value)));
+		try {
+			timeBox.setValue(new Date(Date.parse(value)));
+		}
+		catch(IllegalArgumentException e) {
+			ControlUtils.debugMessage("TimeCreateWidget setStartingValue : Couldn't convert to time");
+		}
 	}
 
 }

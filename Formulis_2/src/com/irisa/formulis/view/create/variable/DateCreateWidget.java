@@ -1,35 +1,25 @@
 package com.irisa.formulis.view.create.variable;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
-import java.util.Date;
-
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Column;
-import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.FluidRow;
+import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.datepicker.client.ui.DateBox;
 
-public class DateCreateWidget extends AbstractCreateWidget implements ValueChangeHandler<Boolean>{
+public class DateCreateWidget extends AbstractCreateWidget implements ChangeHandler{
 	
-//	private Grid element = new Grid(2,1);
 	private FluidRow elementRow = new FluidRow();
 	private Column elementCol = new Column(12);
 	private DateBox dateBox = new DateBox();
 	
-	private FluidContainer checkRow = new FluidContainer(); 
-	private CheckBox yearCheckBox = new CheckBox("Year");
-	private CheckBox monthCheckBox = new CheckBox("Month");
-	private CheckBox dayCheckBox = new CheckBox("Day");
-	private CheckBox yearMonthCheckBox = new CheckBox("Year-Month");
-	private CheckBox monthDayCheckBox = new CheckBox("Month-Day");
+	private ListBox formatBox = new ListBox(false);
 	
 	private String dateFormat = "yyyy-MM-dd";
 	private ControlUtils.LITTERAL_URIS datatype = ControlUtils.LITTERAL_URIS.xsdDate;
@@ -40,20 +30,18 @@ public class DateCreateWidget extends AbstractCreateWidget implements ValueChang
 		elementRow.add(elementCol);
 
 		dateBox.setStartView("YEAR");
-		checkRow.add(yearCheckBox);
-		checkRow.add(monthCheckBox);
-		checkRow.add(dayCheckBox);
-		checkRow.add(yearMonthCheckBox);
-		checkRow.add(monthDayCheckBox);
+		formatBox.addItem("Year-Month-Day", ControlUtils.LITTERAL_URIS.xsdDate.getUri());
+		formatBox.addItem("Month-Day", ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri());
+		formatBox.addItem("Year-Month", ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri());
+		formatBox.addItem("Year", ControlUtils.LITTERAL_URIS.xsdYear.getUri());
+		formatBox.addItem("Month", ControlUtils.LITTERAL_URIS.xsdMonth.getUri());
+		formatBox.addItem("Day", ControlUtils.LITTERAL_URIS.xsdDay.getUri());
+		formatBox.addChangeHandler(this);
+		formatBox.setSelectedIndex(0);
 		
 		elementCol.add(dateBox);
-		elementCol.add(checkRow);
-		yearCheckBox.addValueChangeHandler(this);
-		monthCheckBox.addValueChangeHandler(this);
-		dayCheckBox.addValueChangeHandler(this);
-		yearCheckBox.setValue(true);
-		monthCheckBox.setValue(true);
-		dayCheckBox.setValue(true);
+		elementCol.add(formatBox);
+
 	}
 
 	@Override
@@ -68,72 +56,38 @@ public class DateCreateWidget extends AbstractCreateWidget implements ValueChang
 	}
 
 	@Override
-	public void onValueChange(ValueChangeEvent<Boolean> event) {
-		if(event.getSource() == yearCheckBox || event.getSource() == monthCheckBox || event.getSource() == dayCheckBox ) {
-			String format = "";
-			// Format
-			if(yearCheckBox.getValue()) {
-				format += "yyyy";
-			}
-			if(yearCheckBox.getValue() && monthCheckBox.getValue()) {
-				format += "-";
-			}
-			if(monthCheckBox.getValue()) {
-				format += "MM";
-			}
-			if(monthCheckBox.getValue() && dayCheckBox.getValue() ) {
-				format += "-";
-			}
-			if(dayCheckBox.getValue()) {
-				format += "dd";
-			}
+	public void onChange(ChangeEvent event) {
+		if(event.getSource() == formatBox ) {
+			String format = null;
+			String select = formatBox.getSelectedValue();
 			
-			// Datatype
-			if(yearCheckBox.getValue()) {
+			if(select.equals(ControlUtils.LITTERAL_URIS.xsdYear.getUri())) {
+				format = "yyyy";
 				datatype = ControlUtils.LITTERAL_URIS.xsdYear;
-			}
-			if(monthCheckBox.getValue()) {
+			} 
+			else if(select.equals(ControlUtils.LITTERAL_URIS.xsdMonth.getUri())) {
+				format = "MM";
 				datatype = ControlUtils.LITTERAL_URIS.xsdMonth;
-			}
-			if(dayCheckBox.getValue()) {
+			} 
+			else if(select.equals(ControlUtils.LITTERAL_URIS.xsdDay.getUri())) {
+				format = "dd";
 				datatype = ControlUtils.LITTERAL_URIS.xsdDay;
-			}
-			if(yearCheckBox.getValue() && monthCheckBox.getValue()) {
+			} 
+			else if(select.equals(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri())) {
+				format = "yyyy-MM";
 				datatype = ControlUtils.LITTERAL_URIS.xsdYearMonth;
-			}
-			if(monthCheckBox.getValue() && dayCheckBox.getValue() ) {
+			} 
+			else if(select.equals(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri())) {
+				format = "MM-dd";
 				datatype = ControlUtils.LITTERAL_URIS.xsdMonthDay;
-			}
-			if(yearCheckBox.getValue() && monthCheckBox.getValue() && dayCheckBox.getValue()) {
+			} 
+			else /*if(select.equals(ControlUtils.LITTERAL_URIS.xsdDate.getUri()))*/ {
+				format = "yyyy-MM-dd";
 				datatype = ControlUtils.LITTERAL_URIS.xsdDate;
 			}
 			
 			dateBox.setFormat(format);
-			dateFormat = format;
-		} else if(event.getSource() == yearMonthCheckBox) {
-			if(yearMonthCheckBox.getValue()) {
-				String format = "yyyy-MM";
-				datatype = ControlUtils.LITTERAL_URIS.xsdYearMonth;
-				dateBox.setFormat(format);
-				dateFormat = format;
-			}
-		} else if(event.getSource() == monthDayCheckBox) {
-			if(monthDayCheckBox.getValue()) {
-				String format = "MM-dd";
-				datatype = ControlUtils.LITTERAL_URIS.xsdMonthDay;
-				dateBox.setFormat(format);
-				dateFormat = format;
-			}
-		} 
-		if( event.getSource() == yearCheckBox || event.getSource() == monthCheckBox || event.getSource() == dayCheckBox || event.getSource() == yearMonthCheckBox || event.getSource() == monthDayCheckBox){
-			if( ! (yearCheckBox.getValue() || monthCheckBox.getValue() || dayCheckBox.getValue() || yearMonthCheckBox.getValue() || monthDayCheckBox.getValue())) {
-				String format = "yyyy-MM-dd";
-				datatype = ControlUtils.LITTERAL_URIS.xsdDate;
-				dateBox.setFormat(format);
-				dateFormat = format;
-			}
 		}
-//		ControlUtils.debugMessage("DateCreateWidget onValueChange " + dateFormat + " " +datatype.getUri() );
 	}
 
 	@Override

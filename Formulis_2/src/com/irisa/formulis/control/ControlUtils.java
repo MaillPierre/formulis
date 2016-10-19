@@ -28,6 +28,7 @@ public class ControlUtils {
 	public enum LITTERAL_URIS {
 		xsdString("http://www.w3.org/2001/XMLSchema#string"),
 		xsdInteger("http://www.w3.org/2001/XMLSchema#integer"),
+		xsdDouble("http://www.w3.org/2001/XMLSchema#double"),
 		xsdDate("http://www.w3.org/2001/XMLSchema#date"),
 		xsdDatetime("http://www.w3.org/2001/XMLSchema#dateTime"),
 		xsdTime("http://www.w3.org/2001/XMLSchema#time"),
@@ -45,7 +46,7 @@ public class ControlUtils {
 			uri = u;
 		}
 	
-		public String getUri() {
+		public final String getUri() {
 			return uri;
 		}
 	
