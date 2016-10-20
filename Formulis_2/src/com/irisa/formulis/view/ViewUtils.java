@@ -44,176 +44,93 @@ public class ViewUtils {
 					if(formElement instanceof Keyword) {
 						Keyword k = baseElement.as(Keyword.class);
 						return SafeHtmlUtils.fromTrustedString( "<span class='keyword'> " + k.getKeyword() + " </span>" );
-					} if(formElement instanceof Display) {
+					} 
+					if(formElement instanceof Display) {
 						Display dis = baseElement.as(Display.class);
-
-						String disString = "";
-						Iterator<BasicElement> itDis = dis.getContentIterator();
-						while(itDis.hasNext()) {
-							BasicElement elemDis = itDis.next();
-							disString += toSimpleHtml(elemDis).asString();
-						}
-						disString += "";
-						return SafeHtmlUtils.fromTrustedString(disString);
-					} if(formElement instanceof Typed) {
+						return toSimpleHtmlDisplay(dis);
+					} 
+					if(formElement instanceof Typed) {
 						Typed t = baseElement.as(Typed.class);
 						return SafeHtmlUtils.fromTrustedString("<span title='"+ t.getUri() +"' class='typedLiteral'>" + t.getValue() + "</span>");
-					} if(formElement instanceof URI) {
+					} 
+					if(formElement instanceof URI) {
 						URI u = baseElement.as(URI.class);
-						String uriString = "<span title='"+ u.getUri() +"' class='";
-						if(u.getKind() == URI.KIND.CLASS) {
-							uriString += "class";
-						}
-						else if(u.getKind() == URI.KIND.ENTITY) {
-							uriString +="entity";
-						}
-						else if(u.getKind() == URI.KIND.PROPERTY) {
-							uriString +="property";
-						}
-						uriString +="' > ";
-						if(!u.getLabel().equals("")) {
-							uriString += SafeHtmlUtils.htmlEscape(u.getLabel()) ;
-						} else {
-							uriString += SafeHtmlUtils.htmlEscape(u.getUri()) ;
-						}
-						uriString +=" </span>";
-						return SafeHtmlUtils.fromTrustedString(uriString);
-					} if(formElement instanceof Focus) {
+						return toSimpleHtmlUri(u);
+					} 
+					if(formElement instanceof Focus) {
 						Focus f = baseElement.as(Focus.class);
-						String fString = "<span class='focus' id='"+ f.getId() +"' >";
-						Iterator<BasicElement> itF = f.getContentIterator();
-						while(itF.hasNext()) {
-							BasicElement elemFoc = itF.next();
-							fString += toSimpleHtml(elemFoc).asString();
-						}
-						fString += "</span>";
-						return SafeHtmlUtils.fromTrustedString(fString);
-					} if(formElement instanceof Pair) {
+						return toSimpleHtmlFocus(f);
+					} 
+					if(formElement instanceof Pair) {
 						Pair pair = baseElement.as(Pair.class);
-
-						if(pair.getForceIndent()) {
-							String pairTable = "<table class='pair'><tbody>";
-							// Ligne 1
-							pairTable += "<tr>";
-							pairTable += "<table><tbody><tr>";
-							Iterator<BasicElement> itL1 = pair.getIteratorOnFirstLine();
-							while(itL1.hasNext()) {
-								BasicElement elemPairL1 = itL1.next();
-								pairTable += "<td>" + toSimpleHtml(elemPairL1).asString() + "</td>";
-							}
-							pairTable += "</tr>";
-							// Ligne 2
-							Iterator<BasicElement> itL2 = pair.getIteratorOnSecondLine();
-							pairTable += "<tr>";
-							//							pairTable += "<td><span class='indent'></span></td>";
-							while(itL2.hasNext()) {
-								BasicElement elemPairL2 = itL2.next();
-								pairTable += "<td>" + toSimpleHtml(elemPairL2).asString() + "</td>";
-							}
-							pairTable += "</tr></tbody></table>";
-							pairTable += "</tbody></table>";
-							return SafeHtmlUtils.fromTrustedString(pairTable);
-						} else {
-							String pString = "<span class='pairline'  >";
-							Iterator<BasicElement> itpL1 = pair.getIteratorOnFirstLine();
-							while(itpL1.hasNext()) {
-								BasicElement elempL1 = itpL1.next();
-								pString += toSimpleHtml(elempL1).asString();
-							}
-							Iterator<BasicElement> itpL2 = pair.getIteratorOnSecondLine();
-							while(itpL2.hasNext()) {
-								BasicElement elempL2 = itpL2.next();
-								pString += toSimpleHtml(elempL2).asString();
-							}
-							pString += "</span>";
-							return SafeHtmlUtils.fromTrustedString(pString);
-						}
-					} if(formElement instanceof List) {
-					} if(formElement instanceof Space) {
+						return toSimpleHtmlPair(pair);
+					} 
+					if(formElement instanceof List) {
+						List list = baseElement.as(List.class);
+						return toSimpleHtmlList(list);
+					} 
+					if(formElement instanceof Space) {
 						return SafeHtmlUtils.fromTrustedString("<span class='space'></span>");
-					} if(formElement instanceof Prim) {
+					} 
+					if(formElement instanceof Prim) {
 						Prim prim = baseElement.as(Prim.class);
 						return SafeHtmlUtils.fromTrustedString("<span class='primitive'> "+ prim.getPrim() +"</span>");
-					} if(formElement instanceof Variable) {
+					} 
+					if(formElement instanceof Variable) {
 						Variable v = baseElement.as(Variable.class);
 						return SafeHtmlUtils.fromTrustedString("<span class='variable'> "+ v.getVariable() +"</span>");
-					} if(formElement instanceof Brackets) {
+					} 
+					if(formElement instanceof Brackets) {
 						Brackets bra = baseElement.as(Brackets.class);
-						String braString = "<span class='brackets' > { ";
-						Iterator<BasicElement> itBra = bra.getContentIterator();
-						while(itBra.hasNext()) {
-							BasicElement elemBra = itBra.next();
-							braString += toSimpleHtml(elemBra).asString();
-						}
-						braString += " } </span>";
-						return SafeHtmlUtils.fromTrustedString(braString);
-					} if(formElement instanceof Plain) {
+						return toSimpleHtmlBrackets(bra);
+					} 
+					if(formElement instanceof Plain) {
 						Plain p = baseElement.as(Plain.class);
-						String plainVal = p.getPlain();
-						String plainFull = plainVal;
-						if(p.getLang() != null) {
-							plainFull += "@" + p.getLang();
-						}
-						return SafeHtmlUtils.fromTrustedString("<span title='"+ plainFull +"' class='plainLiteral'>" + plainVal + "</span>");
-						//			} if(e instanceof XML) {
-					} if(formElement instanceof Tuple) {
-					} if(formElement instanceof Sequence) {
-					} if(formElement instanceof Or) {
-					} if(formElement instanceof Not) {
-					} if(formElement instanceof Maybe) {
-					} if(formElement instanceof Quote) {
+						return toSimpleHtmlPlain(p);
+					} 
+					if(formElement instanceof And) {
+						And a = baseElement.as(And.class);
+						return toSimpleHtmlAnd(a);
+					} 
+					if(formElement instanceof Tuple) {
+						Tuple tup = baseElement.as(Tuple.class);
+						return toSimpleHtmlTuple(tup);
+					} 
+					if(formElement instanceof Sequence) {
+						Sequence seq = baseElement.as(Sequence.class);
+						return toSimpleHtmlSequence(seq);
+					} 
+					if(formElement instanceof Or) {
+						Or or = baseElement.as(Or.class);
+						return toSimpleHtmlOr(or);
+					} 
+					if(formElement instanceof Not) {
+						Not not = baseElement.as(Not.class);
+						return toSimpleHtmlNot(not);
+					} 
+					if(formElement instanceof Maybe) {
+						Maybe mabe = baseElement.as(Maybe.class);
+						return toSimpleHtmlMaybe(mabe);
+					} 
+					if(formElement instanceof Quote) {
 						Quote quo = baseElement.as(Quote.class);
-						String quoString = "<span class='quote' > « ";
-						Iterator<BasicElement> itQuo = quo.getContentIterator();
-						while(itQuo.hasNext()) {
-							BasicElement elemBra = itQuo.next();
-							quoString += toSimpleHtml(elemBra).asString();
-						}
-						quoString += " » </span>";
-						return SafeHtmlUtils.fromTrustedString(quoString);
+						return toSimpleHtmlQuote(quo);
 					} else {
+						ControlUtils.debugMessage("ViewUtils toSimpleJtml unable to convert " + baseElement.toString());
 						return SafeHtmlUtils.fromTrustedString("");
 					}
 				} catch (FormElementConversionException e1) {
-					e1.printStackTrace();
+					ControlUtils.exceptionMessage(e1);
 				}
 			} else if(formElement instanceof FormComponent) {
 				//				Utils.debugMessage("toSimpleHtml( " + formElement + " )");
 				FormComponent formCompo = (FormComponent) formElement;
 				if(formCompo.isForm()) {
-					String formTable = "<table class=\"weblis-suggestion-table table table-bordered\"><tbody>";
 					Form formform = (Form) formCompo;
-					if(! formform.isAnonymous()) {
-						Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
-						while(itTypeFormLine.hasNext()) {
-							FormClassLine line = itTypeFormLine.next();
-							if(! line.isAnonymous()) {
-								formTable += "<tr><td>";
-								formTable += toSimpleHtml(line).asString();
-								formTable += "</td></tr>";
-							}
-						}
-					}
-					Iterator<FormRelationLine> itRelFormLine = formform.relationLinesIterator();
-					while(itRelFormLine.hasNext()) {
-						formTable += "<tr><td>";
-						FormLine line = itRelFormLine.next();
-						formTable += toSimpleHtml(line).asString();
-						formTable += "</td></tr>";
-					}
-					formTable += "</tbody></table>";
-//					ControlUtils.debugMessage("toSimpleHtml Form: " + formElement + " ===> " + formTable);
-					return SafeHtmlUtils.fromTrustedString(formTable);
+					return toSimpleHtmlForm(formform);
 				} else if(formCompo.isLine()) {
 					FormLine line = (FormLine) formCompo;
-					String lineString = "";
-					lineString += toSimpleHtml(line.getFixedElement()).asString();
-					if(line.getVariableElement() != null) {
-						lineString += toSimpleHtml(line.getVariableElement()).asString();
-					}
-					lineString += "";
-//					ControlUtils.debugMessage("toSimpleHtml Line: " + formElement + " ===> " + lineString);
-					return SafeHtmlUtils.fromTrustedString(lineString);
+					return toSimpleHtmlFormLine(line);
 				} else {
 					ControlUtils.debugMessage("toSimpleHtml Elément inconnu (Compo)");
 				}
@@ -222,6 +139,202 @@ public class ViewUtils {
 			}
 		}
 		return SafeHtmlUtils.fromTrustedString("");
+	}
+	
+	private static SafeHtml toSimpleHtmlList(List list) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlMaybe(Maybe mabe) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlNot(Not not) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlOr(Or or) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlSequence(Sequence seq) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlTuple(Tuple tup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static SafeHtml toSimpleHtmlAnd(And a) { // TODO Affichage d'un And dans une statement buggé
+		String andTable = "<table class=\"table\"><tbody>";
+		
+		Iterator<BasicElement> itAnd = a.getContentIterator();
+		while(itAnd.hasNext()) {
+			BasicElement andElem = itAnd.next();
+			andTable += "<tr><td>";
+			andTable += toSimpleHtml(andElem).asString();
+			andTable += "</td></tr>";
+		}
+		
+		andTable += "</tbody></table>";
+		return SafeHtmlUtils.fromTrustedString(andTable);
+	}
+
+	private static SafeHtml toSimpleHtmlForm(Form formform) {
+		String formTable = "<table class=\"weblis-suggestion-table table table-bordered\"><tbody>";
+		if(! formform.isAnonymous()) {
+			Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
+			while(itTypeFormLine.hasNext()) {
+				FormClassLine line = itTypeFormLine.next();
+				if(! line.isAnonymous()) {
+					formTable += "<tr><td>";
+					formTable += toSimpleHtml(line).asString();
+					formTable += "</td></tr>";
+				}
+			}
+		}
+		Iterator<FormRelationLine> itRelFormLine = formform.relationLinesIterator();
+		while(itRelFormLine.hasNext()) {
+			formTable += "<tr><td>";
+			FormLine line = itRelFormLine.next();
+			formTable += toSimpleHtml(line).asString();
+			formTable += "</td></tr>";
+		}
+		formTable += "</tbody></table>";
+//		ControlUtils.debugMessage("toSimpleHtml Form: " + formElement + " ===> " + formTable);
+		return SafeHtmlUtils.fromTrustedString(formTable);
+	}
+
+	private static SafeHtml toSimpleHtmlFormLine(FormLine line) {
+		String lineString = "";
+		lineString += toSimpleHtml(line.getFixedElement()).asString();
+		if(line.getVariableElement() != null) {
+			lineString += toSimpleHtml(line.getVariableElement()).asString();
+		}
+		lineString += "";
+//		ControlUtils.debugMessage("toSimpleHtml Line: " + formElement + " ===> " + lineString);
+		return SafeHtmlUtils.fromTrustedString(lineString);
+	}
+	
+	private static SafeHtml toSimpleHtmlDisplay(Display dis) {
+		String disString = "";
+		Iterator<BasicElement> itDis = dis.getContentIterator();
+		while(itDis.hasNext()) {
+			BasicElement elemDis = itDis.next();
+			disString += toSimpleHtml(elemDis).asString();
+		}
+		disString += "";
+		return SafeHtmlUtils.fromTrustedString(disString);
+	}
+
+	private static SafeHtml toSimpleHtmlUri(URI u) {
+		String uriString = "<span title='"+ u.getUri() +"' class='";
+		if(u.getKind() == URI.KIND.CLASS) {
+			uriString += "class";
+		}
+		else if(u.getKind() == URI.KIND.ENTITY) {
+			uriString +="entity";
+		}
+		else if(u.getKind() == URI.KIND.PROPERTY) {
+			uriString +="property";
+		}
+		uriString +="' > ";
+		if(!u.getLabel().equals("")) {
+			uriString += SafeHtmlUtils.htmlEscape(u.getLabel()) ;
+		} else {
+			uriString += SafeHtmlUtils.htmlEscape(u.getUri()) ;
+		}
+		uriString +=" </span>";
+		return SafeHtmlUtils.fromTrustedString(uriString);
+	}
+
+	private static SafeHtml toSimpleHtmlFocus(Focus f) {
+		String fString = "<span class='focus' id='"+ f.getId() +"' >";
+		Iterator<BasicElement> itF = f.getContentIterator();
+		while(itF.hasNext()) {
+			BasicElement elemFoc = itF.next();
+			fString += toSimpleHtml(elemFoc).asString();
+		}
+		fString += "</span>";
+		return SafeHtmlUtils.fromTrustedString(fString);
+	}
+
+	private static SafeHtml toSimpleHtmlPair(Pair pair) {
+
+		if(pair.getForceIndent()) {
+			String pairTable = "<table class='pair'><tbody>";
+			// Ligne 1
+			pairTable += "<tr>";
+			pairTable += "<table><tbody><tr>";
+			Iterator<BasicElement> itL1 = pair.getIteratorOnFirstLine();
+			while(itL1.hasNext()) {
+				BasicElement elemPairL1 = itL1.next();
+				pairTable += "<td>" + toSimpleHtml(elemPairL1).asString() + "</td>";
+			}
+			pairTable += "</tr>";
+			// Ligne 2
+			Iterator<BasicElement> itL2 = pair.getIteratorOnSecondLine();
+			pairTable += "<tr>";
+			//							pairTable += "<td><span class='indent'></span></td>";
+			while(itL2.hasNext()) {
+				BasicElement elemPairL2 = itL2.next();
+				pairTable += "<td>" + toSimpleHtml(elemPairL2).asString() + "</td>";
+			}
+			pairTable += "</tr></tbody></table>";
+			pairTable += "</tbody></table>";
+			return SafeHtmlUtils.fromTrustedString(pairTable);
+		} else {
+			String pString = "<span class='pairline'  >";
+			Iterator<BasicElement> itpL1 = pair.getIteratorOnFirstLine();
+			while(itpL1.hasNext()) {
+				BasicElement elempL1 = itpL1.next();
+				pString += toSimpleHtml(elempL1).asString();
+			}
+			Iterator<BasicElement> itpL2 = pair.getIteratorOnSecondLine();
+			while(itpL2.hasNext()) {
+				BasicElement elempL2 = itpL2.next();
+				pString += toSimpleHtml(elempL2).asString();
+			}
+			pString += "</span>";
+			return SafeHtmlUtils.fromTrustedString(pString);
+		}
+	}
+
+	private static SafeHtml toSimpleHtmlQuote(Quote quo) {
+		String quoString = "<span class='quote' > « ";
+		Iterator<BasicElement> itQuo = quo.getContentIterator();
+		while(itQuo.hasNext()) {
+			BasicElement elemBra = itQuo.next();
+			quoString += toSimpleHtml(elemBra).asString();
+		}
+		quoString += " » </span>";
+		return SafeHtmlUtils.fromTrustedString(quoString);
+	}
+
+	private static SafeHtml toSimpleHtmlPlain(Plain p) {
+		String plainVal = p.getPlain();
+		String plainFull = plainVal;
+		if(p.getLang() != null) {
+			plainFull += "@" + p.getLang();
+		}
+		return SafeHtmlUtils.fromTrustedString("<span title='"+ plainFull +"' class='plainLiteral'>" + plainVal + "</span>");
+	}
+
+	private static SafeHtml toSimpleHtmlBrackets(Brackets bra) {
+		String braString = "<span class='brackets' > { ";
+		Iterator<BasicElement> itBra = bra.getContentIterator();
+		while(itBra.hasNext()) {
+			BasicElement elemBra = itBra.next();
+			braString += toSimpleHtml(elemBra).asString();
+		}
+		braString += " } </span>";
+		return SafeHtmlUtils.fromTrustedString(braString);
 	}
 
 	public static SimpleFormWidget toSimpleWidget(FormElement elem) {

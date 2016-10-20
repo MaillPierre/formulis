@@ -79,18 +79,29 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 			public void onMouseOver(MouseOverEvent event) {
 				element.getElement().getStyle().setCursor(Cursor.MOVE);
 				if(uriDesc != null) {
-					String text = tooltip.getText();
-					text += uriDesc;
-					tooltip.setText(text);
+					tooltip.setText(getTooltipText());
+
+					tooltip.reconfigure();
+					tooltip.show();
 				} 
 				else {
-					fireDescribeUriEvent(getTooltipCallback());
+//					fireDescribeUriEvent(getTooltipCallback()); // TODO remettre pour interrogation à propos de l'URI
 				}
-				tooltip.show();
 			}
 		});
 		
 		element.setWordWrap(false);
+	}
+	
+	public String getTooltipText() {
+		String text = getData().getUri() + " <br/> ";
+		if(getParentWidget() instanceof FormLineWidget) {
+			text += ((FormLineWidget) getParentWidget()).getFormLine().getInfo();
+		}
+		if(uriDesc != null) {
+			text += uriDesc;
+		} 
+		return text;
 	}
 	
 	@Override
@@ -116,10 +127,12 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 		return new DescribeUriCallback() {
 			@Override
 			public void call(String desc) {
-				String text = tooltip.getText();
-				text += desc;
-				tooltip.setText(text);
+				ControlUtils.debugMessage("URIWidget getTooltipCallback call \"" + desc + "\" ");
 				uriDesc = desc;
+				tooltip.setText(getTooltipText());
+
+				tooltip.reconfigure();
+				tooltip.show();
 			}
 			
 			@Override

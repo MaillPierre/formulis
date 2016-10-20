@@ -28,6 +28,9 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
@@ -48,6 +51,7 @@ import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
+import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
@@ -1445,7 +1449,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								navBar.setServerStatusHovertext(message);
 							}
 						} else {
-							event.getCallback().call(docElement.toString());
+							Node root = docElement.getFirstChild();
+							try {
+
+								ControlUtils.debugMessage("uridescription statement statement: " + root.toString());
+								SafeHtml stat = ViewUtils.toSimpleHtml(Parser.parseDisplayNode(root));
+								
+								event.getCallback().call(stat.asString());
+							} catch (XMLParsingException e) {
+								ControlUtils.exceptionMessage(e);
+								ControlUtils.debugMessage("uridescription statement parse failed");
+							}
 						}
 					} else {
 						// TODO GESTION DES MESSAGE D'ERREUR

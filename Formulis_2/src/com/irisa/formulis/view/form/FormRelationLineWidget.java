@@ -179,6 +179,9 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 					formCompo.setParent(this.getData());
 				}
 			}
+			if(nWid instanceof URIWidget) {
+				((URIWidget) nWid).addDescribeUriHandler(this);
+			}
 			nWid.setParentWidget(this);
 			variableElement = nWid;
 			elementRow.clear();
