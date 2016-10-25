@@ -34,24 +34,22 @@ import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
-import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.FinishLineEvent;
-import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
 /**
  * Widget principal pour un formulaire
  * @author pmaillot
  *
  */
-public class FormWidget extends AbstractFormElementWidget implements DragEndHandler, DragEnterHandler, DragLeaveHandler, DragHandler, DragOverHandler, 
-DragStartHandler, DropHandler {
+public class FormWidget 
+	extends AbstractFormElementWidget 
+	implements DragEndHandler, DragStartHandler {
 
 	private FluidRow element = new FluidRow();
 	private Column linesCol = new Column(11);
@@ -78,6 +76,11 @@ DragStartHandler, DropHandler {
 	
 	private boolean storeSet = false;
 	
+	/**
+	 * Responsable de la gestion des evenement lorsqu'une ligne est en cours de déplacement (le début et la fin du déplacement son gérés par le form lui-même
+	 */
+	private LineDragHandler dragLineHand = null; // TODO Test pour gestion drag&drop, sale ?
+	
 	public FormWidget(Form da, AbstractFormulisWidget fParent) {
 		super(da, fParent);
 		initWidget(element);
@@ -91,8 +94,6 @@ DragStartHandler, DropHandler {
 		finishCol.add(finishButton);
 		finishCol.add(moreButton);
 		finishCol.add(reloadButton);
-//		newRelationButton.addStyleName("weblis-max-width");
-//		newClassButton.addStyleName("weblis-max-width");
 		newRelationButton.setBlock(true);
 		newClassButton.setBlock(true);
 		newElementRow.add(newRelationCol);
@@ -122,6 +123,8 @@ DragStartHandler, DropHandler {
 		});
 		profileCheckbox.setText("Add to profile");
 		setProfileMode(false);
+		
+		dragLineHand = new LineDragHandler(this);
 		
 		reload();
 	}
@@ -315,13 +318,13 @@ DragStartHandler, DropHandler {
 		linesWidgets.addLast(line);
 		ViewUtils.connectFormEventChain(line, this);
 		if(line instanceof FormRelationLineWidget) {
-			((FormRelationLineWidget) line).addDragStartHandler(this);
 			((FormRelationLineWidget) line).addDragEndHandler(this);
-			((FormRelationLineWidget) line).addDragEnterHandler(this);
-			((FormRelationLineWidget) line).addDragHandler(this);
-			((FormRelationLineWidget) line).addDragLeaveHandler(this);
-			((FormRelationLineWidget) line).addDragOverHandler(this);
-			((FormRelationLineWidget) line).addDropHandler(this);
+			((FormRelationLineWidget) line).addDragEnterHandler(dragLineHand);
+			((FormRelationLineWidget) line).addDragHandler(dragLineHand);
+			((FormRelationLineWidget) line).addDragLeaveHandler(dragLineHand);
+			((FormRelationLineWidget) line).addDragOverHandler(dragLineHand);
+			((FormRelationLineWidget) line).addDragStartHandler(this);
+			((FormRelationLineWidget) line).addDropHandler(dragLineHand);
 		}
 	}
 
@@ -343,6 +346,28 @@ DragStartHandler, DropHandler {
 			fireMoreFormLinesEvent(getAppendCallback());
 		} else if(event.getSource() == this.reloadButton) {
 			fireReloadEvent(getAppendCallback());
+		}
+	}
+
+	@Override
+	public void onDragStart(DragStartEvent event) {
+		ControlUtils.debugMessage("FormWidget onDragStart");
+		if(event.getSource() instanceof FormRelationLineWidget) {
+			FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+			event.setData("text", src.getData().toString());
+			event.getDataTransfer().setDragImage(src.getElement(), 10, 10);
+			this.dragLineHand.setCurrentDraggedLine(src);
+			src.setDraggedLineFlag(true);
+		}
+	}
+
+	@Override
+	public void onDragEnd(DragEndEvent event) {
+		ControlUtils.debugMessage("FormRelationLineWidget onDragEnd " + event.getSource());
+		if(event.getSource() instanceof FormRelationLineWidget) {
+			FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+			src.setDraggedLineFlag(false);
+			this.dragLineHand.setCurrentDraggedLine(null);
 		}
 	}
 
@@ -428,46 +453,82 @@ DragStartHandler, DropHandler {
 		}
 		
 	}
+	
+	public class LineDragHandler implements DragEnterHandler, DragLeaveHandler, DragHandler, DragOverHandler, DropHandler {
 
-	@Override
-	public void onDragStart(DragStartEvent event) {
-		ControlUtils.debugMessage("FormWidget onDragStart");
-		if(event.getSource() instanceof FormRelationLineWidget) {
-			ControlUtils.debugMessage(((FormRelationLineWidget) event.getSource()).getData());
-			event.setData("text", ((FormRelationLineWidget) event.getSource()).getData().toString());
-			event.getDataTransfer().setDragImage(((FormRelationLineWidget)event.getSource()).getElement(), 10, 10);
+		private FormWidget formWid = null;
+		private FormRelationLineWidget currentDraggedLine = null;
+		
+		public LineDragHandler(FormWidget formWidget) {
+			formWid = formWidget;
 		}
-	}
+		
+		public void setCurrentDraggedLine(FormRelationLineWidget line) {
+			currentDraggedLine = line;
+		}
+		
+		public FormRelationLineWidget getCurrentDraggedLine() {
+			return currentDraggedLine;
+		}
 
-	@Override
-	public void onDrop(DropEvent event) {
-//		ControlUtils.debugMessage("FormWidget onDrop");
-	}
+		@Override
+		public void onDragOver(DragOverEvent event) {
+			ControlUtils.debugMessage("FormRelationLineWidget onDragOver " + event.getSource());
+			
+			if(event.getSource() instanceof FormRelationLineWidget) {
+				FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+				if(this.currentDraggedLine != null 
+						&& ! src.equals(this.currentDraggedLine) 
+						&& src.getParentWidget().equals(this.currentDraggedLine.getParentWidget())) {
+					ControlUtils.debugMessage("FormRelationLineWidget onDragOver " + this.currentDraggedLine + " OVER " + event.getSource());
+				}
+			} else if(event.getSource() instanceof FormRelationLineWidget.FormRelationLinePlaceHolderWidget) {
+				
+			}
+			//TODO Create placeholder line to figure the new place of the line, reordering mechanism
+		}
 
-	@Override
-	public void onDragOver(DragOverEvent event) {
-//		ControlUtils.debugMessage("FormWidget onDragOver");
-		//TODO Create placeholder line to figure the new place of the line, reordering mechanism
-	}
+		@Override
+		public void onDrag(DragEvent event) {
+			ControlUtils.debugMessage("FormRelationLineWidget onDrag " + event.getSource());
+			if(event.getSource() instanceof FormRelationLineWidget && currentDraggedLine.equals(event.getSource())) {
+			}
+		}
 
-	@Override
-	public void onDrag(DragEvent event) {
-//		ControlUtils.debugMessage("FormWidget onDrag");
-	}
+		@Override
+		public void onDragEnter(DragEnterEvent event) {
+			ControlUtils.debugMessage("FormRelationLineWidget onDragEnter " + event.getSource());
+			if(event.getSource() instanceof FormRelationLineWidget) {
+				FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+				if(src.equals(currentDraggedLine)) {
+					src.toggleLinePlaceHolder();
+				}
+			}
+		}
 
-	@Override
-	public void onDragLeave(DragLeaveEvent event) {
-//		ControlUtils.debugMessage("FormWidget onDragLeave");
-	}
+		@Override
+		public void onDragLeave(DragLeaveEvent event) {
+			ControlUtils.debugMessage("FormRelationLineWidget onDragLeave " + event.getSource());
+			if(event.getSource() instanceof FormRelationLineWidget) {
+				FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+				if(! src.equals(currentDraggedLine)) {
+					src.toggleLinePlaceHolder();
+				}
+			}
+		}
 
-	@Override
-	public void onDragEnter(DragEnterEvent event) {
-//		ControlUtils.debugMessage("FormWidget onDragEnter");
-	}
-
-	@Override
-	public void onDragEnd(DragEndEvent event) {
-		ControlUtils.debugMessage("FormWidget onDragEnd");
+		@Override
+		public void onDrop(DropEvent event) {
+			ControlUtils.debugMessage("FormRelationLineWidgets onDrop " + event.getSource().getClass().getSimpleName() + " " + event.getSource());
+			if(event.getSource() instanceof FormRelationLineWidget) {
+				FormRelationLineWidget src = (FormRelationLineWidget) event.getSource();
+				if(! src.equals(currentDraggedLine)) {
+					src.setLinePlaceHolderFlag(false);
+				}
+			}
+			event.stopPropagation();
+		}
+		
 	}
 	
 }

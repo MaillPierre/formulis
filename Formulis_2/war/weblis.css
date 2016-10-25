@@ -49,6 +49,16 @@
     border-width: 1px;
 }
 
+.formulis-line-placeholder {
+    border-style: dotted;
+    border-width: 1px;
+	background-color: #fff;
+}
+
+.formulis-dragged {
+	 background-color: grey;
+}
+
 .header {
     display: inline;
 /*     text-align: left; */

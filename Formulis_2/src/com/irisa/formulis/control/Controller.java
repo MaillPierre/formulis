@@ -659,7 +659,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	// NAVIGATION
 	public void sewelisGetPlaceRoot() {
-		ControlUtils.debugMessage("getPlaceRoot");
+//		ControlUtils.debugMessage("getPlaceRoot");
 		if(currentStore != null) {
 			String placeHomeRequestString = serverAdress + "/getPlaceRoot?";
 			placeHomeRequestString += "userKey=" + userKey;
@@ -707,7 +707,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.exceptionMessage(e);
 			}
 		}
-		ControlUtils.debugMessage("FIN getPlaceRoot");
+//		ControlUtils.debugMessage("FIN getPlaceRoot");
 	}
 
 	public void sewelisGetPlaceHome() {
@@ -2022,7 +2022,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		// SELECTION DE LIGNE
 		// la selection d'une ligne entraine un changement de statement
 
-		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource() + " )");
+//		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource() + " )");
 		this.place.clearCurrentCompletions();
 		// La source est forcément une ligne
 		FormLineWidget widSource = (FormLineWidget)event.getSource();
@@ -2032,24 +2032,24 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String queryLineLispql = lispqlStatementQuery(dataSource);
 		
 		if(dataSource instanceof FormClassLine) { // Selection d'une classe
-			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
+//			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
 			// Si c'est une classe de litteral
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
 				// si le form n'a pas encore de type
 			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
 				dataSourceParent.addTypeLine((FormClassLine) dataSource, true);
-				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
+//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 				// Si la ligne avait déjà un type (retractation)
 			} else {
-				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
+//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
 				dataSourceParent.clear();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
 				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 			}
 		} else if(dataSource instanceof FormRelationLine) { // selection d'une relation
-			ControlUtils.debugMessage("Controller onLineSelection BY A RELATION");
+//			ControlUtils.debugMessage("Controller onLineSelection BY A RELATION");
 			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
 			}

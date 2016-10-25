@@ -1,6 +1,8 @@
 package com.irisa.formulis.view.form;
 
 import com.github.gwtbootstrap.client.ui.Column;
+import com.github.gwtbootstrap.client.ui.FluidRow;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.DragEndEvent;
@@ -19,6 +21,7 @@ import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.HasAllDragAndDropHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
@@ -40,7 +43,9 @@ import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 
-public class FormRelationLineWidget extends FormLineWidget implements SuggestionSelectionHandler, HasAllDragAndDropHandlers {
+public class FormRelationLineWidget 
+	extends FormLineWidget 
+	implements SuggestionSelectionHandler, HasAllDragAndDropHandlers  {
 
 	protected Column fixedElementCol = new Column(3); 
 	protected Column variableElementCol = new Column(9);
@@ -49,11 +54,16 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 	
 	protected AbstractFormulisWidget fixedElement = null;
 	protected AbstractFormulisWidget variableElement = null;
+	
+	protected boolean placeholderFlag = false; // Pour drag & drop
+	protected boolean draggedLineFlag = false; // Pour drag & drop
+	protected FormRelationLinePlaceHolderWidget linePlaceholder = new FormRelationLinePlaceHolderWidget(); // Pour drag & drop
 
 	public FormRelationLineWidget(FormRelationLine l, FormWidget par) {
 		super(l, par);
 		
 		getElement().setDraggable(Element.DRAGGABLE_TRUE);
+		
 		variableElementCol.setSize(8); 
 
 		try {
@@ -88,14 +98,6 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 		
 		// La ligne attend ses suggestions
 		} else {
-//			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
-//			sugg.addSuggestionSelectionHandler(this);
-//			sugg.addMoreCompletionsHandler(this);
-//			sugg.addCompletionAskedHandler(this);
-//			sugg.setPlaceholder("Valeur de " + this.getData().getFixedElement().toLispql());
-//
-//			variableElement = sugg;
-//			variableElement.addClickWidgetEventHandler(this);
 			setLineState(LINE_STATE.SUGGESTIONS);
 		}
 
@@ -300,6 +302,45 @@ public class FormRelationLineWidget extends FormLineWidget implements Suggestion
 	@Override
 	public HandlerRegistration addDropHandler(DropHandler handler) {
 		return addDomHandler(handler, DropEvent.getType());
+	}
+	
+	public void toggleLinePlaceHolder() {
+		setLinePlaceHolderFlag(! this.placeholderFlag);
+	}
+	
+	public void setLinePlaceHolderFlag(boolean placeholder) {
+		this.placeholderFlag = placeholder;
+		if(placeholder) {
+			contentCol.add(linePlaceholder);
+		} else {
+			contentCol.remove(linePlaceholder);
+		}
+	}
+	
+	public void setDraggedLineFlag(boolean draggedFlag) {
+		if(draggedLineFlag) {
+			setLinePlaceHolderFlag(true);
+			contentCol.addStyleName("formulis-dragged");
+		} 
+		else {
+			contentCol.removeStyleName("formulis-dragged");
+		}
+	}
+	
+	public class FormRelationLinePlaceHolderWidget extends Composite {
+		
+		private FluidRow element = new FluidRow();
+		private Column content = new Column(12);
+		private Paragraph labelContent = new Paragraph(" ");
+		
+		public FormRelationLinePlaceHolderWidget() {
+			initWidget(element);
+			
+			content.add(labelContent);
+			element.add(content);
+			element.addStyleName("formulis-line-placeholder");
+		}
+		
 	}
 
 }
