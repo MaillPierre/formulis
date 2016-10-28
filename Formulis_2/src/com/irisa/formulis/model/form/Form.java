@@ -196,6 +196,25 @@ public class Form extends FormComponent {
 		return this.typeLines.size() == 1;
 	}
 	
+	public void insertLine(int index, FormRelationLine line) {
+		this.relationLines.removeFirstOccurrence(line);
+		this.relationLines.add(index, line);
+		if(isTyped() || isAnonymous()) {
+			int nbLines = relationLines.size();
+			Iterator<FormRelationLine> itRelLines = relationLines.iterator();
+			while(itRelLines.hasNext()) {
+				FormRelationLine relLine = itRelLines.next();
+				relLine.setWeight(nbLines);
+				nbLines--;
+			}	
+		}
+	}
+	
+	public void insertLineAfter(FormRelationLine line, FormRelationLine after) {
+		int index = this.relationLines.indexOf(after);
+		insertLine(index, line);
+	}
+	
 	public void clear() {
 		this.relationLines.clear();
 		this.typeLines.clear();

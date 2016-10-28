@@ -2321,11 +2321,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						FormRelationLine relLine = itRelLines.next();
 						relLine.setWeight(nbLines);
 						nbLines--;
-					}
-					
+					}	
 					widSource.getData().addAllLines(relationLines);
 				}
-	
 			}
 			widSource.clear();
 			widSource.reload();

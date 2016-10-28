@@ -50,17 +50,17 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 		
 		typeList.addItem("Date", "date");
 		typeIndexMap.put("date", 0);
-		typeList.addItem("Heure", "time");
+		typeList.addItem("Hour", "time");
 		typeIndexMap.put("time", 1);
-		typeList.addItem("Date et heure", "datetime");
+		typeList.addItem("Date and hour", "datetime");
 		typeIndexMap.put("datetime", 2);
-		typeList.addItem("Valeur numérique", "number");
+		typeList.addItem("Numeric value", "number");
 		typeIndexMap.put("number", 3);
-		typeList.addItem("Texte", "text");
+		typeList.addItem("Text", "text");
 		typeIndexMap.put("text", 4);
-		typeList.addItem("Entité", "entity");
+		typeList.addItem("Entity", "entity");
 		typeIndexMap.put("entity", 5);
-		typeList.addItem("Formulaire", "form");
+		typeList.addItem("Form", "form");
 		typeIndexMap.put("form", 6);
 		
 		this.createButton.addClickHandler(this);

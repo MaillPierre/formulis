@@ -312,6 +312,7 @@ public class FormRelationLineWidget
 		this.placeholderFlag = placeholder;
 		if(placeholder) {
 			contentCol.add(linePlaceholder);
+			contentCol.insert(linePlaceholder, 0);
 		} else {
 			contentCol.remove(linePlaceholder);
 		}
