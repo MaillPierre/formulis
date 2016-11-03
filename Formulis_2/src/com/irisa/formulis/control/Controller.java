@@ -1613,7 +1613,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 								if(followUp != null) {
-									ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
+//									ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
 									if(followUp instanceof StatementChangeEvent) {
 										onStatementChange((StatementChangeEvent) followUp);
 									} else if(followUp.getCallback() != null) {
@@ -2074,10 +2074,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
 		// CHANGEMENT DE STATEMENT
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
-		ControlUtils.debugMessage("onStatementChange " + event.getSource().getClass());
+//		ControlUtils.debugMessage("onStatementChange " + event.getSource().getClass());
 		if(event.getSource() instanceof FormWidget) {
 			FormWidget widSource = (FormWidget)event.getSource();
-			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
+//			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
 			if(! widSource.getData().isTypeList() && ! widSource.getData().isEmpty()) {
 				HistoryUtils.addHistoryToken(currentProfile);
 				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
@@ -2087,10 +2087,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			SuggestionCallback callback = (SuggestionCallback) event.getCallback();
 			if(widSource.getData().isFinished()) {
-				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
+//				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
-				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
+//				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
 				onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
 			}
 

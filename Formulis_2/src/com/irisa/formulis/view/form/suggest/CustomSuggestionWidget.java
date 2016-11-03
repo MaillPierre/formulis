@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
@@ -311,6 +312,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 					this.source.oracle.add(new CustomSuggestion(inc));
 				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+//				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call END");
 			}
 		};
 	}

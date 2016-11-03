@@ -239,7 +239,7 @@ public class Form extends FormComponent {
 			FormLine line = itRelLines.next();
 			try {
 			if(! line.equals(selectedLine) &&  line.isFinished()) {
-				String lineString =  line.toLispql();
+				String lineString =  line.toLispql(isFinalRequest);
 //				ControlUtils.debugMessage("Form toLispql line added:" + lineString);
 				otherlines.add(lineString);
 			}
@@ -253,7 +253,7 @@ public class Form extends FormComponent {
 			while(itTypeLines.hasNext()) {
 				FormClassLine line = itTypeLines.next();
 				if(! line.equals(selectedLine) && ! line.isAnonymous()) {
-					String lineString =  line.toLispql();
+					String lineString =  line.toLispql(isFinalRequest);
 					otherlines.add(lineString);
 				}
 			}
@@ -269,9 +269,12 @@ public class Form extends FormComponent {
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList()) {
 			if(isFinalRequest) {
-				result += this.getType().getEntityUri().toLispql(isFinalRequest) + " ";
-			}
-			result += "[ " + this.getType().toLispql(isFinalRequest) + " ";
+				result += this.getType().getEntityUri().toLispql(isFinalRequest) + " " ;
+//				result += this.getType().toLispql(isFinalRequest) + " ";
+			} 
+//			else {
+				result += "[ " + this.getType().toLispql(isFinalRequest) + " ";
+//			}
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
 			}
@@ -303,7 +306,7 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
-		if(getParent() != null && getParent() instanceof FormLine /*&& selectedLine != null*/) {
+		if(getParent() != null && getParent() instanceof FormLine && ! isFinalRequest /*&& selectedLine != null*/) {
 			FormLine parentLine = (FormLine) getParent();
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();
@@ -318,7 +321,9 @@ public class Form extends FormComponent {
 		
 		// Fermeture de la requête
 //		if(selectedLine != null && selectedLine.getClass() == RelationLine.class && formLines.contains(selectedLine)) {
+//		if(! isFinalRequest || isAnonymous() || isTypeList()) {
 			result += " ]";
+//		}
 //		}
 		
 //		ControlUtils.debugMessage("Form toLispql FIN ( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);

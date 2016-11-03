@@ -38,9 +38,12 @@ public class CustomSuggestionOracle {
 				// Now we are at the start of the block of matching names. Add matching names till we
 				// run out of names, stop finding matches, or have enough matches.
 				while (count < limit && i < tmpSuggestions.size()) {
-					if(tmpSuggestions.get(i).getElement().toLispql().toLowerCase().contains(prefixToMatch)) {
-						matchingIncrement.add( tmpSuggestions.get(i) );
-						count++;
+					if(tmpSuggestions.get(i).getElement() != null) {
+						String normalizedTmpSuggString = tmpSuggestions.get(i).getElement().toLispql().toLowerCase();
+						if(normalizedTmpSuggString.contains(prefixToMatch)) {
+							matchingIncrement.add( tmpSuggestions.get(i) );
+							count++;
+						}
 					}
 					i++;
 				}

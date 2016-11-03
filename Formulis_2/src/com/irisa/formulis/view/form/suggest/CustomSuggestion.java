@@ -41,7 +41,7 @@ public class CustomSuggestion implements Comparable<CustomSuggestion>{
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof CustomSuggestion) {
+		if(o instanceof CustomSuggestion && ((CustomSuggestion)o).getElement() != null && this.getElement() != null) {
 			return ((CustomSuggestion)o).getElement() == this.getElement();
 		}
 		return false;
