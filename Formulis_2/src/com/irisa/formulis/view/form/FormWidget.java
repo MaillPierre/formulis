@@ -235,7 +235,8 @@ public class FormWidget
 			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
 			
 			this.finishButton.setVisible(! getData().isEmpty());
-			this.moreButton.setVisible(! getData().isEmpty() && getData().hasMore());
+//			this.moreButton.setVisible(! getData().isEmpty() && getData().hasMore()); // TODO uncomment to reactivate More Form
+			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
 			this.reloadButton.setVisible(! getData().isEmpty());
 		}
 	}
