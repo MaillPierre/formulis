@@ -86,6 +86,7 @@ public class DateCreateWidget extends AbstractCreateWidget implements ChangeHand
 				datatype = ControlUtils.LITTERAL_URIS.xsdDate;
 			}
 			
+			dateFormat = format;
 			dateBox.setFormat(format);
 		}
 	}
