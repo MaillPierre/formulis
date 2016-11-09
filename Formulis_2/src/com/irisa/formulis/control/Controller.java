@@ -1529,8 +1529,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		ControlUtils.debugMessage("FIN loadPlace");
 	}
 	
-	@SuppressWarnings("deprecation")
+//	@SuppressWarnings("deprecation")
 	private void finish(FormWidget f) {
+		ControlUtils.debugMessage("Controller finish");
 		sewelisRunStatement(/*"get " +*/ f.getData().toLispql(true) + "");
 		if(f.getData() == this.rootForm()) {
 			// Retour au formulaire de départ
@@ -1538,11 +1539,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			
 			// Logging des actions
 			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
-			Date nowDate = new Date();
-			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+//			Date nowDate = new Date();
+//			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
 //			this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
 			numberOfActions = 0;
 		}
+		ControlUtils.debugMessage("Controller finish END");
 	}
 
 
@@ -1898,7 +1900,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		while(itRelL.hasNext()) {
 			FormLine line = itRelL.next();
 			
-			if(line.isFinished()) {
+			if(line.isFinishable()) {
 				result.add(line);
 			} else if(line.getVariableElement() != null && line instanceof FormRelationLine && line.getVariableElement() instanceof Form) {
 				FormRelationLine nLine = new FormRelationLine(null, line.getFixedElement());
@@ -1920,7 +1922,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Form result = new Form(parent);
 		
 		if(! f.isEmpty()) {
-			if(f.isFinished()) {
+			if(f.isFinishable()) {
 				result = f;
 			} else {
 				result.setTypeLine(f.getType());
@@ -2086,7 +2088,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			SuggestionCallback callback = (SuggestionCallback) event.getCallback();
-			if(widSource.getData().isFinished()) {
+			if(widSource.getData().isFinishable()) {
 //				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
@@ -2543,9 +2545,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
-		ControlUtils.debugMessage("Controller onFinishForm " + ((FormWidget)event.getSource()).getData());
+		ControlUtils.debugMessage("Controller onFinishForm");
 		finish( ( (FormWidget)event.getSource()));
 		event.getCallback().call(this);
+		ControlUtils.debugMessage("Controller onFinishForm END");
 	}
 
 	/**
@@ -2554,7 +2557,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onFinishLine(FinishLineEvent event) {
-		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString());
+		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString() + " " + event.getState());
 	}
 
 	/**

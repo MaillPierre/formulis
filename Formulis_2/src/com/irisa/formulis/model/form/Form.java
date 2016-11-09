@@ -17,9 +17,7 @@ import com.irisa.formulis.control.profile.ProfileForm;
  */
 public class Form extends FormComponent {
 
-//	private LinkedList<FormLine> formLines = new LinkedList<FormLine>();
 	private LinkedList<FormRelationLine> relationLines = new LinkedList<FormRelationLine>();
-//	private FormClassLine typeLine = null;
 	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
 	private boolean hasMoreFlag = false;
 	private boolean hasLessFlag = false;
@@ -238,13 +236,13 @@ public class Form extends FormComponent {
 		while(itRelLines.hasNext()) {
 			FormLine line = itRelLines.next();
 			try {
-			if(! line.equals(selectedLine) &&  line.isFinished()) {
+			if(! line.equals(selectedLine) &&  line.isFinishable()) {
 				String lineString =  line.toLispql(isFinalRequest);
 //				ControlUtils.debugMessage("Form toLispql line added:" + lineString);
 				otherlines.add(lineString);
 			}
 			} catch(Exception e) {
-				ControlUtils.debugMessage("Form toLispql EXCEPTION line:" + line + " selectedLine: " + selectedLine + " isFinished:" + line.isFinished());
+				ControlUtils.debugMessage("Form toLispql EXCEPTION line:" + line + " selectedLine: " + selectedLine + " isFinished:" + line.isFinishable());
 				throw e;
 			}
 		}
@@ -268,7 +266,7 @@ public class Form extends FormComponent {
 
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList()) {
-			if(isFinalRequest) {
+			if(isFinalRequest ) {
 				result += this.getType().getEntityUri().toLispql(isFinalRequest) + " " ;
 //				result += this.getType().toLispql(isFinalRequest) + " ";
 			} 
@@ -306,7 +304,7 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
-		if(getParent() != null && getParent() instanceof FormLine && ! isFinalRequest /*&& selectedLine != null*/) {
+		if(getParent() != null && getParent() instanceof FormLine && ! isFinalRequest && selectedLine != null) {
 			FormLine parentLine = (FormLine) getParent();
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();
@@ -409,14 +407,14 @@ public class Form extends FormComponent {
 
 	@Override
 	
-	public boolean isFinished() {
+	public boolean isFinishable() {
 		boolean result = false;
 		Iterator<FormRelationLine> itRel = getRelationLines().iterator();
 		while(itRel.hasNext()) {
 			FormRelationLine rel = itRel.next();
-			result = result || rel.isFinished();
+			result = result || rel.isFinishable();
 		}
-		return ((isTyped() && this.getType().isFinished()) ||(result &&  isAnonymous()));
+		return ((isTyped() && this.getType().isFinishable()) ||(result &&  isAnonymous()));
 	}
 
 	@Override

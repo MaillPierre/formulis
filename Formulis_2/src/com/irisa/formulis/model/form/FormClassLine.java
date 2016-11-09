@@ -113,7 +113,7 @@ public class FormClassLine extends FormLine {
 	}
 
 	@Override
-	public boolean isFinished() {
+	public boolean isFinishable() {
 		return this.isNamed();
 	}
 

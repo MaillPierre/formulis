@@ -7,6 +7,7 @@ public abstract class FormComponent implements FormElement {
 
 	protected FormComponent parent;
 	protected Place place;
+	private boolean finished = false;
 	
 	public FormComponent(FormComponent par) {
 		parent = par;
@@ -26,6 +27,14 @@ public abstract class FormComponent implements FormElement {
 	
 	public Place getPlace() {
 		return this.place;
+	}
+
+	public boolean isFinished() {
+		return finished;
+	}
+
+	public void setFinished(boolean finished) {
+		this.finished = finished;
 	}
 	
 	public abstract boolean isLine();

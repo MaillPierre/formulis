@@ -5,6 +5,6 @@ public interface FormElement {
 	public String toLispql();
 	public String toLispql(boolean isFinalRequest);
 	
-	public boolean isFinished();
+	public boolean isFinishable();
 	public String getTag();
 }

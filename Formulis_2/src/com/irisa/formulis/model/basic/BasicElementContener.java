@@ -18,7 +18,7 @@ public abstract class BasicElementContener implements BasicElement {
 	}
 	
 	@Override
-	public boolean isFinished() {
+	public boolean isFinishable() {
 		return true;
 	}
 	

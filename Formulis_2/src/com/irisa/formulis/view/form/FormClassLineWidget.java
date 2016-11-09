@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
@@ -65,7 +64,9 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			public void onKeyUp(KeyUpEvent event) {
 				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
 				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					setLineState(LINE_STATE.FINISHED);
+					if(getData().isFinishable()) {
+						setLineState(LINE_STATE.FINISHED);
+					}
 				}
 			}
 		});
@@ -155,6 +156,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		this.resetElementButton.setEnabled(! this.getParentWidget().getData().isTypeList() && this.getFormLine().isNamed());
 		if(state == LINE_STATE.FINISHED) {
 			hideLabelBox();
+			this.getData().setFinished(true);
 		} else if(state == LINE_STATE.SUGGESTIONS) {
 			showLabelBox();
 		}
@@ -173,7 +175,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		if(event.getSource() == this.resetElementButton) {
 			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishLineEvent(this.getFormLine().isFinished());
+			this.fireFinishLineEvent(this.getFormLine().isFinishable());
 		} else if(event.getSource() == this.removeLineButton) {
 			ControlUtils.debugMessage("FormClassLine onClick remove");
 			fireRemoveLineEvent();
@@ -184,7 +186,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(event.getValue());
-			this.fireFinishLineEvent(this.getFormLine().isFinished());
+			this.fireFinishLineEvent(this.getFormLine().isFinishable());
 		}
 	}
 

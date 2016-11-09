@@ -134,6 +134,7 @@ public class FormRelationLineWidget
 
 	@Override
 	public void setLineState(LINE_STATE state, CreationTypeOracle oracl) {
+		ControlUtils.debugMessage("FormRelationLineWidget setLineState");
 		switch(state) {
 		case SUGGESTIONS:
 			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
@@ -147,11 +148,12 @@ public class FormRelationLineWidget
 			variableElement.addClickWidgetEventHandler(this);
 			getData().setVariableElement(null);
 			setVariableElement(sugg);
-
+			this.getData().setFinished(false);
 			resetElementButton.setEnabled(false);
 			break;
 		case GUIDED_CREATION:
 			resetElementButton.setEnabled(true);
+			this.getData().setFinished(false);
 			break;
 		case CREATION:
 			if(oracl != null) {
@@ -160,17 +162,21 @@ public class FormRelationLineWidget
 				setVariableElement(new SelectCreateWidget(this));
 			}
 			resetElementButton.setEnabled(true);
+			this.getData().setFinished(false);
 			break;
 		case FINISHED:
 			resetElementButton.setEnabled(true);
 			fireFinishLineEvent(true);
+			this.getData().setFinished(true);
 			break;
 		}
 		currentState = state;
+		ControlUtils.debugMessage("FormRelationLineWidget setLineState END");
 	}
 	
 	@Override
 	public void setVariableElement(AbstractFormulisWidget nWid) {
+		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement");
 		if(nWid != null) {
 			nWid.addClickWidgetEventHandler(this);
 			if(nWid instanceof AbstractFormElementWidget) {
@@ -194,11 +200,12 @@ public class FormRelationLineWidget
 			variableElementCol.clear();
 			elementRow.add(fixedElement);
 		}
+		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement END");
 	}
 
 	@Override
 	public void onClickWidgetEvent(ClickWidgetEvent event)  { 
-//		ControlUtils.debugMessage("RelationLineWidget onClickWidgetEvent CLICK ON LINE " + event.getSource() + " " + event.getSource().getClass() + " " + event.getSource().equals(this.variableElement));
+		ControlUtils.debugMessage("FormRelationLineWidget onClickWidgetEvent " + event.getSource().getClass().getSimpleName());
 		if(event.getSource() == this.fixedElement) {
 			fireLineSelectionEvent();
 		} else if(this.variableElement instanceof CustomSuggestionWidget) {
@@ -216,6 +223,7 @@ public class FormRelationLineWidget
 				ControlUtils.exceptionMessage(e);
 			}
 		}
+		ControlUtils.debugMessage("FormRelationLineWidget onClickWidgetEvent " + event.getSource().getClass().getSimpleName() + " END");
 	}
 
 
@@ -241,7 +249,7 @@ public class FormRelationLineWidget
 
 	@Override
 	public void onSelection(SuggestionSelectionEvent event) {
-//		ControlUtils.debugMessage("RelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
+		ControlUtils.debugMessage("FormRelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
 		try {
 			FormElement elem = event.getSuggestion().getElement();
 			AbstractFormulisWidget nWid = FormulisWidgetFactory.getWidget(elem, this);
@@ -252,6 +260,7 @@ public class FormRelationLineWidget
 		} catch (FormElementConversionException e) {
 			ControlUtils.exceptionMessage(e);
 		} 
+		ControlUtils.debugMessage("FormRelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
 	}
 
 	@Override

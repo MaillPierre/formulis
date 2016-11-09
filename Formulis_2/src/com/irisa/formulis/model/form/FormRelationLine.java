@@ -96,12 +96,12 @@ public class FormRelationLine extends FormLine {
 	}
 
 	@Override
-	public boolean isFinished() {
+	public boolean isFinishable() {
 //		ControlUtils.debugMessage("FormRelation isFinished variable:" + this.variableElement  );
 //		if(this.variableElement != null) {
 //			ControlUtils.debugMessage("FormRelation isFinished variableIsFinished:" + this.variableElement.isFinished()  );
 //		}
-		return this.variableElement != null && this.variableElement.isFinished();
+		return this.variableElement != null && this.variableElement.isFinishable();
 	}
 
 	@Override

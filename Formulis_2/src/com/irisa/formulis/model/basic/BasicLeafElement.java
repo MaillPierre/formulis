@@ -20,7 +20,7 @@ public abstract class BasicLeafElement extends ProfileLeafElement implements Bas
 	public abstract <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException ;
 	
 	@Override
-	public boolean isFinished() {
+	public boolean isFinishable() {
 		return true;
 	}
 
