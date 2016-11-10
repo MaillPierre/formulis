@@ -1536,6 +1536,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(f.getData() == this.rootForm()) {
 			// Retour au formulaire de départ
 			sewelisGetPlaceRoot();
+//			this.toRootForm();
 			
 			// Logging des actions
 			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
@@ -2253,7 +2254,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	/**
 	 * Créé un formulaire vide et déplace le stateement à la racine "get []"
 	 */
-	protected void getRootForm() {
+	protected void toRootForm() {
 		setCurrentForm( newForm());
 		sewelisGetPlaceStatement("get [ ]", new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
 	}
@@ -2328,6 +2329,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				}
 			}
 			widSource.clear();
+			widSource.getData().setFinished(false);
 			widSource.reload();
 		}
 

@@ -119,8 +119,10 @@ public class FormWidget
 		setFinishButtonsState(computeFinishButtonState());
 		moreButton.setBlock(true);
 		moreButton.addClickHandler(this);
+		moreButton.setTitle("Generalize");
 		reloadButton.setBlock(true);
 		reloadButton.addClickHandler(this);
+		reloadButton.setTitle("Reload");
 		
 		profileCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -212,6 +214,8 @@ public class FormWidget
 //		this.finishButton.setVisible(! getData().isEmpty());
 //		this.finishButton.setEnabled(false);
 		this.setFinishButtonsState(FINISH_BUTTON_STATE.FINISHED);
+		this.moreButton.setVisible(false);
+		this.reloadButton.setVisible(false);
 		
 		ControlUtils.debugMessage("FormWidget transformToSubmittedForm END");
 	}
@@ -264,9 +268,9 @@ public class FormWidget
 		this.finishButton.setVisible(getData() != null && ! getData().isEmpty());
 //		this.finishButton.setEnabled(getData() != null && ! getData().isFinished());
 		this.setFinishButtonsState(computeFinishButtonState());
-		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore()); // TODO uncomment to reactivate More Form
+		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore() && ! getData().isFinished()); // TODO uncomment to reactivate More Form
 //			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
-		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty());	
+		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty() && ! getData().isFinished());	
 		ControlUtils.debugMessage("FormWidget reload END");
 	}
 	
@@ -277,7 +281,7 @@ public class FormWidget
 	}
 	
 	public void setFinishButtonsState(FINISH_BUTTON_STATE state) {
-		ControlUtils.debugMessage("setFinishButtonsState " + state);
+//		ControlUtils.debugMessage("setFinishButtonsState " + state);
 		if(state.equals(FINISH_BUTTON_STATE.FINISHED) || state.equals(FINISH_BUTTON_STATE.FINISHABLE)) {
 			finishButton.setEnabled(state.equals(FINISH_BUTTON_STATE.FINISHABLE));
 			this.finishButton.setBaseIcon(IconType.CHECK);
@@ -287,7 +291,7 @@ public class FormWidget
 			this.finishButton.setBaseIcon(IconType.PENCIL);
 			this.finishButton.setType(ButtonType.DANGER);
 		}
-		ControlUtils.debugMessage("setFinishButtonsState " + state + " END");
+//		ControlUtils.debugMessage("setFinishButtonsState " + state + " END");
 	}
 	
 	protected LinkedList<FormLineWidget> formLinesToWidgetLines() {
