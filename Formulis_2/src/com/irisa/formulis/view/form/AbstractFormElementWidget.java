@@ -252,7 +252,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireFinishLineEvent(boolean state) {
+	public void fireFinishableLineEvent(boolean state) {
 		if(this instanceof FormLineWidget) {
 			FinishLineEvent event = new FinishLineEvent((FormLineWidget) this, state);
 			fireFinishLineEvent(event);

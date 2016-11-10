@@ -171,7 +171,7 @@ public class FormRelationLineWidget
 			break;
 		case FINISHED:
 			resetElementButton.setEnabled(true);
-			fireFinishLineEvent(true);
+			fireFinishableLineEvent(true);
 			this.getData().setFinished(true);
 			break;
 		}
@@ -245,7 +245,7 @@ public class FormRelationLineWidget
 		else if(event.getSource() == this.resetElementButton) {
 //			ControlUtils.debugMessage("FormRelationLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishLineEvent(false);
+			this.fireFinishableLineEvent(false);
 		} else if(event.getSource() == this.removeLineButton) {
 //			ControlUtils.debugMessage("FormRelationLine onClick remove");
 			fireRemoveLineEvent();

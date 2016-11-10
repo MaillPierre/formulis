@@ -6,6 +6,6 @@ public interface HasFinishLineHandler {
 	
 	public void addFinishLineHandler(FinishLineHandler handler);
 	public void fireFinishLineEvent(FinishLineEvent event);
-	public void fireFinishLineEvent(boolean state);
+	public void fireFinishableLineEvent(boolean state);
 
 }

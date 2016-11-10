@@ -179,7 +179,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		if(event.getSource() == this.resetElementButton) {
 //			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishLineEvent(this.getFormLine().isFinishable());
+			this.fireFinishableLineEvent(this.getFormLine().isFinishable());
 		} else if(event.getSource() == this.removeLineButton) {
 //			ControlUtils.debugMessage("FormClassLine onClick remove");
 			fireRemoveLineEvent();
@@ -190,7 +190,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	public void onValueChange(ValueChangeEvent<String> event) {
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(event.getValue());
-			this.fireFinishLineEvent(this.getFormLine().isFinishable());
+			this.fireFinishableLineEvent(this.getFormLine().isFinishable());
 		}
 	}
 
