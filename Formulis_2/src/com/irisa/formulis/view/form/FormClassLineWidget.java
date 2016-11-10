@@ -163,6 +163,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 			this.getData().setFinished(true);
 		} else if(state == LINE_STATE.SUGGESTIONS) {
 			showLabelBox();
+			this.getData().setFinished(false);
 		}
 	}
 

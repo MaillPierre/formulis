@@ -36,11 +36,12 @@ import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
+import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
-import com.irisa.formulis.view.event.FinishLineEvent;
+import com.irisa.formulis.view.event.FinishableLineEvent;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
 /**
@@ -188,7 +189,7 @@ public class FormWidget
 		return new FormCallback(this) {
 			@Override
 			public void call(Controller control) {
-				this.getSource().transformToSubmittedForm();
+				this.getSource().reload();
 			}
 		};
 	}
@@ -275,9 +276,16 @@ public class FormWidget
 	}
 	
 	@Override
-	public void onFinishLine(FinishLineEvent event) {
-		super.onFinishLine(event);
+	public void onFinishableLine(FinishableLineEvent event) {
+		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState());
+		super.onFinishableLine(event);
 		this.setFinishButtonsState(computeFinishButtonState());
+		// Si c'est la ligne de type qui est ré-éditée
+		if(event.getSource() instanceof FormClassLineWidget && this.getData().isTyped() && ! ((FormLineWidget) event.getSource()).getData().isFinished() && this.getData().isFinished()) {
+			this.getData().setFinished(false);
+			reload();
+		}
+		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState() + " END");
 	}
 	
 	public void setFinishButtonsState(FINISH_BUTTON_STATE state) {

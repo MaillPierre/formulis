@@ -2558,7 +2558,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event
 	 */
 	@Override
-	public void onFinishLine(FinishLineEvent event) {
+	public void onFinishableLine(FinishableLineEvent event) {
 		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString() + " " + event.getState());
 	}
 

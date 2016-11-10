@@ -12,7 +12,7 @@ import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
-import com.irisa.formulis.view.event.FinishLineEvent;
+import com.irisa.formulis.view.event.FinishableLineEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
@@ -254,22 +254,22 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void fireFinishableLineEvent(boolean state) {
 		if(this instanceof FormLineWidget) {
-			FinishLineEvent event = new FinishLineEvent((FormLineWidget) this, state);
+			FinishableLineEvent event = new FinishableLineEvent((FormLineWidget) this, state);
 			fireFinishLineEvent(event);
 		}
 	}
 
 	@Override
-	public void fireFinishLineEvent(FinishLineEvent event) {
+	public void fireFinishLineEvent(FinishableLineEvent event) {
 		Iterator<FinishLineHandler> itHand = this.finishLineHandlers.iterator();
 		while(itHand.hasNext()) {
 			FinishLineHandler hand = itHand.next();
-			hand.onFinishLine(event);
+			hand.onFinishableLine(event);
 		}
 	}
 
 	@Override
-	public void onFinishLine(FinishLineEvent event) {
+	public void onFinishableLine(FinishableLineEvent event) {
 		fireFinishLineEvent(event);
 	}
 
