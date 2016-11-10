@@ -41,6 +41,7 @@ import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.FinishLineEvent;
+import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
 
 /**
  * Widget principal pour un formulaire
@@ -76,6 +77,12 @@ public class FormWidget
 	
 	private boolean storeSet = false;
 	
+	public enum FINISH_BUTTON_STATE {
+		FINISHABLE, // Peut être fini
+		FINISHED, // Fini et envoyé au serveur
+		EDIT; // Manque d'éléments pour être fini
+	}
+	
 	/**
 	 * Responsable de la gestion des evenement lorsqu'une ligne est en cours de déplacement (le début et la fin du déplacement son gérés par le form lui-même
 	 */
@@ -109,7 +116,7 @@ public class FormWidget
 		
 		finishButton.addClickHandler(this);
 		finishButton.setBlock(true);
-		setFinishButtonsState(this.getData().isFinishable());
+		setFinishButtonsState(computeFinishButtonState());
 		moreButton.setBlock(true);
 		moreButton.addClickHandler(this);
 		reloadButton.setBlock(true);
@@ -135,6 +142,18 @@ public class FormWidget
 	
 	public void setStoreIsSet(boolean storeIsSet) {
 		this.storeSet = storeIsSet;
+	}
+	
+	public FINISH_BUTTON_STATE computeFinishButtonState() {
+		if(getData() != null) {
+			if(getData().isFinishable()) {
+				if(getData().isFinished()) {
+					return FINISH_BUTTON_STATE.FINISHED;
+				}
+				return FINISH_BUTTON_STATE.FINISHABLE;
+			}
+		}
+		return FINISH_BUTTON_STATE.EDIT;
 	}
 	
 	/**
@@ -167,9 +186,7 @@ public class FormWidget
 		return new FormCallback(this) {
 			@Override
 			public void call(Controller control) {
-				ControlUtils.debugMessage("FormWidget SubmittedCallback");
 				this.getSource().transformToSubmittedForm();
-				ControlUtils.debugMessage("FormWidget SubmittedCallback END");
 			}
 		};
 	}
@@ -180,10 +197,11 @@ public class FormWidget
 		if(getData() != null && ! getData().isEmpty()) {
 			clear();
 
-			Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
+			Iterator<FormLineWidget> itFo = formLinesToWidgetLines().iterator();
 			while(itFo.hasNext()) {
 				FormLineWidget line = itFo.next();
 				if(line.getData().isFinishable()) {
+					line.setLineState(LINE_STATE.FINISHED);
 					addLine(line);
 				}
 			}
@@ -191,9 +209,9 @@ public class FormWidget
 		newRelationButton.setEnabled(false);
 		newClassButton.setEnabled(false);
 		
-		this.finishButton.setVisible(! getData().isEmpty());
-		this.finishButton.setEnabled(false);
-		this.getData().setFinished(true);
+//		this.finishButton.setVisible(! getData().isEmpty());
+//		this.finishButton.setEnabled(false);
+		this.setFinishButtonsState(FINISH_BUTTON_STATE.FINISHED);
 		
 		ControlUtils.debugMessage("FormWidget transformToSubmittedForm END");
 	}
@@ -218,57 +236,61 @@ public class FormWidget
 		linesCol.clear();
 		newRelationButton.setEnabled(false);
 		newClassButton.setEnabled(false);
-		setFinishButtonsState(false);
+		setFinishButtonsState(FINISH_BUTTON_STATE.EDIT);
 	}
 	
 	public void reload() {
+		ControlUtils.debugMessage("FormWidget reload");
 		if(getData() != null ) {
-			if(! getData().isEmpty()) {
-				clear();
-	
-				Iterator<FormLineWidget> itFo = formLinesToWidget().iterator();
-				while(itFo.hasNext()) {
-					FormLineWidget line = itFo.next();
-					addLine(line);
-				}
-//				newRelationButton.setEnabled(true);
-
-				this.setFinishButtonsState(this.getData().isFinishable());
-			} 
-			
-			
-			if(getData().isFinished()) {
+			if(! getData().isEmpty() ) {
+				if(getData().isFinished()) {
+					transformToSubmittedForm();
+				} else {
+					clear();
+		
+					Iterator<FormLineWidget> itFo = formLinesToWidgetLines().iterator();
+					while(itFo.hasNext()) {
+						FormLineWidget line = itFo.next();
+						ControlUtils.debugMessage("\t" + line.getData());
+						addLine(line);
+					}
+				} 
+				
+				newClassButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTypeList()));
+				newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
 				
 			}
-			
-			newClassButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTypeList()));
-			newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
-			
-			this.finishButton.setVisible(! getData().isEmpty());
-			this.moreButton.setVisible(! getData().isEmpty() && getData().hasMore()); // TODO uncomment to reactivate More Form
-//			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
-			this.reloadButton.setVisible(! getData().isEmpty());
 		}
+		this.finishButton.setVisible(getData() != null && ! getData().isEmpty());
+//		this.finishButton.setEnabled(getData() != null && ! getData().isFinished());
+		this.setFinishButtonsState(computeFinishButtonState());
+		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore()); // TODO uncomment to reactivate More Form
+//			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
+		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty());	
+		ControlUtils.debugMessage("FormWidget reload END");
 	}
 	
 	@Override
 	public void onFinishLine(FinishLineEvent event) {
 		super.onFinishLine(event);
-		this.setFinishButtonsState(this.getData().isFinishable());
+		this.setFinishButtonsState(computeFinishButtonState());
 	}
 	
-	public void setFinishButtonsState(boolean finishable) {
-		finishButton.setEnabled(finishable);
-		if(finishable) {
+	public void setFinishButtonsState(FINISH_BUTTON_STATE state) {
+		ControlUtils.debugMessage("setFinishButtonsState " + state);
+		if(state.equals(FINISH_BUTTON_STATE.FINISHED) || state.equals(FINISH_BUTTON_STATE.FINISHABLE)) {
+			finishButton.setEnabled(state.equals(FINISH_BUTTON_STATE.FINISHABLE));
 			this.finishButton.setBaseIcon(IconType.CHECK);
 			this.finishButton.setType(ButtonType.SUCCESS);
 		} else {
+			finishButton.setEnabled(false);
 			this.finishButton.setBaseIcon(IconType.PENCIL);
 			this.finishButton.setType(ButtonType.DANGER);
 		}
+		ControlUtils.debugMessage("setFinishButtonsState " + state + " END");
 	}
 	
-	protected LinkedList<FormLineWidget> formLinesToWidget() {
+	protected LinkedList<FormLineWidget> formLinesToWidgetLines() {
 		LinkedList<FormLineWidget> result = new LinkedList<FormLineWidget>();
 		
 		Iterator<FormClassLine> itClassL = getData().typeLinesIterator();
@@ -278,13 +300,6 @@ public class FormWidget
 				FormClassLineWidget nClassLine = new FormClassLineWidget(line, this);
 				nClassLine.setProfileMode(this.profileMode);
 				result.add(nClassLine);
-//				if(this.getData().isTyped() ) {
-//					if(line.isFinished()) {
-//						nClassLine.setLineState(LINE_STATE.FINISHED);
-//					} else {
-//						nClassLine.showLabelBox();
-//					}
-//				}
 			}
 		}
 
@@ -292,8 +307,10 @@ public class FormWidget
 		while(itRelL.hasNext()) {
 			FormRelationLine line = itRelL.next();
 			FormRelationLineWidget nRelLine = new FormRelationLineWidget(line, this);
-			nRelLine.setProfileMode(this.profileMode);
-			result.add(nRelLine);
+			if( ! getData().isFinished() || (getData().isFinished() && nRelLine.getData().isFinished())) {
+				nRelLine.setProfileMode(this.profileMode);
+				result.add(nRelLine);
+			}
 		}
 
 		final FormLineComparator comp = new FormLineComparator();
@@ -351,15 +368,21 @@ public class FormWidget
 	}
 
 	@Override
+	public void finish() {
+		if(getData().isFinishable() && ! getData().isFinished()) {
+			getData().setFinished(true);
+			fireFinishFormEvent(true, this.getSubmittedCallback());
+		}
+	}
+
+	@Override
 	public void onClick(ClickEvent event) {
 		if(event.getSource() == newRelationButton) {
 			putRelationCreationWidget();
 		} else if(event.getSource() == newClassButton) {
 			putClassCreationWidget();
 		} else if(event.getSource() == finishButton) {
-			ControlUtils.debugMessage("FormWidget onClick finishButton");
-			fireFinishFormEvent(true, this.getSubmittedCallback());
-			ControlUtils.debugMessage("FormWidget onClick finishButton END");
+			finish();
 		} else if(event.getSource() == this.moreButton) {
 			fireMoreFormLinesEvent(getAppendCallback());
 		} else if(event.getSource() == this.reloadButton) {

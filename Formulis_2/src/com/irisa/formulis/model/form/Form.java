@@ -141,6 +141,10 @@ public class Form extends FormComponent {
 			newLine.setInfo(l.getInfo());
 			newLine.setWeight(l.getWeight());
 			relationLines.add(index+1, newLine);
+			for(int pos = 0; pos <= index ; pos++) {
+				FormRelationLine incWeightLine = relationLines.get(pos);
+				incWeightLine.setWeight(incWeightLine.getWeight() + 1);
+			}
 		}
 	}
 	

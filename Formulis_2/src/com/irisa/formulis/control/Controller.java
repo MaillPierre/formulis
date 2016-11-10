@@ -2546,8 +2546,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
 		ControlUtils.debugMessage("Controller onFinishForm");
-		finish( ( (FormWidget)event.getSource()));
 		event.getCallback().call(this);
+		finish( ( (FormWidget)event.getSource()));
 		ControlUtils.debugMessage("Controller onFinishForm END");
 	}
 

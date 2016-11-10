@@ -76,6 +76,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	public boolean isInProfileMode() {
 		return this.profileMode;
 	}
+	
+	public abstract void finish();
 
 	@Override
 	public void addCompletionAskedHandler(CompletionAskedHandler hand) {
