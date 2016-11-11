@@ -1,5 +1,6 @@
 package com.irisa.formulis.view.form.suggest;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.form.FormElement;
@@ -15,10 +16,13 @@ public class CustomSuggestion implements Comparable<CustomSuggestion>{
 	public CustomSuggestion(Increment inc) {
 		elem = DataUtils.extractDisplayElementFromIncrement(inc);
 		support = inc.getRatioLeft();
-		if(inc.isNew()) {
-			htmlRepresentation = "<table> <tr style:\"font-weight: bold;\"> <td> " +ViewUtils.toSimpleHtml( elem).asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
-		} else {
-			htmlRepresentation = "<table> <tr> <td> " +ViewUtils.toSimpleHtml( elem).asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+		SafeHtml safeElem = ViewUtils.toSimpleHtml( elem);
+		if(safeElem != null) {
+			if(inc.isNew()) {
+				htmlRepresentation = "<table> <tr style:\"font-weight: bold;\"> <td> " + safeElem.asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+			} else {
+				htmlRepresentation = "<table> <tr> <td> " + safeElem.asString() + "</td> <td> (" + support + ") </td> </tr> </table>";
+			}
 		}
 	}
 	

@@ -656,6 +656,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //
 //	}
 
+	public void sewelisGetPlaceRoot(FormWidget formWid) {
+			
+	}
 
 	// NAVIGATION
 	public void sewelisGetPlaceRoot() {
@@ -704,6 +707,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					}
 				});
 			} catch (RequestException e) {
+				ControlUtils.debugMessage("SewelisGetPlaceRoot ERROR " + e);
 				ControlUtils.exceptionMessage(e);
 			}
 		}
@@ -919,7 +923,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						}
 					}
 				});
-			} catch (RequestException e) {
+			} catch (Exception e) {
+				ControlUtils.debugMessage("sewelisGetPlaceStatement EXCEPTION");
 				ControlUtils.exceptionMessage(e);
 			}
 		}
@@ -1455,7 +1460,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								ControlUtils.debugMessage("uridescription statement statement: " + root.toString());
 								SafeHtml stat = ViewUtils.toSimpleHtml(Parser.parseDisplayNode(root));
 								
-								event.getCallback().call(stat.asString());
+								if(stat != null) {
+									event.getCallback().call(stat.asString());
+								}
 							} catch (XMLParsingException e) {
 								ControlUtils.exceptionMessage(e);
 								ControlUtils.debugMessage("uridescription statement parse failed");
@@ -1638,7 +1645,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					}
 				}
 			});
-		} catch (RequestException e) {
+		} catch (Exception e) {
+			ControlUtils.debugMessage("SewelisChangeFocus EXCEPTION ");
 			ControlUtils.exceptionMessage(e);
 		}
 	}
@@ -2035,7 +2043,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String queryLineLispql = lispqlStatementQuery(dataSource);
 		
 		if(dataSource instanceof FormClassLine) { // Selection d'une classe
-//			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
+			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
 			// Si c'est une classe de litteral
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
@@ -2046,7 +2054,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 				// Si la ligne avait déjà un type (retractation)
 			} else {
-//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
+				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
 				dataSourceParent.clear();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
 				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));

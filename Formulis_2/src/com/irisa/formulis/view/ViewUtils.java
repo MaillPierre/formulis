@@ -177,9 +177,12 @@ public class ViewUtils {
 		Iterator<BasicElement> itAnd = a.getContentIterator();
 		while(itAnd.hasNext()) {
 			BasicElement andElem = itAnd.next();
-			andTable += "<tr><td>";
-			andTable += toSimpleHtml(andElem).asString();
-			andTable += "</td></tr>";
+			SafeHtml safeAnd = toSimpleHtml(andElem);
+			if(safeAnd != null) {
+				andTable += "<tr><td>";
+				andTable += safeAnd.asString();
+				andTable += "</td></tr>";
+			}
 		}
 		
 		andTable += "</tbody></table>";
@@ -192,19 +195,23 @@ public class ViewUtils {
 			Iterator<FormClassLine> itTypeFormLine = formform.typeLinesIterator();
 			while(itTypeFormLine.hasNext()) {
 				FormClassLine line = itTypeFormLine.next();
+				SafeHtml safeLine = toSimpleHtml(line);
 				if(! line.isAnonymous()) {
 					formTable += "<tr><td>";
-					formTable += toSimpleHtml(line).asString();
+					formTable += safeLine.asString();
 					formTable += "</td></tr>";
 				}
 			}
 		}
 		Iterator<FormRelationLine> itRelFormLine = formform.relationLinesIterator();
 		while(itRelFormLine.hasNext()) {
-			formTable += "<tr><td>";
-			FormLine line = itRelFormLine.next();
-			formTable += toSimpleHtml(line).asString();
-			formTable += "</td></tr>";
+			FormRelationLine line = itRelFormLine.next();
+			SafeHtml safeLine = toSimpleHtml(line);
+			if(safeLine != null) {
+				formTable += "<tr><td>";
+				formTable += toSimpleHtml(line).asString();
+				formTable += "</td></tr>";
+			}
 		}
 		formTable += "</tbody></table>";
 //		ControlUtils.debugMessage("toSimpleHtml Form: " + formElement + " ===> " + formTable);
@@ -213,9 +220,15 @@ public class ViewUtils {
 
 	private static SafeHtml toSimpleHtmlFormLine(FormLine line) {
 		String lineString = "";
-		lineString += toSimpleHtml(line.getFixedElement()).asString();
+		SafeHtml safeFixElem = toSimpleHtml(line.getFixedElement());
+		if(safeFixElem != null) {
+			lineString += safeFixElem.asString();
+		}
 		if(line.getVariableElement() != null) {
-			lineString += toSimpleHtml(line.getVariableElement()).asString();
+			SafeHtml safeVarElem = toSimpleHtml(line.getVariableElement());
+			if(safeVarElem != null) {
+				lineString += safeVarElem.asString();
+			}
 		}
 		lineString += "";
 //		ControlUtils.debugMessage("toSimpleHtml Line: " + formElement + " ===> " + lineString);
@@ -227,7 +240,10 @@ public class ViewUtils {
 		Iterator<BasicElement> itDis = dis.getContentIterator();
 		while(itDis.hasNext()) {
 			BasicElement elemDis = itDis.next();
-			disString += toSimpleHtml(elemDis).asString();
+			SafeHtml safeDis = toSimpleHtml(elemDis);
+			if(safeDis != null) {
+				disString += safeDis.asString();
+			}
 		}
 		disString += "";
 		return SafeHtmlUtils.fromTrustedString(disString);
@@ -259,7 +275,10 @@ public class ViewUtils {
 		Iterator<BasicElement> itF = f.getContentIterator();
 		while(itF.hasNext()) {
 			BasicElement elemFoc = itF.next();
-			fString += toSimpleHtml(elemFoc).asString();
+			SafeHtml safeFoc = toSimpleHtml(elemFoc);
+			if(safeFoc != null) {
+				fString += safeFoc.asString();
+			}
 		}
 		fString += "</span>";
 		return SafeHtmlUtils.fromTrustedString(fString);
@@ -275,7 +294,10 @@ public class ViewUtils {
 			Iterator<BasicElement> itL1 = pair.getIteratorOnFirstLine();
 			while(itL1.hasNext()) {
 				BasicElement elemPairL1 = itL1.next();
-				pairTable += "<td>" + toSimpleHtml(elemPairL1).asString() + "</td>";
+				SafeHtml safePL1 = toSimpleHtml(elemPairL1);
+				if(safePL1 != null) {
+					pairTable += "<td>" + safePL1.asString() + "</td>";
+				}
 			}
 			pairTable += "</tr>";
 			// Ligne 2
@@ -284,7 +306,10 @@ public class ViewUtils {
 			//							pairTable += "<td><span class='indent'></span></td>";
 			while(itL2.hasNext()) {
 				BasicElement elemPairL2 = itL2.next();
-				pairTable += "<td>" + toSimpleHtml(elemPairL2).asString() + "</td>";
+				SafeHtml safePL2 = toSimpleHtml(elemPairL2);
+				if(safePL2 != null) {
+					pairTable += "<td>" + safePL2.asString() + "</td>";
+				}
 			}
 			pairTable += "</tr></tbody></table>";
 			pairTable += "</tbody></table>";
@@ -294,12 +319,18 @@ public class ViewUtils {
 			Iterator<BasicElement> itpL1 = pair.getIteratorOnFirstLine();
 			while(itpL1.hasNext()) {
 				BasicElement elempL1 = itpL1.next();
-				pString += toSimpleHtml(elempL1).asString();
+				SafeHtml safePL1 = toSimpleHtml(elempL1);
+				if(safePL1 != null) {
+					pString += safePL1.asString();
+				}
 			}
 			Iterator<BasicElement> itpL2 = pair.getIteratorOnSecondLine();
 			while(itpL2.hasNext()) {
 				BasicElement elempL2 = itpL2.next();
-				pString += toSimpleHtml(elempL2).asString();
+				SafeHtml safePL2 = toSimpleHtml(elempL2);
+				if(safePL2 != null) {
+					pString += safePL2.asString();
+				}
 			}
 			pString += "</span>";
 			return SafeHtmlUtils.fromTrustedString(pString);
@@ -310,8 +341,11 @@ public class ViewUtils {
 		String quoString = "<span class='quote' > « ";
 		Iterator<BasicElement> itQuo = quo.getContentIterator();
 		while(itQuo.hasNext()) {
-			BasicElement elemBra = itQuo.next();
-			quoString += toSimpleHtml(elemBra).asString();
+			BasicElement elemQuo = itQuo.next();
+			SafeHtml safeQuo = toSimpleHtml(elemQuo);
+			if(safeQuo != null) {
+				quoString += safeQuo.asString();
+			}
 		}
 		quoString += " » </span>";
 		return SafeHtmlUtils.fromTrustedString(quoString);
@@ -331,7 +365,10 @@ public class ViewUtils {
 		Iterator<BasicElement> itBra = bra.getContentIterator();
 		while(itBra.hasNext()) {
 			BasicElement elemBra = itBra.next();
-			braString += toSimpleHtml(elemBra).asString();
+			SafeHtml safeBra = toSimpleHtml(elemBra);
+			if(safeBra != null) {
+				braString += safeBra.asString();
+			}
 		}
 		braString += " } </span>";
 		return SafeHtmlUtils.fromTrustedString(braString);

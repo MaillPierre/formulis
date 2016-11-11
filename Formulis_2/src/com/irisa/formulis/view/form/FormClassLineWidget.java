@@ -56,7 +56,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		labelUriBox.setWidth("100%");
 		labelUriBox.setText(startValue);
 		labelUriBox.addStyleName("input-block-level");
-		labelUriBox.setPlaceholder("Name of this new element (Random by default)");
+		labelUriBox.setPlaceholder("Name of this new element");
 		labelUriBox.addValueChangeHandler(this);
 		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
 			@Override
@@ -125,7 +125,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	}
 	
 	public void hideLabelBox() {
-		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
+//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
 		labelUriBox.setVisible(false);
 		
 		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
@@ -136,7 +136,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 				elementRow.setCellWidth(labelWid, "100%");
 			}
 		}
-		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
+//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
 	}
 	
 	public void showLabelBox() {

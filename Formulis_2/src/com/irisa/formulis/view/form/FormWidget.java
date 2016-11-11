@@ -189,13 +189,14 @@ public class FormWidget
 		return new FormCallback(this) {
 			@Override
 			public void call(Controller control) {
+				this.getSource().getData().setFinished(true);
 				this.getSource().reload();
 			}
 		};
 	}
 	
 	public void transformToSubmittedForm() {
-		ControlUtils.debugMessage("FormWidget transformToSubmittedForm");
+//		ControlUtils.debugMessage("FormWidget transformToSubmittedForm");
 		
 		if(getData() != null && ! getData().isEmpty()) {
 			clear();
@@ -218,7 +219,7 @@ public class FormWidget
 		this.moreButton.setVisible(false);
 		this.reloadButton.setVisible(false);
 		
-		ControlUtils.debugMessage("FormWidget transformToSubmittedForm END");
+//		ControlUtils.debugMessage("FormWidget transformToSubmittedForm END");
 	}
 	
 	public void putElementCreationButtons(){
@@ -245,7 +246,7 @@ public class FormWidget
 	}
 	
 	public void reload() {
-		ControlUtils.debugMessage("FormWidget reload");
+//		ControlUtils.debugMessage("FormWidget reload");
 		if(getData() != null ) {
 			if(! getData().isEmpty() ) {
 				if(getData().isFinished()) {
@@ -261,9 +262,16 @@ public class FormWidget
 					}
 				} 
 				
-				newClassButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTypeList()));
-				newRelationButton.setEnabled(isStoreIsSet() && (this.getData().isEmpty() || this.getData().isAnonymous() || this.getData().isTyped()));
-				
+				newClassButton.setEnabled(isStoreIsSet() 
+						&& (this.getData().isEmpty() 
+								|| this.getData().isAnonymous() 
+								|| this.getData().isTypeList())
+						&& ! this.getData().isFinished());
+				newRelationButton.setEnabled(isStoreIsSet() 
+						&& (this.getData().isEmpty() 
+								|| this.getData().isAnonymous() 
+								|| this.getData().isTyped())
+						&& ! this.getData().isFinished());
 			}
 		}
 		this.finishButton.setVisible(getData() != null && ! getData().isEmpty());
@@ -272,7 +280,7 @@ public class FormWidget
 		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore() && ! getData().isFinished()); // TODO uncomment to reactivate More Form
 //			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
 		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty() && ! getData().isFinished());	
-		ControlUtils.debugMessage("FormWidget reload END");
+//		ControlUtils.debugMessage("FormWidget reload END");
 	}
 	
 	@Override
@@ -382,7 +390,6 @@ public class FormWidget
 	@Override
 	public void finish() {
 		if(getData().isFinishable() && ! getData().isFinished()) {
-			getData().setFinished(true);
 			fireFinishFormEvent(true, this.getSubmittedCallback());
 		}
 	}
