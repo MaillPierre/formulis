@@ -285,7 +285,7 @@ public class FormWidget
 	
 	@Override
 	public void onFinishableLine(FinishableLineEvent event) {
-		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState());
+//		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState());
 		super.onFinishableLine(event);
 		this.setFinishButtonsState(computeFinishButtonState());
 		// Si c'est la ligne de type qui est ré-éditée
@@ -293,7 +293,7 @@ public class FormWidget
 			this.getData().setFinished(false);
 			reload();
 		}
-		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState() + " END");
+//		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState() + " END");
 	}
 	
 	public void setFinishButtonsState(FINISH_BUTTON_STATE state) {
