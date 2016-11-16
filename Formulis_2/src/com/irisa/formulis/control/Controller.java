@@ -2478,7 +2478,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public static String newElementUri(String label) {
-		String result = uriBaseAdress + instance().currentStore.getName() + "#";
+		String result = uriBaseAdress + instance().currentStore.getName() + "/#";
 		String sanitizedLabel = label.replace(" ", "_").replace("<","_").replace(">","_").replace("#","_").replace("%","_").replace("\"","_").replace(",","_").replace(")","_").replace("{","_").replace("}","_").replace("|","_").replace("\\","_").replace("^","_").replace("'","_").replace(";","_").replace("/","_").replace("?","_").replace(":","_").replace("@","_").replace("&","_").replace("=","_").replace("+","_").replace("$","_").replace(",", "_");
 		result += sanitizedLabel;
 		return result;
