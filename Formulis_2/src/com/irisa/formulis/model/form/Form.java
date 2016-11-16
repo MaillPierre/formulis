@@ -137,7 +137,7 @@ public class Form extends FormComponent {
 	public void repeatRelationLine(FormRelationLine l) {
 		if(relationLines.contains(l)) {
 			int index = relationLines.indexOf(l);
-			FormRelationLine newLine = new FormRelationLine( l.getParent(), l.getFixedElement(), l.getVariableElement());
+			FormRelationLine newLine = new FormRelationLine( l.getParent(), l.getFixedElement());
 			newLine.setInfo(l.getInfo());
 			newLine.setWeight(l.getWeight());
 			relationLines.add(index+1, newLine);

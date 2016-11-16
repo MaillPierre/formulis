@@ -67,8 +67,9 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 		typeList.addChangeHandler(this);
 		if(oracl != null) {
 			String oracleAttempt = oracl.getMostLikelyLiteralType();
+			String simpleOracleAttempt = oracl.getSimpleMostLikelyLiteralType();
 			if(oracleAttempt != null) {
-				typeList.setItemSelected(typeIndexMap.get(oracleAttempt), true);
+				typeList.setItemSelected(typeIndexMap.get(simpleOracleAttempt), true); // Seul les versions simple sont dans le menu (sans le détail des dates)
 				this.setCreationType(oracleAttempt);
 			} else {
 				typeList.setItemSelected(4, true);
@@ -105,26 +106,47 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	}
 	
 	public void setCreationType(String type) {
-//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
-		if(type == "date") {
+		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
+		if(type.equals("date")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date");
 			this.createWid = new DateCreateWidget(null);
-		} else if(type == "time") {
+		} else if(type.equals("date-year")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-year");
+			this.createWid = new DateCreateWidget(null);
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYear.getUri());
+		} else if(type.equals("date-month")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-month");
+			this.createWid = new DateCreateWidget(null);
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonth.getUri());
+		} else if(type.equals("date-day")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-day");
+			this.createWid = new DateCreateWidget(null);
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdDay.getUri());
+		} else if(type.equals("date-monthday")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-monthday");
+			this.createWid = new DateCreateWidget(null);
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri());
+		} else if(type.equals("date-yearmonth")) {
+			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-yearmonth");
+			this.createWid = new DateCreateWidget(null);
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri());
+		} else if(type.equals("time")) {
 			this.createWid = new TimeCreateWidget(null);
-		} else if(type == "datetime") {
+		} else if(type.equals("datetime")) {
 			this.createWid = new DateTimeCreateWidget(null);
-		} else if(type == "number") {
+		} else if(type.equals("number")) {
 			this.createWid = new NumericCreateWidget(null);
-		} else if(type == "text") {
+		} else if(type.equals("text")) {
 			this.createWid = new TextCreateWidget(null);
-		} else if(type == "entity") {
+		} else if(type.equals("entity")) {
 			this.createWid = new EntityCreateWidget(null);
-		} else if(type == "form") {
+		} else if(type.equals("form")) {
 			this.createWid = new FormCreateWidget(null);
 		}
 		if(this.oracle != null) {
 			this.createWid.setStartingValue(this.oracle.getStartValue());
 		}
-//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") FIN");
+		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") FIN");
 	}
 
 }

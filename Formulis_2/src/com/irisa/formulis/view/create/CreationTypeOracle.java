@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.Couple;
 import com.irisa.formulis.model.basic.BasicLeafElement;
 import com.irisa.formulis.model.basic.Plain;
@@ -26,14 +27,14 @@ public class CreationTypeOracle {
 
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#string", "text");
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#integer", "number");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#date", "date");
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#datetime", "datetime");
 		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#time", "time");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gYear", "date");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gMonth", "date");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gDay", "date");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gMonthDay", "date");
-		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gYearMonth", "date");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#date", "date");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gYear", "date-year");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gMonth", "date-month");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gDay", "date-day");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gMonthDay", "date-monthday");
+		uriTypeMap.put("http://www.w3.org/2001/XMLSchema#gYearMonth", "date-yearmonth");
 		uriTypeMap.put("", "text");
 		
 		typeItemMap.put("date", "Date");
@@ -47,6 +48,7 @@ public class CreationTypeOracle {
 	}
 
 	private void determineMostLikelyType() {
+		ControlUtils.debugMessage("CreationTypeOracle determineMostLikelyType");
 		HashMap<String, Integer> typeScoreMap = new HashMap<String, Integer>();
 		// init de la map des scores
 		Iterator<String> itKeys = uriTypeMap.keySet().iterator();
@@ -82,9 +84,22 @@ public class CreationTypeOracle {
 		});
 		
 		oracle = uriTypeMap.get(typeScoreSet.getLast().getFirst());
+		ControlUtils.debugMessage("CreationTypeOracle determineMostLikelyType "+ oracle +" END");
 	}
 
 	public String getMostLikelyLiteralType() {
+		return oracle;
+	}
+
+	public String getSimpleMostLikelyLiteralType() {
+		if(oracle.equals("date-year") 
+				|| oracle.equals("date-month") 
+				|| oracle.equals("date-day") 
+				|| oracle.equals("date-monthday") 
+				|| oracle.equals("date-yearmonth")){
+			return "date";
+		}
+			
 		return oracle;
 	}
 	
