@@ -13,6 +13,7 @@ import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishFormEvent;
 import com.irisa.formulis.view.event.FinishableLineEvent;
+import com.irisa.formulis.view.event.HistoryEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
@@ -29,6 +30,7 @@ import com.irisa.formulis.view.event.interfaces.FinishFormHandler;
 import com.irisa.formulis.view.event.interfaces.FinishLineHandler;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
+import com.irisa.formulis.view.event.interfaces.HistoryHandler;
 import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
@@ -48,6 +50,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	protected LinkedList<FinishFormHandler> finishFormHandlers = new LinkedList<FinishFormHandler>();
 	protected LinkedList<FinishLineHandler> finishLineHandlers = new LinkedList<FinishLineHandler>();
+	protected LinkedList<HistoryHandler> historyHandlers = new LinkedList<HistoryHandler>();
 	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
@@ -271,6 +274,30 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onFinishableLine(FinishableLineEvent event) {
 		fireFinishLineEvent(event);
+	}
+	
+	@Override
+	public void onHistory(HistoryEvent event) {
+		fireHistoryEvent(event);
+	}
+	
+	@Override
+	public void fireHistoryEvent(HistoryEvent event) {
+		Iterator<HistoryHandler> itHand = this.historyHandlers.iterator();
+		while(itHand.hasNext()) {
+			HistoryHandler hand = itHand.next();
+			hand.onHistory(event);
+		}
+	}
+	
+	@Override
+	public void fireHistoryEvent() {
+		fireHistoryEvent(new HistoryEvent(this));
+	}
+	
+	@Override
+	public void addHistoryHandler(HistoryHandler handler) {
+		this.historyHandlers.add(handler);
 	}
 
 	@Override

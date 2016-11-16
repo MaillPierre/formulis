@@ -385,6 +385,7 @@ public class ViewUtils {
 		emitter.addElementCreationHandler(handler);
 		emitter.addFinishFormHandler(handler);
 		emitter.addFinishLineHandler(handler);
+		emitter.addHistoryHandler(handler);
 		emitter.addLessCompletionsHandler(handler);
 		emitter.addLineSelectionHandler(handler);
 		emitter.addMoreCompletionsHandler(handler);

@@ -1,3 +1,14 @@
 16/11/2016
+- Etablissemet du changelog pour suivi de l'application
 - Transmission d'une valeur temporaire dans les champs pour la conserver au reload et à la creation de nouvelle entité dans un formulaire imbriqué
 - Suggestions cachées après avoir appuyé sur entrée dans un champ de suggestion
+- Gestion plus fine des types de dates
+- Etapes de listing présentes dans l'historique de la page
+- Ajouts/suppressions de lignes présents dans l'historique de la page
+
+TODO:
+- Changement rechargement des completions; Cas-test: Film "I, origins" avec la meme personne directeur, scenariste et producteur, absent de la base (+++)
+- Ajout de bulles d'aide pour explication de l'utilité des boutons (++)
+- Suppression des étapes intermédiaires (une seul type) de l'historique (+++)
+- Remise à zéro de l'indice d'historique de la barre d'adresse lorsque nécessaire (ou trouver un moyen de rendre chaque session unique) (+++)
+- Lien entre answers et formulaire (++)

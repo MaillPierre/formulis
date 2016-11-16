@@ -2083,18 +2083,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onStatementChange(StatementChangeEvent event) {
-		try {
-		String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
 		// CHANGEMENT DE STATEMENT
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
-//		ControlUtils.debugMessage("onStatementChange " + event.getSource().getClass());
 		if(event.getSource() instanceof FormWidget) {
-			FormWidget widSource = (FormWidget)event.getSource();
-//			ControlUtils.debugMessage("onStatementChange BY A FORM " + widSource.getData().toLispql());
-			if(! widSource.getData().isTypeList() && ! widSource.getData().isEmpty()) {
-				HistoryUtils.addHistoryToken(currentProfile);
-				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
-			}
 			event.getCallback().call(this);
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
@@ -2106,14 +2097,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
 				onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
 			}
-
-			HistoryUtils.addHistoryToken(currentProfile);
-			mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
 		}
 		refreshAnswers();
-		} catch (SerializingException|InvalidHistoryState e) {
-			ControlUtils.exceptionMessage(e);
-		}
 		
 //		incrementNumberOfActions();
 	}
@@ -2324,6 +2309,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							String queryString = lispqlStatementQuery(widSource.getData());
 							relationLines.clear();
 							this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));
+					} else if (widSource.getData().isTypeList()){ // C'est une liste de type
+						widSource.fireHistoryEvent();
 					}
 				} 
 					
@@ -2337,6 +2324,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						nbLines--;
 					}	
 					widSource.getData().addAllLines(relationLines);
+					widSource.fireHistoryEvent();
 				}
 			}
 			widSource.clear();
@@ -2361,6 +2349,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 			widSource.getData().setHasMore(this.place.hasMore());
 			widSource.reload();
+			widSource.fireHistoryEvent();
 		}
 	}
 	
@@ -2588,6 +2577,28 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onReload(ReloadEvent event) {
 		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
 		sewelisGetPlaceStatement(queryString, event);
+	}
+
+	@Override
+	public void onHistory(HistoryEvent event) {
+		try {
+			String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
+
+			if(event.getSource() instanceof FormWidget) {
+				FormWidget widSource = (FormWidget)event.getSource();
+				if(! widSource.getData().isEmpty()) {
+					HistoryUtils.addHistoryToken(currentProfile);
+					mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
+				}
+			} else if(event.getSource() instanceof FormRelationLineWidget) {
+				HistoryUtils.addHistoryToken(currentProfile);
+				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
+			}
+		} catch (SerializingException | InvalidHistoryState e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

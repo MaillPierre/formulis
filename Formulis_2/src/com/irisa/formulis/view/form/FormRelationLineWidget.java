@@ -178,6 +178,9 @@ public class FormRelationLineWidget
 			this.getData().setFinished(true);
 			break;
 		}
+		if(currentState != state) {
+			fireHistoryEvent();
+		}
 		currentState = state;
 //		ControlUtils.debugMessage("FormRelationLineWidget setLineState END");
 	}
@@ -243,6 +246,7 @@ public class FormRelationLineWidget
 			FormWidget parWid = this.getParentWidget();
 			Form parData = parWid.getData();
 			parData.repeatRelationLine((FormRelationLine) this.getData());
+			fireHistoryEvent();
 			parWid.reload();
 		}
 		else if(event.getSource() == this.resetElementButton) {
@@ -252,6 +256,7 @@ public class FormRelationLineWidget
 		} else if(event.getSource() == this.removeLineButton) {
 //			ControlUtils.debugMessage("FormRelationLine onClick remove");
 			fireRemoveLineEvent();
+			fireHistoryEvent();
 		}
 	}
 
