@@ -49,6 +49,7 @@ import com.irisa.formulis.model.form.*;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.FooterWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
 import com.irisa.formulis.view.ViewUtils;
@@ -1755,6 +1756,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		RootPanel.get().add(mainPage);
 		RootPanel.get().add(navBar);
+		RootPanel.get().add(new FooterWidget());
 		RootPanel.get().setStyleName("root");
 		
 		if((Cookies.getCookie(cookiesUserLogin) != null && Cookies.getCookie(cookiesUserLogin) != "") 
