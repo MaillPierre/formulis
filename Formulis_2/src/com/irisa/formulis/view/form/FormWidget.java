@@ -322,6 +322,9 @@ public class FormWidget
 				result.add(nClassLine);
 			}
 		}
+		if(getData().isTyped() && result.getFirst() instanceof FormClassLineWidget) {
+			((FormClassLineWidget) result.getFirst()).getData().setTempValue(this.getData().getTempValue());
+		}
 
 		Iterator<FormRelationLine> itRelL = getData().relationLinesIterator();
 		while(itRelL.hasNext()) {

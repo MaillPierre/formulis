@@ -2140,6 +2140,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				dataSource.setVariableElement(newDataForm);
 				widSource.setVariableElement(newFormWid);
 				newFormWid.addClickWidgetEventHandler(widSource);
+				newDataForm.setTempValue(event.getValue());
 	//			ViewUtils.connectFormEventChain(newFormWid, widSource);
 	
 				String queryLineLispql = lispqlStatementQuery(dataSource);
@@ -2290,7 +2291,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public void loadFormContent(FormWidget widSource) {
-		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
+//		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
 		if(this.currentStore != null) {
 			widSource.setStoreIsSet(true);
 		}
@@ -2346,7 +2347,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	public void appendFormContent(FormWidget widSource) {
-		ControlUtils.debugMessage("appendFormContent " + widSource);
+//		ControlUtils.debugMessage("appendFormContent " + widSource);
 
 		if(this.isFormContentLoadable(widSource)) {
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());

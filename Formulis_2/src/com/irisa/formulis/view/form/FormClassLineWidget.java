@@ -70,6 +70,8 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 		
 		if(! l.getEntityLabel().isEmpty()) {
 			labelUriBox.setText(l.getEntityLabel());
+		} else if(! l.getTempValue().isEmpty()) {
+			labelUriBox.setText(l.getTempValue());
 		}
 
 		if(! l.isAnonymous()) {

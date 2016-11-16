@@ -6,7 +6,7 @@ import com.irisa.formulis.model.Place;
 public abstract class FormComponent implements FormElement {
 
 	protected FormComponent parent;
-	protected Place place;
+	protected String tmpValue = "";
 	private boolean finished = false;
 	
 	public FormComponent(FormComponent par) {
@@ -20,14 +20,6 @@ public abstract class FormComponent implements FormElement {
 	public FormComponent getParent() {
 		return parent;
 	}
-	
-	public void setPlace(Place p) {
-		this.place = p;
-	}
-	
-	public Place getPlace() {
-		return this.place;
-	}
 
 	public boolean isFinished() {
 		return finished;
@@ -35,6 +27,21 @@ public abstract class FormComponent implements FormElement {
 
 	public void setFinished(boolean finished) {
 		this.finished = finished;
+	}
+	
+	/**
+	 * @return temporary value, used to keep in memory filled but not validated fields, or entity names passed to new forms
+	 */
+	public String getTempValue() {
+		return tmpValue;
+	}
+	
+	/**
+	 * Set the temporary value of a Form component, used to keep in memory filled but not validated fields, or entity names passed to new forms
+	 * @param value
+	 */
+	public void setTempValue(String value) {
+		this.tmpValue = value;
 	}
 	
 	public abstract boolean isLine();
