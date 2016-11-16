@@ -92,6 +92,10 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		limit = l;
 	}
 	
+	public void setText(String text) {
+		this.element.setText(text);
+	}
+	
 	public boolean isMoreCompletionMode() {
 		return moreCompletionMode;
 	}
@@ -160,6 +164,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		fireCompletionAskedEvent();
+		this.getParentWidget().getData().setTempValue(event.getValue());
 	}
 
 	@Override
@@ -291,6 +296,7 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		} if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 			if(element.getText() != "") {
 				fireElementCreationEvent(element.getText());
+				this.popover.hide();
 			}
 		}
 	}

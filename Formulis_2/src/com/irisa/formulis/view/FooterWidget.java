@@ -38,6 +38,7 @@ public class FooterWidget extends Composite {
 		InlineHTML lisLink = new InlineHTML(SafeHtmlUtils.fromTrustedString("<a target=\"_blank\" href=\"http://www.irisa.fr/LIS/\"><img src=\"http://www.irisa.fr/LIS/ferre/sewelis/lis.png\" alt=\"LIS team\" style=\"height: 20px;\"></a>"));
 		InlineHTML irisaLink = new InlineHTML(SafeHtmlUtils.fromTrustedString("<a target=\"_blank\" href=\"http://www.irisa.fr/\"><img src=\"http://www.irisa.fr/LIS/ferre/sewelis/irisa.jpg\" alt=\"IRISA\" style=\"height: 20px;\"></a>"));
 		InlineHTML ur1Link = new InlineHTML(SafeHtmlUtils.fromTrustedString("<a target=\"_blank\" href=\"http://www.univ-rennes1.fr/\"><img src=\"http://www.irisa.fr/LIS/ferre/sewelis/UR1.png\" alt=\"Université Rennes 1\" style=\"height: 20px;\"></a>"));
+		InlineHTML changeLink = new InlineHTML(SafeHtmlUtils.fromTrustedString("<a target=\"_blank\" href=\"changelog.txt\">changelog (fr)</a>"));
 		
 		createdP.setText("Created by Pierre Maillot and ");
 		createdP.add(sebLink);
@@ -45,6 +46,8 @@ public class FooterWidget extends Composite {
 		createdP.add(lisLink);
 		createdP.add(irisaLink);
 		createdP.add(ur1Link);
+		createdP.add(new InlineLabel(" | "));
+		createdP.add(changeLink);
 		
 		
 		element.add(createdP);

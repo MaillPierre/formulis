@@ -155,6 +155,9 @@ public class FormRelationLineWidget
 			setVariableElement(sugg);
 			this.getData().setFinished(false);
 			resetElementButton.setEnabled(false);
+			if(! this.getData().getTempValue().isEmpty()) {
+				sugg.setText(this.getData().getTempValue());
+			}
 			break;
 		case GUIDED_CREATION:
 			resetElementButton.setEnabled(true);

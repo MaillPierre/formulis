@@ -118,6 +118,7 @@ public class FormWidget
 		finishButton.addClickHandler(this);
 		finishButton.setBlock(true);
 		setFinishButtonsState(computeFinishButtonState());
+		finishButton.setTitle("Submit");
 		moreButton.setBlock(true);
 		moreButton.addClickHandler(this);
 		moreButton.setTitle("Generalize");

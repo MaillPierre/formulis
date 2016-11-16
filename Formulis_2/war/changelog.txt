@@ -1,0 +1,3 @@
+16/11/2016
+- Transmission d'une valeur temporaire dans les champs pour la conserver au reload et à la creation de nouvelle entité dans un formulaire imbriqué
+- Suggestions cachées après avoir appuyé sur entrée dans un champ de suggestion
