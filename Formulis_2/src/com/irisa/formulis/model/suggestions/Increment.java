@@ -100,8 +100,8 @@ public class Increment implements Comparable<Increment>{
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o.getClass() == Increment.class) {
-			return ((Increment)o).getId() == this.getId();
+		if(o instanceof Increment) {
+			return ((Increment)o).getDisplayElement().toLispql().equals(this.getDisplayElement().toLispql());
 		}
 		return false;
 	}

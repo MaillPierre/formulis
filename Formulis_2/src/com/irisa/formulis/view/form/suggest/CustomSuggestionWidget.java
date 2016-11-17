@@ -57,6 +57,9 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	private TextBox element = new TextBox();
 	private CustomSuggestionOracle oracle = new CustomSuggestionOracle();
 	private CustomSuggestionPopover popover;
+	
+	private boolean waitingFor = false;
+	
 	private static int limit = 10;
 	
 	private boolean moreCompletionMode = false;
@@ -146,9 +149,10 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 
 	@Override
 	public void onClick(ClickEvent event) {
-//		ControlUtils.debugMessage("CustomSuggestionWidget onClick " );
-//		fireCompletionAskedEvent();
-		this.getParentWidget().fireLineSelectionEvent(this.getSetCallback());
+		ControlUtils.debugMessage("CustomSuggestionWidget onClick popovershowing:" + popover.isShowing());
+		if(! waitingFor) {
+			fireLineSelectionEvent();
+		}
 	}
 	
 	public void refreshSuggestions() {
@@ -163,7 +167,9 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
-		fireCompletionAskedEvent();
+		ControlUtils.debugMessage("CustomSuggestionWidget onValueChange");
+//		fireCompletionAskedEvent(); // FIXME commented for testing
+		fireCompletionAskedEvent(event.getValue());
 		this.getParentWidget().getData().setTempValue(event.getValue());
 	}
 
@@ -180,12 +186,20 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	@Override
 	public void fireCompletionAskedEvent() {
 //		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent");
-		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback());
+		fireCompletionAskedEvent(getValue());
+	}
+	
+	@Override
+	public void fireCompletionAskedEvent(String search) {
+//		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent");
+		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback(), search);
 		fireCompletionAskedEvent(event);
 	}
 
 	@Override
 	public void fireCompletionAskedEvent(CompletionAskedEvent event) {
+		ControlUtils.debugMessage("CustomSuggestionWidget fireCompletionAskedEvent " + event.getSearch());
+		waitingFor = true;
 		Iterator<CompletionAskedHandler> itHand = this.completionAskedHandlers.iterator();
 		while(itHand.hasNext()) {
 			CompletionAskedHandler hand = itHand.next();
@@ -279,13 +293,23 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 			hand.onElementCreation(event);
 		}
 	}
+	
+	public void fireLineSelectionEvent() {
+		ControlUtils.debugMessage("CustomSuggestionWidget fireLineSelectionEvent");
+		waitingFor = true;
+		this.getParentWidget().fireLineSelectionEvent(this.getSelectionCallback());
+	}
 
 	@Override
 	public void onFocus(FocusEvent event) {
-		if(this.isMoreCompletionMode()) {
-			popover.refreshSuggestion();
-		} else {
-			fireCompletionAskedEvent();
+		ControlUtils.debugMessage("CustomSuggestionWidget onFocus");
+//		if(this.isMoreCompletionMode()) {
+//			popover.refreshSuggestion();
+//		} else {
+//			fireCompletionAskedEvent();
+//		}
+		if(! popover.isShowing()) {
+			fireLineSelectionEvent();
 		}
 	}
 
@@ -303,22 +327,43 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 	
 	/**
 	 * 
-	 * @return un callback pour les evenement visant à remplacer les suggestions existantes
+	 * @return un callback à appeler des que les suggestions sont prètes
+	 */
+	public SuggestionCallback getSelectionCallback() {
+		return new SuggestionCallback(this) {
+			@Override
+			public void call(Controller control) {
+				this.source.fireCompletionAskedEvent();
+			}
+		};
+	}
+	
+	/**
+	 * 
+	 * @return un callback pour les evenement visant à remplacer les suggestions existantes par celle en mémoire
 	 */
 	public SuggestionCallback getSetCallback() {
 		return new SuggestionCallback(this){
 			@Override
 			public void call(Controller control) {
 //				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call");
-				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
-				this.source.oracle.clear();
-				Iterator<Increment> itInc = increments.iterator();
-				while(itInc.hasNext()) {
-					Increment inc = itInc.next();
-					this.source.oracle.add(new CustomSuggestion(inc));
-				}
+//				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
+//				this.source.oracle.clear();
+//				Iterator<Increment> itInc = increments.iterator();
+//				while(itInc.hasNext()) {
+//					Increment inc = itInc.next();
+//					this.source.oracle.add(new CustomSuggestion(inc));
+//				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 //				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call END");
+
+				if(control.getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+					source.showSuggestions();
+
+					waitingFor = false;
+				}
+				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 			}
 		};
 	}
@@ -331,14 +376,19 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 		return new SuggestionCallback(this){
 			@Override
 			public void call(Controller control) {
-				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
-				Iterator<Increment> itInc = increments.iterator();
-				while(itInc.hasNext()) {
-					Increment inc = itInc.next();
-					this.source.oracle.add(new CustomSuggestion(inc));
-				}
+//				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
+//				Iterator<Increment> itInc = increments.iterator();
+//				while(itInc.hasNext()) {
+//					Increment inc = itInc.next();
+//					this.source.oracle.add(new CustomSuggestion(inc));
+//				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+
+				if(control.getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+					source.showSuggestions();
+				}
 			}
 		};
 	}

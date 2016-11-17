@@ -88,7 +88,7 @@ public class CustomSuggestionPopover extends PopupPanel {
 			itemList.add(item);
 		}
 		suggestionBar.addSeparator();
-		suggestionBar.addItem(moreElementsItem);
+//		suggestionBar.addItem(moreElementsItem);
 		suggestionBar.addItem(newElementItem);
 		if(! itemList.isEmpty()) {
 			suggestionBar.selectItem(itemList.getFirst());

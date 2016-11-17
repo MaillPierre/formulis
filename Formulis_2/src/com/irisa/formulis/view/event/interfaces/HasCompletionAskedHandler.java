@@ -7,6 +7,7 @@ public interface HasCompletionAskedHandler {
 	public void addCompletionAskedHandler(CompletionAskedHandler hand);
 	
 	public void fireCompletionAskedEvent();
+	public void fireCompletionAskedEvent(String value);
 	public void fireCompletionAskedEvent(CompletionAskedEvent event);
 	
 }

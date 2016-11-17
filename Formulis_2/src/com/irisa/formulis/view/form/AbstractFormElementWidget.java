@@ -94,6 +94,12 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
+	public void fireCompletionAskedEvent(String search) {
+		CompletionAskedEvent event = new CompletionAskedEvent(this, null, search);
+		fireCompletionAskedEvent(event);
+	}
+
+	@Override
 	public void fireCompletionAskedEvent(CompletionAskedEvent event) {
 		Iterator<CompletionAskedHandler> itHand = this.completionAskedHandlers.iterator();
 		while(itHand.hasNext()) {

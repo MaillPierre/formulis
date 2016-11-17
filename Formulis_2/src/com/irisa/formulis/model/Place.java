@@ -1,5 +1,6 @@
 package com.irisa.formulis.model;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.irisa.formulis.model.suggestions.Increment;
@@ -90,7 +91,21 @@ public class Place {
 		currentCompletions.clear();
 	}
 
-	public void setCurrentCompletions(LinkedList<Increment> currentCompletions) {
-		this.currentCompletions = currentCompletions;
+	public void setCurrentCompletions(LinkedList<Increment> currentComp) {
+		this.currentCompletions = currentComp;
+	}
+
+	public void addCurrentCompletions(LinkedList<Increment> currentComp) {
+		Iterator<Increment> itInc = currentComp.iterator();
+		while(itInc.hasNext()) {
+			Increment inc = itInc.next();
+			addCompletion(inc);
+		}
+	}
+	
+	public void addCompletion(Increment inc) {
+		if(! currentCompletions.contains(inc)) {
+			this.currentCompletions.add(inc);
+		}
 	}
 }

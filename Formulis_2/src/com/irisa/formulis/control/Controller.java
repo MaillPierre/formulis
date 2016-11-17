@@ -984,14 +984,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param match Chaine partielle demandée par la source
 	 * @param widSource source à qui renvoyer les completions
 	 */
-	public void sewelisGetCompletions(final String match, final CustomSuggestionWidget widSource) {
-		//		displayDebugMessage("getCompletions " + match + " " + event);
-		String insertIncrementRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
-		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-		insertIncrementRequestString += "&placeId=" + place.getId(); 
-		insertIncrementRequestString += "&matchingKey=" + match;
+	public void sewelisGetCompletions(final String match, final FormEvent event) {
+		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
+		getCompletionsRequestString += "&storeName=" + currentStore.getName(); 
+		getCompletionsRequestString += "&placeId=" + place.getId(); 
+		getCompletionsRequestString += "&matchingKey=" + match;
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(getCompletionsRequestString));
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1015,15 +1014,35 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									Node currNode = responseNode.getFirstChild();
 									while(currNode.getNextSibling() != null) {
 										try {
-											result.add(Parser.parseIncrement(currNode));
+											Increment inc = Parser.parseIncrement(currNode);
+											if(inc.getKind() != KIND.CLASS 
+													&& inc.getKind() != KIND.INVERSEPROPERTY 
+													&& inc.getKind() != KIND.OPERATOR
+													&& inc.getKind() != KIND.PROPERTY
+													&& inc.getKind() != KIND.RELATION) {
+												result.add(inc);
+												ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
+											}
 											currNode = currNode.getNextSibling();
 										} catch (XMLParsingException e) {
 											ControlUtils.exceptionMessage(e);
 										}
 									}
+									Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
+									while(itInc.hasNext()){
+										Increment inc = itInc.next();
+										if(inc.getKind() != KIND.CLASS 
+										&& inc.getKind() != KIND.INVERSEPROPERTY 
+										&& inc.getKind() != KIND.OPERATOR
+										&& inc.getKind() != KIND.PROPERTY
+										&& inc.getKind() != KIND.RELATION
+										&& ! result.contains(inc)) {
+											result.add(inc);
+										}
+									}
 									if(!result.isEmpty()) {
 										place.setCurrentCompletions(result);
-										onCompletionReady(widSource);
+										event.getCallback().call(instance());
 									}
 								}
 							}
@@ -2027,9 +2046,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisChangeFocus(f.getId());
 	}
 
-
-	
-
 	@Override
 	public void onLineSelection(LineSelectionEvent event) {
 		// SELECTION DE LIGNE
@@ -2065,6 +2081,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //			ControlUtils.debugMessage("Controller onLineSelection BY A RELATION");
 			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
+			} else {
+				event.getCallback().call(this);
 			}
 		}
 		incrementNumberOfActions();
@@ -2072,11 +2090,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
+		ControlUtils.debugMessage("Controller onCompletionAsked");
 		// COMPLETIONS DEMANDEES
 		// Les completions doivent être rechargée pour correspondre au statement
-		if(event.getCallback() != null) {
-			event.getCallback().call(this);
-		}
+		// FIXME Comented for testing
+//		if(event.getCallback() != null) {
+//			event.getCallback().call(this); 
+//		}
+		// FIXME Comented for testing
+		sewelisGetCompletions(event.getSearch(), event);
 		
 //		incrementNumberOfActions();
 	}
@@ -2151,16 +2173,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
-	public void onCompletionReady(CustomSuggestionWidget source) {
-//		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
-		if(place.getCurrentCompletions().size() < 2 && place.hasMore()) {
-			sewelisShowMore();
-		}
-		if(place.getCurrentCompletions() != null) {
-			source.setOracleSuggestions(place.getCurrentCompletions());
-			source.showSuggestions();
-		}
-	}
+//	public void onCompletionReady(CustomSuggestionWidget source) {
+////		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
+//		if(place.getCurrentCompletions().size() < 2 && place.hasMore()) {
+//			sewelisShowMore();
+//		}
+//		if(place.getCurrentCompletions() != null) {
+//			source.setOracleSuggestions(place.getCurrentCompletions());
+//			source.showSuggestions();
+//		}
+//	}
 
 	@Override
 	public void onDescribeUri(DescribeUriEvent event) {

@@ -6,23 +6,26 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 /**
  * Demande de complétions
  */
-public class CompletionAskedEvent extends FormEvent {
+public class CompletionAskedEvent extends CompletionEvent {
 	
-	private CustomSuggestionWidget.SuggestionCallback callback;
+	public String search = "";
 	
 	public CompletionAskedEvent(Widget widget, CustomSuggestionWidget.SuggestionCallback cb) {
-		super(widget);
-		callback = cb;
+		super(widget, cb);
 	}
 	
-	@Override
-	public CustomSuggestionWidget.SuggestionCallback getCallback() {
-		return this.callback;
+	public CompletionAskedEvent(Widget src, CustomSuggestionWidget.SuggestionCallback cb, String srch) {
+		super(src, cb);
+		search = srch;
+	}
+	
+	public String getSearch() {
+		return search;
 	}
 
 	@Override
 	public String toString() {
-		return "Event: CompletionAsked from " + source;
+		return "CompletionAskedEvent from " + source;
 	}
 
 }
