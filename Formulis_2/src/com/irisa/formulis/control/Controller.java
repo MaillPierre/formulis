@@ -1012,22 +1012,24 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								LinkedList<Increment> result = new LinkedList<Increment>();
 								if(responseNode.hasChildNodes()) {
 									Node currNode = responseNode.getFirstChild();
-									while(currNode.getNextSibling() != null) {
+									do {
 										try {
 											Increment inc = Parser.parseIncrement(currNode);
+											ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
 											if(inc.getKind() != KIND.CLASS 
 													&& inc.getKind() != KIND.INVERSEPROPERTY 
 													&& inc.getKind() != KIND.OPERATOR
 													&& inc.getKind() != KIND.PROPERTY
 													&& inc.getKind() != KIND.RELATION) {
-												result.add(inc);
-												ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
+												result.addFirst(inc);
+												ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 											}
-											currNode = currNode.getNextSibling();
 										} catch (XMLParsingException e) {
 											ControlUtils.exceptionMessage(e);
 										}
+										currNode = currNode.getNextSibling();
 									}
+									while(currNode != null);
 									Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
 									while(itInc.hasNext()){
 										Increment inc = itInc.next();
@@ -1037,7 +1039,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 										&& inc.getKind() != KIND.PROPERTY
 										&& inc.getKind() != KIND.RELATION
 										&& ! result.contains(inc)) {
-											result.add(inc);
+											result.addLast(inc);
+//											ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 										}
 									}
 									if(!result.isEmpty()) {

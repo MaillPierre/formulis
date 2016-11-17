@@ -354,16 +354,16 @@ public class CustomSuggestionWidget extends AbstractFormulisWidget
 //					Increment inc = itInc.next();
 //					this.source.oracle.add(new CustomSuggestion(inc));
 //				}
-				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+//				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 //				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call END");
 
 				if(control.getPlace().getCurrentCompletions() != null) {
 					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
-					source.showSuggestions();
 
 					waitingFor = false;
 				}
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+				source.showSuggestions();
 			}
 		};
 	}
