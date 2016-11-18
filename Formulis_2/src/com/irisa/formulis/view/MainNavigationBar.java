@@ -45,7 +45,7 @@ public class MainNavigationBar extends Composite{
 	// Buttons
 	private FluidRow buttonRow = new FluidRow();
 //	public AdminPanel adminPanel = new AdminPanel();
-	public Label adminPanel = new Label(LabelType.INFO, "Beta version, for data browsing go to http://www.irisa.fr/LIS/ferre/sewelis-servolis/");
+	public Label adminPanel = new Label(LabelType.INFO, "For data browsing go to http://www.irisa.fr/LIS/ferre/sewelis-servolis/");
 
 	public MainNavigationBar() {
 		super();
