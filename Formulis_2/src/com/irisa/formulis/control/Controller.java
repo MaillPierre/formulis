@@ -1776,10 +1776,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		form = new Form(null);
 		mainPage = new MainPage(this);
 
-		RootPanel.get().add(mainPage);
 		RootPanel.get().add(navBar);
+		RootPanel.get().add(mainPage);
 		RootPanel.get().add(new FooterWidget());
-		RootPanel.get().setStyleName("root");
+//		RootPanel.get().setStyleName("root");
 		
 		if((Cookies.getCookie(cookiesUserLogin) != null && Cookies.getCookie(cookiesUserLogin) != "") 
 				&& (Cookies.getCookie(cookiesUserkey) != null && Cookies.getCookie(cookiesUserkey) != "")) {

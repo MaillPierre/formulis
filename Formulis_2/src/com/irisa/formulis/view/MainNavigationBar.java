@@ -81,7 +81,8 @@ public class MainNavigationBar extends Composite{
 		controlsCol.add(statusBarPanel);
 		controlsCol.add(buttonRow);
 		navBar.add(controlsCol);
-		navBar.setPosition(NavbarPosition.TOP);
+		navBar.setPosition(NavbarPosition.STATIC_TOP);
+//		navBar.addStyleName("navbar navbar-default navbar-static-top");
 		
 
 		} catch(Exception e) {
