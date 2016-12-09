@@ -323,7 +323,7 @@ public class FormWidget
 				result.add(nClassLine);
 			}
 		}
-		if(getData().isTyped() && result.getFirst() instanceof FormClassLineWidget) {
+		if(getData().isTyped() && ! getData().isAnonymous() && result.getFirst() instanceof FormClassLineWidget) {
 			((FormClassLineWidget) result.getFirst()).getData().setTempValue(this.getData().getTempValue());
 		}
 
