@@ -28,9 +28,9 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.i18n.client.Dictionary;
+import java.util.MissingResourceException;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
@@ -53,7 +53,6 @@ import com.irisa.formulis.view.FooterWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
 import com.irisa.formulis.view.ViewUtils;
-import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
@@ -62,7 +61,6 @@ import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
-import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
 
 /**
@@ -1770,6 +1768,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onModuleLoad() {
 		// Init de singleton
 		_instance = this;
+		
+		// Récupération de l'adresse du serveur
+		try {
+			Dictionary appSettings = Dictionary.getDictionary("formulisSettings");
+			String serverAdressString = appSettings.get("serverAdress");
+			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
+			serverAdress = serverAdressString;
+		} catch(MissingResourceException e) {
+			ControlUtils.debugMessage("Controller onModuleLoad couldn't load server adress from main page");
+			ControlUtils.exceptionMessage(e);
+		}
 		
 		Parser.setControl(this);
 		initializeProfilesFromCookie();
