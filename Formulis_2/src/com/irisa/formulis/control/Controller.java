@@ -65,11 +65,15 @@ import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCal
 
 /**
  * controller of all client-server interactions
+ * Functions beginning with sewelis* are direct correspondance to the SEWELIS API
+ * server adress is set by default to http://127.0.0.1:9999/ or set in a dictionnary on index.html
+ * This class is the end of the event chain
+ * Main method is onModuleLoad
  * @author pmaillot
  *
  */
 
-public final class Controller implements EntryPoint, ClickHandler, FormEventChainHandler, StatementFocusChangeHandler, ValueChangeHandler<Integer> {
+public final class Controller implements EntryPoint, ClickHandler, FormEventChainHandler, StatementFocusChangeHandler/*, ValueChangeHandler<Integer>*/ {
 
 	private HashMap<String, Store> storeMapByName = new HashMap<String, Store>();
 	private HashMap<String, Store> storeMapByLabel = new HashMap<String, Store>();
@@ -99,12 +103,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private int numberOfActions = 0;
 	private Date startEditDate = new Date();
 	
-	public static Controller _instance = null;
+	private static Controller _instance = null;
 
+	/**
+	 * Singleton design pattern
+	 * @return the Controller instance
+	 */
 	public static Controller instance() {
 		return _instance;
 	}
 
+	/**
+	 * 
+	 * @return the SEWELIS server adress, initialized by a dictionnary in index.html or set to http://127.0.0.1:9999/ by default
+	 */
 	public static String getServerAdress() {
 		return serverAdress;
 	}
@@ -113,10 +125,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		serverAdress = adress;
 	}
 
+	/**
+	 * SEWELIS work by "places", composition of a statement/query + differents suggestions + answers
+	 * FORMULIS works by jumping from place to place according to user interaction with the forms
+	 * @return
+	 */
 	public Place getPlace() {
 		return this.place;
 	}
 
+	/**
+	 * Select the given store in the known store list, refresh this list
+	 * @param a store name
+	 */
 	private void setCurrentStore(String selectValue) {
 		if(currentStore != null && ! selectValue.equals(currentStore.getName())) {
 			this.form.clear();
@@ -126,6 +147,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisStoreXmlns();
 	}
 	
+	/**
+	 * Function for a hidden variable counting the number of user interactions with the forms
+	 */
 	private void incrementNumberOfActions() {
 		numberOfActions++;
 		ControlUtils.debugMessage("numberOfActions: " + getNumberOfActions());
@@ -135,125 +159,128 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return numberOfActions;
 	}
 
-	// Profiles
-
-	public void addProfile(Profile pro) {
-		ControlUtils.debugMessage("addProfile " + pro);
-		profiles.add(pro);
-		if(! storeProfileMap.containsKey(pro.getStoreName())) {
-			storeProfileMap.put(pro.getStoreName(), new LinkedList<Profile>());
-		}
-		storeProfileMap.get(pro.getStoreName()).add(pro);
-		addProfileToCookies(pro);
-	}
-
-	public void addProfileToCookies(Profile pro) {
-		try {
-			LinkedList<Profile> cookiesProfiles = Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(this.cookiesProfilesIndex)).getDocumentElement());
-			cookiesProfiles.add(pro);
-			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(cookiesProfiles).toString(), cookiesProfilesExpireDate);
-		} catch (XMLParsingException | SerializingException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-		reloadNavbarProfileList();
-	}
-
-	public void addProfiles(Collection<Profile> l) {
-		Iterator<Profile> itPro = l.iterator();
-		while(itPro.hasNext()) {
-			Profile pro = itPro.next();
-			addProfile(pro);
-		}
-	}
-	
-	public void removeProfile(Profile pro) {
-		profiles.remove(pro);
-		storeProfileMap.get(pro.getStoreName()).remove(pro);
-	}
-
-	private Profile findProfile(Collection<Profile> list, String name) {
-		Iterator<Profile> itPro = list.iterator();
-		while(itPro.hasNext()) {
-			Profile pro = itPro.next();
-			if(pro.getName() == name) {
-				return pro;
-			}
-		}
-		return null;
-	}
-
-	public Profile getProfile(String name) {
-		return findProfile(this.profiles, name);
-	}
-
-	public LinkedList<Profile> getProfilesByStore(String store) {
-		return this.storeProfileMap.get(store);
-	}
-
-	public Profile getProfileForAStore(String name, String store) {
-		return findProfile(getProfilesByStore(store), name);
-	}
-
-	public void initializeProfilesFromCookie() {
-		if(Cookies.getCookie(cookiesProfilesIndex) == null) {
-			try {
-				Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
-			} catch (SerializingException e) {
-				ControlUtils.exceptionMessage(e);
-			}
-		} 
-		try {
-			this.profiles.addAll(Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)).getDocumentElement()));
-		} catch (XMLParsingException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-		this.reloadNavbarProfileList();
-	}
-	
-	/**
-	 * @return Le contenu parsé du cookie de profile
-	 */
-	public Document getProfileDocument() {
-		return XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex));
-	}
-	
-	public void setProfileDocument(String doc) {
-		Cookies.setCookie(cookiesProfilesIndex, doc, cookiesProfilesExpireDate);
-	}
-
-	public LinkedList<Profile> getCookiesProfileList() {
-		try {
-//			Utils.debugMessage("getCookiesProfileList cookie: " + Cookies.getCookie(cookiesProfilesIndex));
-			Document profilesXMLDoc = XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)); 
-			Node profilesXMLNode = profilesXMLDoc.getDocumentElement();
-			return Parser.parseProfiles(profilesXMLNode);
-		} catch (XMLParsingException | DOMParseException e) {
-			ControlUtils.exceptionMessage(e);
-			return null;
-		}
-	}
-
-	public void clearProfiles() {
-		this.profiles.clear();
-		this.storeProfileMap.clear();
-		try {
-			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
-		} catch (SerializingException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-	}
-
-	public void reloadNavbarProfileList() {
-//		navBar.adminPanel.profileList.clear();
-//		Iterator<Profile> itPro = this.profiles.iterator();
+	// Profiles FIXME REMETTRE GESTION DES PROFILS ( HERE BE DRAGONS )
+//
+//	public void addProfile(Profile pro) {
+//		ControlUtils.debugMessage("addProfile " + pro);
+//		profiles.add(pro);
+//		if(! storeProfileMap.containsKey(pro.getStoreName())) {
+//			storeProfileMap.put(pro.getStoreName(), new LinkedList<Profile>());
+//		}
+//		storeProfileMap.get(pro.getStoreName()).add(pro);
+//		addProfileToCookies(pro);
+//	}
+//
+//	public void addProfileToCookies(Profile pro) {
+//		try {
+//			LinkedList<Profile> cookiesProfiles = Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(this.cookiesProfilesIndex)).getDocumentElement());
+//			cookiesProfiles.add(pro);
+//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(cookiesProfiles).toString(), cookiesProfilesExpireDate);
+//		} catch (XMLParsingException | SerializingException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+//		reloadNavbarProfileList();
+//	}
+//
+//	public void addProfiles(Collection<Profile> l) {
+//		Iterator<Profile> itPro = l.iterator();
 //		while(itPro.hasNext()) {
 //			Profile pro = itPro.next();
-//			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
+//			addProfile(pro);
 //		}
-//		
-//		navBar.adminPanel.profileEditReload.click(); // SALE
-	}
+//	}
+//	
+//	public void removeProfile(Profile pro) {
+//		profiles.remove(pro);
+//		storeProfileMap.get(pro.getStoreName()).remove(pro);
+//	}
+//
+//	private Profile findProfile(Collection<Profile> list, String name) {
+//		Iterator<Profile> itPro = list.iterator();
+//		while(itPro.hasNext()) {
+//			Profile pro = itPro.next();
+//			if(pro.getName() == name) {
+//				return pro;
+//			}
+//		}
+//		return null;
+//	}
+//
+//	public Profile getProfile(String name) {
+//		return findProfile(this.profiles, name);
+//	}
+//
+//	public LinkedList<Profile> getProfilesByStore(String store) {
+//		return this.storeProfileMap.get(store);
+//	}
+//
+//	public Profile getProfileForAStore(String name, String store) {
+//		return findProfile(getProfilesByStore(store), name);
+//	}
+//
+//	public void initializeProfilesFromCookie() {
+//		if(Cookies.getCookie(cookiesProfilesIndex) == null) {
+//			try {
+//				Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
+//			} catch (SerializingException e) {
+//				ControlUtils.exceptionMessage(e);
+//			}
+//		} 
+//		try {
+//			this.profiles.addAll(Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)).getDocumentElement()));
+//		} catch (XMLParsingException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+//		this.reloadNavbarProfileList();
+//	}
+//	
+//	/**
+//	 * @return Le contenu parsé du cookie de profile
+//	 */
+//	public Document getProfileDocument() {
+//		return XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex));
+//	}
+//	
+//	public void setProfileDocument(String doc) {
+//		Cookies.setCookie(cookiesProfilesIndex, doc, cookiesProfilesExpireDate);
+//	}
+//
+//	public LinkedList<Profile> getCookiesProfileList() {
+//		try {
+////			Utils.debugMessage("getCookiesProfileList cookie: " + Cookies.getCookie(cookiesProfilesIndex));
+//			Document profilesXMLDoc = XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)); 
+//			Node profilesXMLNode = profilesXMLDoc.getDocumentElement();
+//			return Parser.parseProfiles(profilesXMLNode);
+//		} catch (XMLParsingException | DOMParseException e) {
+//			ControlUtils.exceptionMessage(e);
+//			return null;
+//		}
+//	}
+//
+//	public void clearProfiles() {
+//		this.profiles.clear();
+//		this.storeProfileMap.clear();
+//		try {
+//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
+//		} catch (SerializingException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+//	}
+//
+//	public void reloadNavbarProfileList() {
+////		navBar.adminPanel.profileList.clear();
+////		Iterator<Profile> itPro = this.profiles.iterator();
+////		while(itPro.hasNext()) {
+////			Profile pro = itPro.next();
+////			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
+////		}
+////		
+////		navBar.adminPanel.profileEditReload.click(); // SALE
+//	}
 	
+	/**
+	 * Refresh the  displayed namespaces associated to a store according to the values stocked in the Store object
+	 */
 	public void refreshNamespaceList() {
 		this.mainPage.getSettingsWidget().getNsListBox().clear();
 		Iterator<String> itNs = currentStore.getNamespaceIterator();
@@ -298,6 +325,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		});
 	}
 
+	/**
+	 * Register a new user
+	 * @param nu a NewUserToken containing the necessary infos to create a new SEWELIS account
+	 */
 	public void sewelisRegister(final NewUserToken nu) {
 		String registerRequestString = serverAdress + "/register";
 		registerRequestString += "?userKey=" + userKey;
@@ -341,6 +372,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
+	/**
+	 * Connect to an existing SEWELIS account on the server
+	 * @param t Login Token containing login and password
+	 */
 	public void sewelisLogin(final LoginToken t) {
 		String loginRequestString = serverAdress + "/login";
 		loginRequestString += "?userKey=" + userKey;
@@ -389,6 +424,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	}
 
+	/**
+	 * Logout from the current connexion to a SEWELIS account
+	 */
 	public void sewelisLogout() {
 		String logoutRequestString = serverAdress + "/logout";
 		logoutRequestString += "?userKey=" + userKey;
@@ -431,7 +469,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	// STORES LISTS
 	/**
-	 * Rafraichit la liste des stores accessibles
+	 * Refresh the list of available stores
 	 */
 	public void sewelisVisibleStores() {
 		try {
@@ -459,7 +497,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							String storeRole = storeNode.getAttributes().getNamedItem("role").getNodeValue();
 							String storeLabel = storeNode.getFirstChild().getNodeValue();
 							Store store = new Store(storeName, storeLabel, storeRole);
-							if(storeRole.equals("publisher") || storeRole.equals("collaborator") || storeRole.equals("admin")) {
+							if(storeRole.equals("publisher") /*|| storeRole.equals("collaborator")*/ || storeRole.equals("admin")) {
 								storeMapByName.put(storeName, store) ;
 								storeMapByLabel.put(storeLabel, store) ;
 								storeList.add(store);
@@ -486,40 +524,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-	/**
-	 * Aucune utilité apparente ! (CTRL-C CTRL-V de ping() )
-	 */
-	public void sewelisRemovedStores() {
-		String removedStoresRequestString = serverAdress + "/removedStores";
-		removedStoresRequestString += "?userKey=" + userKey;
-		removedStoresRequestString += "&storeId=" + currentStore.getName();
-		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(removedStoresRequestString));
-
-		try {
-			builder.sendRequest(null, new RequestCallback() {	
-				@Override		
-				public void onError(Request request, Throwable exception) {
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-					} else {
-						// FIXME GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}
-				}
-			});
-		} catch (RequestException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 
 //	// STORES ACCESSORS
 //	public void exportRDF(String extension) {
@@ -548,15 +553,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		}
 //	}
 
-	//	/**
-	//	 * Utilité inconnue
-	//	 */
-	//	public void storeBase() {
-	//
-	//	}
-	//
 		/**
-		 * Rafraichit la liste des namespaces pour le store
+		 * Refresh the namespace list associated to the current store from the server
 		 */
 		public void sewelisStoreXmlns() {
 			if(this.currentStore != null) {
@@ -655,11 +653,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //
 //	}
 
-	public void sewelisGetPlaceRoot(FormWidget formWid) {
-			
-	}
-
 	// NAVIGATION
+		/**
+		 * Place the current Place object to the root place of the current Store
+		 */
 	public void sewelisGetPlaceRoot() {
 //		ControlUtils.debugMessage("getPlaceRoot");
 		if(currentStore != null) {
@@ -713,6 +710,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		ControlUtils.debugMessage("FIN getPlaceRoot");
 	}
 
+	/**
+	 * Place the current palce to the home place ( or root in undefined) of the current store
+	 */
 	public void sewelisGetPlaceHome() {
 		ControlUtils.debugMessage("getPlaceHome");
 		if(currentStore != null) {
@@ -777,94 +777,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * 
+	 * Set the current place to the place corresponding to the LispQL statement passed in parameter (for some reason, sewelisChangeFocus has to be called right after)
 	 * @param statString statement LispQL
-	 */
-	public Place sewelisGetPlaceStatementAlone(final String statString) {
-		ControlUtils.debugMessage("getPlaceStatementAlone( " + statString + " ) " );
-		Place result = null;
-		if(currentStore != null) {
-			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
-			placeStatementRequestString += "userKey=" + userKey;
-			placeStatementRequestString += "&storeName=" + currentStore.getName();
-			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
-			navBar.setServerStatusMessage("Waiting...");
-			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {
-				
-				private Place resultPlace = null;
-				
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					//						displayDebugMessage("onResponseReceived");
-					if (200 == response.getStatusCode()) {
-						Document homePlaceDoc = XMLParser.parse(response.getText());
-						Element homePlaceElem = homePlaceDoc.getDocumentElement();
-						String status = homePlaceElem.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(homePlaceElem.getNodeName() == "getPlaceStatementResponse" && status == "ok") {
-							Node placeNode = homePlaceElem.getFirstChild();
-							if(placeNode.getNodeName() == "place") {
-								try {
-									Place here = Parser.parsePlace(placeNode);
-
-									// TODO Rustine pour gérer le focus renvoyé par getPlaceStatement = a étudier
-									// Le focused est placé à la racine du statement, ce qui ne permet pas d'avoir de suggestions pour l'objet qui nous interesse
-									// La rustine déplace le focused au premier focus de la formule (2 numéro après, premier élément da la première Pair)
-									// SALE
-									try {
-										String focusedId = place.getStatement().getFocusedDisplay();
-										String targetFocusId = String.valueOf(Integer.valueOf(focusedId) - 1);
-										resultPlace = sewelisChangeFocusAlone(here, targetFocusId);
-									} catch(Exception e) {
-										ControlUtils.exceptionMessage( e);
-									}
-								} catch (XMLParsingException e1) {
-									ControlUtils.exceptionMessage(e1);
-								}
-							} else {
-								// FIXME GESTION DES MESSAGES D'ERREUR
-								ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
-							}
-						} else {
-							navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
-							if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-								String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage(message);
-								navBar.setServerStatusHovertext(message);
-							}
-						}
-					} else {
-						// FIXME GESTION DES MESSAGES D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}
-				}
-
-				@Override
-				public Place getPlace() {
-					return resultPlace;
-				}
-			};
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
-			try {
-				builder.sendRequest(null, placeCallback);
-				result = placeCallback.getPlace();
-			} catch (RequestException e) {
-				ControlUtils.exceptionMessage(e);
-			}
-		}
-		ControlUtils.debugMessage("FIN getPlaceStatement " );
-		return result;
-	}
-
-	/**
-	 * 
-	 * @param statString statement LispQL
-	 * @param event Event a emettre en cas de succès
+	 * @param event transmitted to changeFocus
 	 */
 	public void sewelisGetPlaceStatement(final String statString, final FormEvent event) {
 		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
@@ -932,6 +847,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 	/**
+	 * Run the given statement, eg. used to create entities
 	 * @param statString statement LispQL
 	 */
 	private void sewelisRunStatement(String statString) {
@@ -978,9 +894,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * 
-	 * @param match Chaine partielle demandée par la source
-	 * @param widSource source à qui renvoyer les completions
+	 * Retriece completions computed by the SEWELIS server from the given string. Potentially computationally heavy in case of property with no previous values
+	 * @param match partial string to be matched
+	 * @param event Event whose callback will be used in case of success
 	 */
 	public void sewelisGetCompletions(final String match, final FormEvent event) {
 		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
@@ -1059,194 +975,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-//	public void insertElement(BasicElement elem, FormEvent callback) {
-//		try {
-//			if(elem instanceof Plain) {
-//				insertPlain((Plain) elem, callback);
-//			} else if(elem instanceof Typed) {
-//				insertTyped((Typed) elem, callback);
-//			} else if(elem instanceof URI) {
-//				insertUri((URI) elem, callback);
-//			}
-//		} catch (RequestException e) {
-//			Utils.exceptionMessage(e);
-//		}
-//	}
-//
-//	public void insertPlain(Plain plain,final  FormEvent callback) throws RequestException {
-//		String insertIncrementRequestString = serverAdress + "/insertPlainLiteral?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + place.getId(); 
-//		insertIncrementRequestString += "&text=" + URL.encodeQueryString(plain.getPlain());
-//		insertIncrementRequestString += "&lang=" + URL.encodeQueryString(plain.getLang());
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//
-//		builder.sendRequest(null, new RequestCallback() {			
-//			@Override
-//			public void onError(Request request, Throwable exception) {
-//				Utils.exceptionMessage(exception);
-//			}
-//
-//			@Override
-//			public void onResponseReceived(Request request, Response response) {
-//				if (200 == response.getStatusCode()) {
-//					Document statusDoc = XMLParser.parse(response.getText());
-//					Element docElement = statusDoc.getDocumentElement();
-//					String status = docElement.getAttribute("status");
-//					navBar.setServerStatusMessage(status);
-//					if(status == "ok") {
-//						Node placeNode = docElement.getFirstChild();
-//						if(placeNode.getNodeName().equals("place")) {
-//							loadPlace(placeNode);
-//							//							onFormEvent(callback);
-//						}
-//					}
-//				} else {
-//					// TODO GESTION DES MESSAGE D'ERREUR
-//					Utils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//				}
-//			}
-//		});
-//	}
-//
-//	public void insertTyped(Typed typed,final  FormEvent callback) throws RequestException {
-//		String insertIncrementRequestString = serverAdress + "/insertTypedLiteral?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + place.getId(); 
-//		insertIncrementRequestString += "&text=" + URL.encodeQueryString(typed.getValue());
-//		insertIncrementRequestString += "&datatype=" + URL.encodeQueryString(typed.getUri());
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//
-//		builder.sendRequest(null, new RequestCallback() {			
-//			@Override
-//			public void onError(Request request, Throwable exception) {
-//				Utils.exceptionMessage(exception);
-//			}
-//
-//			@Override
-//			public void onResponseReceived(Request request, Response response) {
-//				if (200 == response.getStatusCode()) {
-//					Document statusDoc = XMLParser.parse(response.getText());
-//					Element docElement = statusDoc.getDocumentElement();
-//					String status = docElement.getAttribute("status");
-//					navBar.setServerStatusMessage(status);
-//					if(status == "ok") {
-//						Node placeNode = docElement.getFirstChild();
-//						if(placeNode.getNodeName().equals("place")) {
-//							loadPlace(placeNode);
-//							//							onFormEvent(callback);
-//						}
-//					}
-//				} else {
-//					// TODO GESTION DES MESSAGE D'ERREUR
-//					Utils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//				}
-//			}
-//		});
-//	}
-//
-//	public void insertUri(URI uri,final FormEvent callback) throws RequestException {
-//		String insertIncrementRequestString = serverAdress + "/insertUri?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + place.getId(); 
-//		insertIncrementRequestString += "&uri=" + URL.encodeQueryString(uri.getUri());
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//
-//		builder.sendRequest(null, new RequestCallback() {			
-//			@Override
-//			public void onError(Request request, Throwable exception) {
-//				Utils.exceptionMessage(exception);
-//			}
-//
-//			@Override
-//			public void onResponseReceived(Request request, Response response) {
-//				if (200 == response.getStatusCode()) {
-//					Document statusDoc = XMLParser.parse(response.getText());
-//					Element docElement = statusDoc.getDocumentElement();
-//					String status = docElement.getAttribute("status");
-//					navBar.setServerStatusMessage(status);
-//					if(status == "ok") {
-//						Node placeNode = docElement.getFirstChild();
-//						if(placeNode.getNodeName().equals("place")) {
-//							loadPlace(placeNode);
-//							//							onFormEvent(callback);
-//						}
-//					}
-//				} else {
-//					// TODO GESTION DES MESSAGE D'ERREUR
-//					Utils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//				}
-//			}
-//		});
-//	}
-//
-//	public void insertIncrement(Increment select) throws RequestException {
-//		String insertIncrementRequestString = serverAdress + "/insertIncrement?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + place.getId(); 
-//		insertIncrementRequestString += "&incrementId=" + select.getId();
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//
-//		builder.sendRequest(null, new RequestCallback() {			
-//			@Override
-//			public void onError(Request request, Throwable exception) {
-//				Utils.exceptionMessage(exception);
-//			}
-//
-//			@Override
-//			public void onResponseReceived(Request request, Response response) {
-//				if (200 == response.getStatusCode()) {
-//					Document statusDoc = XMLParser.parse(response.getText());
-//					Element docElement = statusDoc.getDocumentElement();
-//					String status = docElement.getAttribute("status");
-//					navBar.setServerStatusMessage(status);
-//					if(status == "ok") {
-//						Node placeNode = docElement.getFirstChild();
-//						if(placeNode.getNodeName().equals("place")) {
-//							loadPlace(placeNode);
-//						}
-//					}
-//				} else {
-//					// TODO GESTION DES MESSAGE D'ERREUR
-//					Utils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//				}
-//			}
-//		});
-//	}
-//
-//	public void applyTransformation(Transformation t) throws RequestException {
-//		String applyTransformationRequestString = serverAdress + "/applyTransformation?userKey=" + userKey ;
-//		applyTransformationRequestString += "&storeName=" + currentStore.getName(); 
-//		applyTransformationRequestString += "&placeId=" + place.getId(); 
-//		applyTransformationRequestString += "&transformation=" + t.getName();
-//
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(applyTransformationRequestString));
-//		builder.sendRequest(null, new RequestCallback() {
-//			@Override
-//			public void onError(Request request, Throwable exception) {
-//			}
-//
-//			@Override
-//			public void onResponseReceived(Request request, Response response) {
-//				if (200 == response.getStatusCode()) {
-//					Document statusDoc = XMLParser.parse(response.getText());
-//					Element docElement = statusDoc.getDocumentElement();
-//					String status = docElement.getAttribute("status");
-//					navBar.setServerStatusMessage(status);
-//					if(status == "ok") {
-//						Node placeNode = docElement.getFirstChild();
-//						if(placeNode.getNodeName().equals("place")) {
-//							loadPlace(placeNode);
-//						}
-//					}
-//				} else {
-//					// TODO GESTION DES MESSAGE D'ERREUR
-//					Utils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//				}
-//			}
-//		});
-//	}
-
+	/**
+	 * Corresponding function to sur showMost SEWLIS API function, return the most relaxed suggestions reachable
+	 * @param event whose callback will be run in case of success
+	 */
 	public void sewelisShowMost(final FormEvent event) {
 		String showMostRequestString = serverAdress + "/showMost?userKey=" + userKey ;
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
@@ -1297,7 +1029,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisShowMore() {
 		sewelisShowMore(null);
 	}
-	
+
+
+	/**
+	 * Corresponding function to sur showMore SEWLIS API function, return the next reachable relaxed suggestions
+	 * @param event whose callback will be run in case of success
+	 */
 	public void sewelisShowMore(final FormEvent event) {
 		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
@@ -1350,6 +1087,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisShowLess(null);
 	}
 
+	/**
+	 * Corresponding function to sur showLess SEWLIS API function, reduce the relaxation of suggestions by one rank
+	 * @param event whose callback will be run in case of success
+	 */
 	public void sewelisShowLess(final FormEvent event) {
 		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
@@ -1397,6 +1138,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
+
+	/**
+	 * Corresponding function to showLeast SEWELIS API function, reduce the relaxation of suggestions to 0
+	 * @param event whose callback will be run in case of success
+	 */
 	public void sewelisShowLeast(final FormEvent event) {
 		String showLeastRequestString = serverAdress + "/showLeast?userKey=" + userKey ;
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
@@ -1444,6 +1190,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 	
+	/**
+	 * Corresponding function to uriDescription SEWELIS API function, return a place with a statement containing all statement known starting from an uri contained in event.getSource.getData
+	 * @param event event with a URIWidget at its source
+	 */
 	public void sewelisUriDescription(final DescribeUriEvent event) {
 		String showMoreRequestString = serverAdress + "/uriDescription?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
@@ -1499,7 +1249,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e);
 		}
 	}
-
+	/**
+	 * Define a new prefixed namespace for the current store 
+	 * @param prefix 
+	 * @param adress
+	 */
 	public void sewelisDefineNamespace(String prefix, String adress) {
 		String showMoreRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
@@ -1545,6 +1299,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 	// DATA LOAD FUNCTIONS 
+	/**
+	 * Parse and load the XML Place node passed in arguments, call refreshAnswers
+	 * @param placeNode a XML Place node
+	 */
 	private void loadPlace(Node placeNode) {
 //		ControlUtils.debugMessage("loadPlace " + placeNode.toString());
 		try {
@@ -1557,6 +1315,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		ControlUtils.debugMessage("FIN loadPlace");
 	}
 	
+	/**
+	 * Call for run to create the data contained in the transmitted form, go back to placeRoot
+	 * Supposed to be used to also send log to an external serveur
+	 * @param f FormWidget containing data to be created
+	 */
 //	@SuppressWarnings("deprecation")
 	private void finish(FormWidget f) {
 		ControlUtils.debugMessage("Controller finish");
@@ -1578,39 +1341,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 	// NAVIGATION 
-	public void sewelisDoRun() {
-		String insertIncrementRequestString = serverAdress + "/doRun?userKey=" + userKey ;
-		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-		insertIncrementRequestString += "&placeId=" + place.getId();
-		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							loadPlace(docElement.getFirstChild());
-						}
-					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}
-				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-	}
+//	public void sewelisDoRun() {
+//		String insertIncrementRequestString = serverAdress + "/doRun?userKey=" + userKey ;
+//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
+//		insertIncrementRequestString += "&placeId=" + place.getId();
+//		navBar.setServerStatusMessage("Waiting...");
+//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
+//		try {
+//			builder.sendRequest(null, new RequestCallback() {			
+//				@Override
+//				public void onError(Request request, Throwable exception) {
+//					ControlUtils.exceptionMessage(exception);
+//				}
+//
+//				@Override
+//				public void onResponseReceived(Request request, Response response) {
+//					if (200 == response.getStatusCode()) {
+//						Document statusDoc = XMLParser.parse(response.getText());
+//						Element docElement = statusDoc.getDocumentElement();
+//						String status = docElement.getAttribute("status");
+//						navBar.setServerStatusMessage(status);
+//						if(status == "ok") {
+//							loadPlace(docElement.getFirstChild());
+//						}
+//					} else {
+//						// TODO GESTION DES MESSAGE D'ERREUR
+//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+//					}
+//				}
+//			});
+//		} catch (RequestException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+//	}
 
 
 	// TRANSFORMATION
@@ -1618,6 +1381,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisChangeFocus(focusId, null);
 	}
 
+	/**
+	 * In SEWELIS Places, elements in statement can be set as focus, identified by numbers
+	 * With this function, the statement stay the same, but the place change
+	 * @param focusId number of the element in the statement
+	 * @param followUp event whose callback will be called in case of success
+	 */
 	public void sewelisChangeFocus(String focusId, final FormEvent followUp) {
 		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
 		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
@@ -1672,71 +1441,74 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-	public Place sewelisChangeFocusAlone(Place here, String focusId) {
-		//		mainPage.addDebugMessage("changeFocus " + f.toString());
-		Place result = null;
-		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
-		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-		insertIncrementRequestString += "&placeId=" + here.getId(); 
-		insertIncrementRequestString += "&focusId=" + focusId;
-		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-		try {
-			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {
-				
-				private Place resultPlace = null;
-				
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node placeNode = docElement.getFirstChild();
-							if(placeNode.getNodeName().equals("place")) {
-								try {
-									resultPlace = Parser.parsePlace(placeNode);
-								} catch (XMLParsingException e) {
-									ControlUtils.exceptionMessage(e);
-								}
-							}
-						}else {
-							ControlUtils.debugMessage("sewelisChangeFocusAlone ERROR " + status);
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage( message);
-								navBar.setServerStatusHovertext(message);
-							}
-						}
-					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}
-				}
-
-				@Override
-				public Place getPlace() {
-					return resultPlace;
-				}
-			};
-			builder.sendRequest(null, placeCallback );
-			result = placeCallback.getPlace();
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-		return result;
-	}
+//	public Place sewelisChangeFocusAlone(Place here, String focusId) {
+//		//		mainPage.addDebugMessage("changeFocus " + f.toString());
+//		Place result = null;
+//		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
+//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
+//		insertIncrementRequestString += "&placeId=" + here.getId(); 
+//		insertIncrementRequestString += "&focusId=" + focusId;
+//		navBar.setServerStatusMessage("Waiting...");
+//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
+//		try {
+//			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {
+//				
+//				private Place resultPlace = null;
+//				
+//				@Override
+//				public void onError(Request request, Throwable exception) {
+//					ControlUtils.exceptionMessage(exception);
+//				}
+//
+//				@Override
+//				public void onResponseReceived(Request request, Response response) {
+//					if (200 == response.getStatusCode()) {
+//						Document statusDoc = XMLParser.parse(response.getText());
+//						Element docElement = statusDoc.getDocumentElement();
+//						String status = docElement.getAttribute("status");
+//						navBar.setServerStatusMessage(status);
+//						if(status == "ok") {
+//							Node placeNode = docElement.getFirstChild();
+//							if(placeNode.getNodeName().equals("place")) {
+//								try {
+//									resultPlace = Parser.parsePlace(placeNode);
+//								} catch (XMLParsingException e) {
+//									ControlUtils.exceptionMessage(e);
+//								}
+//							}
+//						}else {
+//							ControlUtils.debugMessage("sewelisChangeFocusAlone ERROR " + status);
+//							if(docElement.getFirstChild().getNodeName() == "message") {
+//								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+//								ControlUtils.debugMessage( message);
+//								navBar.setServerStatusHovertext(message);
+//							}
+//						}
+//					} else {
+//						// TODO GESTION DES MESSAGE D'ERREUR
+//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+//					}
+//				}
+//
+//				@Override
+//				public Place getPlace() {
+//					return resultPlace;
+//				}
+//			};
+//			builder.sendRequest(null, placeCallback );
+//			result = placeCallback.getPlace();
+//		} catch (RequestException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+//		return result;
+//	}
 
 
 	// VIEW REFRESH
 
+	/**
+	 * Refresh the displayed answers from the place answers
+	 */
 	private void refreshAnswers() {
 		//		Utils.debugMessage("refreshAnswers " + place.getAnswers());
 		mainPage.ansWidget.setAnswers(place.getAnswers());
@@ -1746,10 +1518,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		//		Utils.debugMessage("FIN refreshAnswers");
 	}
 
+	/**
+	 * 
+	 * @return a Form without root
+	 */
 	private Form newForm() {
 		return newForm(null);
 	}
 
+	/**
+	 * 
+	 * @param l Form line parent of the form (the form is nested)
+	 * @return a (nested) form 
+	 */
 	private Form newForm(FormLine l) {
 		Form result = new Form(l);
 
@@ -1763,6 +1544,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	/**
 	 * Initializations and handlers attribution
+	 * Main function of the GWT module
 	 */
 	@Override
 	public void onModuleLoad() {
@@ -1773,15 +1555,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		try {
 			Dictionary appSettings = Dictionary.getDictionary("formulisSettings");
 			String serverAdressString = appSettings.get("serverAdress");
+			String uriBaseString = appSettings.get("uriBaseAdress");
 			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
 			serverAdress = serverAdressString;
+			uriBaseAdress = uriBaseString;
 		} catch(MissingResourceException e) {
 			ControlUtils.debugMessage("Controller onModuleLoad couldn't load server adress from main page");
 			ControlUtils.exceptionMessage(e);
 		}
 		
 		Parser.setControl(this);
-		initializeProfilesFromCookie();
+//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
 		form = new Form(null);
 		mainPage = new MainPage(this);
 
@@ -1980,7 +1764,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	// EVENTS
 
 	/**
-	 * Handling click event on the mainpage
+	 * Handling click event on the mainpage.
+	 * Mostly used for settings and login events
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
@@ -2053,11 +1838,21 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	}
 
+	/**
+	 * call sewelisChangeFocus
+	 */
 	@Override
 	public void onFocusChange(Focus f) {
 		sewelisChangeFocus(f.getId());
 	}
 
+	/**
+	 * Clear the current completions, according to the source of the event it will:
+	 * - call sewelisGetPlaceStatement if it's a change of selected relation line
+	 * - set the form typeline and call sewelisGetPlaceStatement if the source is a form type list ou anonymous
+	 * - unset the form type line if the source is a typed form (and call sewelisGetPlaceStatement to logically retract to a type list form)
+	 * @param event whose callback will be transmitted in the mentioned cases or directly called otherwise
+	 */
 	@Override
 	public void onLineSelection(LineSelectionEvent event) {
 		// SELECTION DE LIGNE
@@ -2100,6 +1895,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
+	/**
+	 * call sewelisGetCompletions(event.getSearch(), event)
+	 * @param event
+	 */
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
 		ControlUtils.debugMessage("Controller onCompletionAsked");
@@ -2115,6 +1914,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		incrementNumberOfActions();
 	}
 
+	/**
+	 * According to the event source:
+	 * - if it is a FormWidget, it will call the event callback
+	 * - if it is a finishable RelationLineWidget, it will call sewelisGetPlaceStatement
+	 * - if it is an empty line, it will call onCompletionsAsked (with the same event callback)
+	 */
 	@Override
 	public void onStatementChange(StatementChangeEvent event) {
 		// CHANGEMENT DE STATEMENT
@@ -2138,9 +1943,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * Evenement de demande de création d'élément provenant d'un widget de ligne de relation (FormRelationLineWidget)
-	 * Si les éléments pour un nouveau formulaire sont présent, un nouveau formulaire est crée et le statement est changé pour charger son contenu via un statementchangeevent
-	 * Sinon la ligne est en mode création de littéral
+	 * Intended use: a FormRelationLineWidget call for the creation of a new element
+	 * If it is possible to create a new nested form (there are properties and/or classes to be used), the line is set into guide creation mode, (sewelisGetPlaceStatement is called to load the new form content)
+	 * Otherwise, the literal creation widgets (widget + type oracle) are set as variable element of the line
 	 */
 	@Override
 	public void onElementCreation(ElementCreationEvent event) {
@@ -2172,6 +1977,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
+	/**
+	 * Call Form.removeRelationLine and FormWidget.reload
+	 */
 	@Override
 	public void onRemoveLine(RemoveLineEvent event) {
 		FormLineWidget widSource = event.getSource();
@@ -2185,17 +1993,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
-//	public void onCompletionReady(CustomSuggestionWidget source) {
-////		Utils.debugMessage("onCompletionReady " + place.getCurrentCompletions().size());
-//		if(place.getCurrentCompletions().size() < 2 && place.hasMore()) {
-//			sewelisShowMore();
-//		}
-//		if(place.getCurrentCompletions() != null) {
-//			source.setOracleSuggestions(place.getCurrentCompletions());
-//			source.showSuggestions();
-//		}
-//	}
-
+	/**
+	 * Call sewelisUriDescription
+	 */
 	@Override
 	public void onDescribeUri(DescribeUriEvent event) {
 //		URIWidget widSource = event.getSource();
@@ -2203,6 +2003,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisUriDescription(event);
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
 //		ControlUtils.debugMessage("onMoreCompletions");
@@ -2218,24 +2021,27 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onLessCompletions(LessCompletionsEvent event) {
-		ControlUtils.debugMessage("onLessCompletions");
+//		ControlUtils.debugMessage("onLessCompletions");
 		if(this.getPlace().hasLess()) {
-			ControlUtils.debugMessage("onLessCompletions showLeast");
+//			ControlUtils.debugMessage("onLessCompletions showLeast");
 			sewelisShowLeast(event);
 		} else {
 			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData());
-			ControlUtils.debugMessage("onLessCompletions " + queryString);
+//			ControlUtils.debugMessage("onLessCompletions " + queryString);
 			sewelisGetPlaceStatement(queryString, event);	
 		}
 	}
+//
+//	@Override
+//	public void onValueChange(ValueChangeEvent<Integer> event) {
+////		if(event.getSource() == this.navBar.adminPanel.limitBox) {
+////			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
+////		}
+//	}
 
-	@Override
-	public void onValueChange(ValueChangeEvent<Integer> event) {
-//		if(event.getSource() == this.navBar.adminPanel.limitBox) {
-//			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
-//		}
-	}
-
+	/**
+	 * Create a new line, add it to the data form source of event, call FormWidget.reload
+	 */
 	@Override
 	public void onRelationCreation(RelationCreationEvent event) {
 		if(event.getSource() instanceof RelationCreateWidget) {
@@ -2256,6 +2062,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
+	/**
+	 * Create a new ClassLine, add it to the form source of event, call FormWidget.reload
+	 */
 	@Override
 	public void onClassCreation(ClassCreationEvent event) {
 		ControlUtils.debugMessage("Controller onClassCreation");
@@ -2276,19 +2085,87 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		incrementNumberOfActions();
 	}
+
+	/**
+	 * Call the event callback and call Controller.finish
+	 */
+	@Override
+	public void onFinishForm(FinishFormEvent event) {
+//		ControlUtils.debugMessage("Controller onFinishForm");
+		event.getCallback().call(this);
+		finish( ( (FormWidget)event.getSource()));
+//		ControlUtils.debugMessage("Controller onFinishForm END");
+	}
+
+	/**
+	 * Not supposed to do anything in the controller
+	 * @param event
+	 */
+	@Override
+	public void onFinishableLine(FinishableLineEvent event) {
+	}
+
+	/**
+	 * call sewelisShowMore
+	 */
+	@Override
+	public void onMoreFormLines(MoreFormLinesEvent event) {
+		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
+		if(this.getPlace().hasMore()) {
+			this.sewelisShowMore(event);
+		}
+	}
+
+	/**
+	 * Reload the event source content from the base 
+	 */
+	@Override
+	public void onReload(ReloadEvent event) {
+		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
+		sewelisGetPlaceStatement(queryString, event);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void onHistory(HistoryEvent event) {
+		try {
+			String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
+
+			if(event.getSource() instanceof FormWidget) {
+				FormWidget widSource = (FormWidget)event.getSource();
+				if(! widSource.getData().isEmpty()) {
+					HistoryUtils.addHistoryToken(currentProfile);
+					mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
+				}
+			} else if(event.getSource() instanceof FormRelationLineWidget) {
+				HistoryUtils.addHistoryToken(currentProfile);
+				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
+			}
+		} catch (SerializingException | InvalidHistoryState e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	
 	
 	// GESTION FORMULAIRE
 
 	/**
-	 * Créé un formulaire vide et déplace le stateement à la racine "get []"
+	 * Create an empty form and place the current Place to the statement equivalent to "get []"
 	 */
 	protected void toRootForm() {
 		setCurrentForm( newForm());
 		sewelisGetPlaceStatement("get [ ]", new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
 	}
 	
+	/**
+	 * Set the main form data and call FormWidget.reload
+	 * @param f
+	 */
 	public void setCurrentForm(Form f) {
 		ControlUtils.debugMessage("setCurrentForm( " + f + " )");
 		this.form = f;
@@ -2297,17 +2174,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 	
 	/**
-	 * Chargement dans le widget principal
+	 * load the content of the main form from Place data
 	 */
 	public void loadFormContent() {
 		loadFormContent(mainPage.formWidget);
 	}
 
 	/**
-	 * Vide et charge les lignes du formulaire en argument en fonction du contenu de la place courante.
-	 * Si il n'y a pas de ligne de type, il charge les lignes de Class, sinon les lignes de relation
+	 * Clear then load the form content from the current Place data.
+	 * If there is no class line, it will load only relation line, otherwise it will load all class lines
 	 * @param widSource
-	 * @return
 	 */
 	public void loadFormContent(FormWidget widSource) {
 //		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
@@ -2368,6 +2244,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	}
 
+
+	/**
+	 * add form content from the current Place data.
+	 * If there is no class line, it will load only relation line, otherwise it will load all class lines
+	 * @param widSource
+	 */
 	public void appendFormContent(FormWidget widSource) {
 //		ControlUtils.debugMessage("appendFormContent " + widSource);
 
@@ -2386,18 +2268,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			widSource.fireHistoryEvent();
 		}
 	}
-	
-	public void addNewRelation(FormWidget widSource, URI relation) {
-		
-	}
 
 	/**
-	 * Vérifie si il y a les lignes nécessaires pour qu'un nouveau formulaire soir chargé:
-	 * Soit un ensemble de lignes de classe, 
-	 * soit une seule ligne de classe, 
-	 * soit un ensemble de lignes de relations
-	 * @param widSource
-	 * @return
+	 * Check the current Place if there is a set of class lines, one class line or a set of relation line
+	 * @param widSource whose corresponding lispql statement il to be checked
+	 * @return true if the mentioned necessary component are present
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
 //		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
@@ -2429,6 +2304,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
+	/**
+	 * 
+	 * @param source
+	 * @return the liste of available class lines in the current Place suggestions (with the passed form as their parent)
+	 */
 	public LinkedList<FormClassLine> getPlaceClassLines(Form source) {
 		LinkedList<FormClassLine> result = new LinkedList<FormClassLine>();
 
@@ -2450,9 +2330,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * Récupération des lignes avec relation après filtrage des valeurs interdites
-	 * @param widSource Widget sont les données seront la racine des lignes retournées
-	 * @return lignes relations après filtrage des valeurs interdites
+	 * @param widSource
+	 * @return the liste of available relation lines in the current Place suggestions (after filtering the RDFS/OWL ones and with the passed form as their parent)
 	 */
 	public LinkedList<FormRelationLine> getPlaceRelationLines(Form source) {
 		LinkedList<FormRelationLine> result = new LinkedList<FormRelationLine>();
@@ -2476,6 +2355,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param widSource
+	 * @return List of literal suggestions in the current place
+	 */
 	public LinkedList<BasicLeafElement> getPlaceLiteralLines(FormWidget widSource) {
 		LinkedList<BasicLeafElement> result = new LinkedList<BasicLeafElement>();
 
@@ -2503,6 +2387,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 
+	/**
+	 * Utility function to create new URIs as per SEWELIS standards
+	 * @param label end part of the uri (most of the type, the label of the entity)
+	 * @return
+	 */
 	public static String newElementUri(String label) {
 		String result = uriBaseAdress + instance().currentStore.getName() + "/#";
 		String sanitizedLabel = label.replace(" ", "_").replace("<","_").replace(">","_").replace("#","_").replace("%","_").replace("\"","_").replace(",","_").replace(")","_").replace("{","_").replace("}","_").replace("|","_").replace("\\","_").replace("^","_").replace("'","_").replace(";","_").replace("/","_").replace("?","_").replace(":","_").replace("@","_").replace("&","_").replace("=","_").replace("+","_").replace("$","_").replace(",", "_");
@@ -2510,10 +2399,21 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param e
+	 * @return the corresponding statement to interrogate the base from e
+	 */
 	public String lispqlStatementQuery(FormElement e) {
 		return lispqlStatementQuery(e, false);
 	}
 
+	/**
+	 * 
+	 * @param eleme element à the start of the query
+	 * @param root element  is the root of the form
+	 * @return
+	 */
 	public String lispqlStatementQuery(FormElement eleme, boolean root) {
 //		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
 		String result = "";
@@ -2547,6 +2447,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 	
+	/**
+	 * EXPERIMENTAL
+	 * @param user
+	 * @param store
+	 * @param uri
+	 * @param start
+	 * @param end
+	 * @param nbActions
+	 */
 	public void sendExperimentLog(String user, String store, String uri, String start, String end, int nbActions) {
 //		http://servolis.irisa.fr:3941/message?user=testUser2&store=testStore2&uri=testUri&start=11:50&end=11:52
 		String logRequestString = logServerAdress + "/message?";
@@ -2577,62 +2486,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} catch (RequestException e) {
 			ControlUtils.exceptionMessage(e);
 		}
-	}
-
-	@Override
-	public void onFinishForm(FinishFormEvent event) {
-//		ControlUtils.debugMessage("Controller onFinishForm");
-		event.getCallback().call(this);
-		finish( ( (FormWidget)event.getSource()));
-//		ControlUtils.debugMessage("Controller onFinishForm END");
-	}
-
-	/**
-	 * Le controller est handler parce qu'il est en bout de FormEventCHain, mais il n'est pas sensé en faire quoi que ce soit.
-	 * @param event
-	 */
-	@Override
-	public void onFinishableLine(FinishableLineEvent event) {
-		ControlUtils.debugMessage("Controller onFinishLine " + event.getSource().toString() + " " + event.getState());
-	}
-
-	/**
-	 * Doit recharger une généralistion des lignes du formulaire si possible et appeller le callback
-	 */
-	@Override
-	public void onMoreFormLines(MoreFormLinesEvent event) {
-		ControlUtils.debugMessage("Controller onMoreFormLines " + event.getSource().toString());
-		if(this.getPlace().hasMore()) {
-			this.sewelisShowMore(event);
-		}
-	}
-
-	@Override
-	public void onReload(ReloadEvent event) {
-		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
-		sewelisGetPlaceStatement(queryString, event);
-	}
-
-	@Override
-	public void onHistory(HistoryEvent event) {
-		try {
-			String currentProfile = XMLSerializer.profileToXml(this.formToProfile()).toString();
-
-			if(event.getSource() instanceof FormWidget) {
-				FormWidget widSource = (FormWidget)event.getSource();
-				if(! widSource.getData().isEmpty()) {
-					HistoryUtils.addHistoryToken(currentProfile);
-					mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
-				}
-			} else if(event.getSource() instanceof FormRelationLineWidget) {
-				HistoryUtils.addHistoryToken(currentProfile);
-				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
-			}
-		} catch (SerializingException | InvalidHistoryState e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 
 }
