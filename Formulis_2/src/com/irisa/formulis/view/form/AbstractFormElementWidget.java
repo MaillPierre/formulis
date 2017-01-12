@@ -199,8 +199,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireElementCreationEvent(String value) {
-		if(this instanceof FormLineWidget) {
-			ElementCreationEvent event = new ElementCreationEvent((FormLineWidget) this, value);
+		if(this instanceof AbstractFormLineWidget) {
+			ElementCreationEvent event = new ElementCreationEvent((AbstractFormLineWidget) this, value);
 			fireElementCreationEvent(event);
 		}
 	}
@@ -262,8 +262,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireFinishableLineEvent(boolean state) {
-		if(this instanceof FormLineWidget) {
-			FinishableLineEvent event = new FinishableLineEvent((FormLineWidget) this, state);
+		if(this instanceof AbstractFormLineWidget) {
+			FinishableLineEvent event = new FinishableLineEvent((AbstractFormLineWidget) this, state);
 			fireFinishLineEvent(event);
 		}
 	}
@@ -416,8 +416,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 
 	@Override
 	public void fireRemoveLineEvent() {
-		if(this instanceof FormLineWidget) {
-			RemoveLineEvent event = new RemoveLineEvent((FormLineWidget) this);
+		if(this instanceof AbstractFormLineWidget) {
+			RemoveLineEvent event = new RemoveLineEvent((AbstractFormLineWidget) this);
 			fireRemoveLineEvent(event);
 		}
 	}

@@ -16,7 +16,7 @@ import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
 import com.irisa.formulis.view.event.interfaces.HasDescribeUriHandler;
 import com.irisa.formulis.view.form.FormEventCallback;
-import com.irisa.formulis.view.form.FormLineWidget;
+import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -46,8 +46,8 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 		tooltip.setHtml(true);
 		tooltip.setHeading(u.getLabel());
 		tooltip.setText(u.getUri());
-		if(par instanceof FormLineWidget) {
-			tooltip.setText(u.getUri() + " <br/> " + ((FormLineWidget) par).getFormLine().getInfo());
+		if(par instanceof AbstractFormLineWidget) {
+			tooltip.setText(u.getUri() + " <br/> " + ((AbstractFormLineWidget) par).getFormLine().getInfo());
 		}
 		tooltip.setWidget(element);
 		tooltip.setTrigger(Trigger.MANUAL);
@@ -95,8 +95,8 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	
 	public String getTooltipText() {
 		String text = getData().getUri() + " <br/> ";
-		if(getParentWidget() instanceof FormLineWidget) {
-			text += ((FormLineWidget) getParentWidget()).getFormLine().getInfo();
+		if(getParentWidget() instanceof AbstractFormLineWidget) {
+			text += ((AbstractFormLineWidget) getParentWidget()).getFormLine().getInfo();
 		}
 		if(uriDesc != null) {
 			text += uriDesc;

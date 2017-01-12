@@ -41,10 +41,10 @@ import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.suggest.SuggestionWidget;
+import com.irisa.formulis.view.form.suggest.VariableSuggestionWidget;
 
 public class FormRelationLineWidget 
-	extends FormLineWidget 
+	extends AbstractFormLineWidget 
 	implements SuggestionSelectionHandler, HasAllDragAndDropHandlers  {
 
 	protected Column fixedElementCol = new Column(3); 
@@ -142,10 +142,10 @@ public class FormRelationLineWidget
 //		ControlUtils.debugMessage("FormRelationLineWidget setLineState");
 		switch(state) {
 		case SUGGESTIONS:
-			SuggestionWidget sugg = new SuggestionWidget(this);
+			VariableSuggestionWidget sugg = new VariableSuggestionWidget(this);
 			sugg.addSuggestionSelectionHandler(this);
-			sugg.addMoreCompletionsHandler(this);
-			sugg.addLessCompletionsHandler(this);
+//			sugg.addMoreCompletionsHandler(this);
+//			sugg.addLessCompletionsHandler(this);
 			sugg.addCompletionAskedHandler(this);
 			sugg.addElementCreationHandler(this);
 			sugg.setPlaceholder("Value of " + this.getFormLine().getFixedElement().getLabel());
@@ -219,11 +219,8 @@ public class FormRelationLineWidget
 //		ControlUtils.debugMessage("FormRelationLineWidget onClickWidgetEvent " + event.getSource().getClass().getSimpleName());
 		if(event.getSource() == this.fixedElement) {
 			fireLineSelectionEvent();
-		} else if(this.variableElement instanceof SuggestionWidget) {
-			SuggestionWidget sugg = (SuggestionWidget) this.variableElement;
-//			if(! sugg.isMoreCompletionMode()) {
+		} else if(this.variableElement instanceof VariableSuggestionWidget) {
 				fireLineSelectionEvent(event.getCallback());
-//			}
 		} else if(this.variableElement instanceof SelectCreateWidget){
 			try {
 				FormElement newElem =  this.getVariableElement().getData();

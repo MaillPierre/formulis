@@ -1,8 +1,8 @@
 package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
-import com.irisa.formulis.view.form.suggest.SuggestionWidget;
 
 public abstract class CompletionEvent extends FormEvent {
 
@@ -15,8 +15,8 @@ public abstract class CompletionEvent extends FormEvent {
 	}
 
 	@Override
-	public SuggestionWidget getSource() {
-		return (SuggestionWidget)super.getSource(); 
+	public AbstractSuggestionWidget getSource() {
+		return (AbstractSuggestionWidget)super.getSource(); 
 	}
 	
 	@Override

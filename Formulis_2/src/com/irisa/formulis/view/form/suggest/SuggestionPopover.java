@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class SuggestionPopover extends PopupPanel {
 	
-	private SuggestionWidget source;
+	private AbstractSuggestionWidget source;
 	private LinkedList<Suggestion> content = new LinkedList<Suggestion>();
 	private VerticalPanel panel = new VerticalPanel();
 	private MenuBar suggestionBar = new MenuBar(true);
@@ -21,7 +21,7 @@ public class SuggestionPopover extends PopupPanel {
 	private MenuItem newElementItem;
 	private boolean canCreateNewElement = true;
 	
-	public SuggestionPopover(SuggestionWidget src) {
+	public SuggestionPopover(AbstractSuggestionWidget src) {
 		super(true);
 		
 		this.setVisible(false);

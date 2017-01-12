@@ -38,45 +38,22 @@ import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 
-public class SuggestionWidget extends AbstractSuggestionWidget {
-
-	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
-	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
-	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
-	protected LinkedList<SuggestionSelectionHandler> suggestionSelectionHandlers = new LinkedList<SuggestionSelectionHandler>();
-	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
+public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	
-	private TextBox element = new TextBox();
-	private SuggestionOracle oracle = new SuggestionOracle();
-	private SuggestionPopover popover;
+//	private boolean moreCompletionMode = false;
 	
-	private boolean waitingFor = false;
-	
-	private static int limit = 10;
-	
-	private boolean moreCompletionMode = false;
-	
-	public SuggestionWidget(FormRelationLineWidget par) {
+	public VariableSuggestionWidget(FormRelationLineWidget par) {
 		super(null, par );
-		initWidget(element);
-		
-		element.addFocusHandler(this);
-		element.addValueChangeHandler(this);
-		element.addKeyDownHandler(this);
-		element.addClickHandler(this);
-//		element.setWidth("100%");
-		element.addStyleName("input-block-level");
-		element.getElement().setPropertyString("autocomplete", "off");
-		element.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				if(! element.getValue().isEmpty()) {
-					ValueChangeEvent.fire(element, element.getValue());
-				}
+	}
+	
+	public void onKeyDown(KeyDownEvent event) {
+		super.onKeyDown(event); 
+		if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			if(element.getText() != "") {
+				fireElementCreationEvent(element.getText());
+				this.popover.hide();
 			}
-		});
-		
-		popover = new SuggestionPopover(this);
+		}
 	}
 	
 	public void addSuggestionToOracle(Increment inc) {
@@ -109,7 +86,7 @@ public class SuggestionWidget extends AbstractSuggestionWidget {
 	 * 
 	 * @return un callback à appeler des que les suggestions sont prètes
 	 */
-	public SuggestionCallback getSelectionCallback() {
+	public SuggestionCallback getLineSelectionCompletionsCallback() {
 		return new SuggestionCallback(this) {
 			@Override
 			public void call(Controller control) {

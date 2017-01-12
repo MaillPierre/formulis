@@ -1,8 +1,8 @@
 package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
-import com.irisa.formulis.view.form.suggest.SuggestionWidget;
 
 /**
  * Demande de suggestions complémentaires
@@ -11,7 +11,7 @@ import com.irisa.formulis.view.form.suggest.SuggestionWidget;
  */
 public class MoreCompletionsEvent extends CompletionEvent {
 	
-	public MoreCompletionsEvent(SuggestionWidget src) {
+	public MoreCompletionsEvent(AbstractSuggestionWidget src) {
 		super(src);
 	}
 

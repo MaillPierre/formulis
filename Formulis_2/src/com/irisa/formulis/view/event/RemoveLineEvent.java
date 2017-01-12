@@ -1,16 +1,16 @@
 package com.irisa.formulis.view.event;
 
-import com.irisa.formulis.view.form.FormLineWidget;
+import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
 public class RemoveLineEvent extends FormEvent {
 	
-	public RemoveLineEvent(FormLineWidget src) {
+	public RemoveLineEvent(AbstractFormLineWidget src) {
 		super(src);
 	}
 	
 	@Override
-	public FormLineWidget getSource() {
-		return (FormLineWidget) super.getSource();
+	public AbstractFormLineWidget getSource() {
+		return (AbstractFormLineWidget) super.getSource();
 	}
 
 }

@@ -21,12 +21,20 @@ import com.irisa.formulis.view.FormulisWidgetFactory;
 import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
+import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
+import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.suggest.EntitySuggestionWidget;
 
-public class FormClassLineWidget extends FormLineWidget implements ValueChangeHandler<String>, ClickHandler {
+public class FormClassLineWidget extends AbstractFormLineWidget implements ValueChangeHandler<String>, ClickHandler, CompletionAskedHandler, SuggestionSelectionHandler {
 
 	protected HorizontalPanel elementRow = new HorizontalPanel();
 	protected Column elementCol = new Column(12, elementRow);
-	private TextBox labelUriBox = new TextBox();
+//	private TextBox labelUriBox = new TextBox();
+	private EntitySuggestionWidget labelUriBox = null;
 	private URIWidget labelWid = null;
 
 	protected AbstractFormulisWidget fixedElement = null;
@@ -52,29 +60,6 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 
 	public FormClassLineWidget(FormClassLine l, FormWidget par, String startValue) {
 		super(l, par);
-		
-		labelUriBox.setWidth("100%");
-		labelUriBox.setText(startValue);
-		labelUriBox.addStyleName("input-block-level");
-		labelUriBox.setPlaceholder("Name of this new element");
-		labelUriBox.addValueChangeHandler(this);
-		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
-				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					finish();
-				}
-			}
-		});
-		
-		if(! l.getEntityLabel().isEmpty()) {
-			labelUriBox.setText(l.getEntityLabel());
-			ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());
-		} else if(! l.getTempValue().isEmpty()) {
-			labelUriBox.setText(l.getTempValue());
-			ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());
-		}
 
 		if(! l.isAnonymous()) {
 			try {
@@ -85,6 +70,33 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 				ControlUtils.debugMessage("ClassLineWidget fixed:" + l.getFixedElement() + " isAno:" + l.isAnonymous());
 				throw e;
 			}
+		}
+		
+		labelUriBox = new EntitySuggestionWidget(l, this);
+		
+		labelUriBox.setWidth("100%");
+		labelUriBox.setText(startValue);
+		labelUriBox.addStyleName("input-block-level");
+		labelUriBox.setPlaceholder("Name of this new element");
+		labelUriBox.addValueChangeHandler(this);
+		labelUriBox.addSuggestionSelectionHandler(this);
+		labelUriBox.addCompletionAskedHandler(this);
+//		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
+//			@Override
+//			public void onKeyUp(KeyUpEvent event) {
+//				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
+//				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+//					finish();
+//				}
+//			}
+//		});
+		
+		if(! l.getEntityLabel().isEmpty()) {
+			labelUriBox.setText(l.getEntityLabel());
+			ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());
+		} else if(! l.getTempValue().isEmpty()) {
+			labelUriBox.setText(l.getTempValue());
+			ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());
 		}
 
 		elementRow.setWidth("100%");
@@ -180,7 +192,7 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	
 	@Override
 	public void onClick(ClickEvent event) {
-//		ControlUtils.debugMessage("FormClassLine onClick");
+		ControlUtils.debugMessage("FormClassLine onClick");
 		if(event.getSource() == this.resetElementButton) {
 //			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
@@ -217,6 +229,11 @@ public class FormClassLineWidget extends FormLineWidget implements ValueChangeHa
 	@Override
 	public AbstractFormulisWidget getVariableElement() {
 		return null;
+	}
+
+	@Override
+	public void onSelection(SuggestionSelectionEvent event) {
+		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion());
 	}
 	
 }

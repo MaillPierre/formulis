@@ -42,7 +42,7 @@ import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.FinishableLineEvent;
-import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
+import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
 
 /**
  * Widget principal pour un formulaire
@@ -55,7 +55,7 @@ public class FormWidget
 
 	private FluidRow element = new FluidRow();
 	private Column linesCol = new Column(11);
-	private LinkedList<FormLineWidget> linesWidgets = new LinkedList<FormLineWidget>();
+	private LinkedList<AbstractFormLineWidget> linesWidgets = new LinkedList<AbstractFormLineWidget>();
 
 	private Column controlCol = new Column(1);
 	private CheckBox profileCheckbox = new CheckBox();
@@ -202,9 +202,9 @@ public class FormWidget
 		if(getData() != null && ! getData().isEmpty()) {
 			clear();
 
-			Iterator<FormLineWidget> itFo = formLinesToWidgetLines().iterator();
+			Iterator<AbstractFormLineWidget> itFo = formLinesToWidgetLines().iterator();
 			while(itFo.hasNext()) {
-				FormLineWidget line = itFo.next();
+				AbstractFormLineWidget line = itFo.next();
 				if(line.getData().isFinishable()) {
 					line.setLineState(LINE_STATE.FINISHED);
 					addLine(line);
@@ -255,9 +255,9 @@ public class FormWidget
 				} else {
 					clear();
 		
-					Iterator<FormLineWidget> itFo = formLinesToWidgetLines().iterator();
+					Iterator<AbstractFormLineWidget> itFo = formLinesToWidgetLines().iterator();
 					while(itFo.hasNext()) {
-						FormLineWidget line = itFo.next();
+						AbstractFormLineWidget line = itFo.next();
 						ControlUtils.debugMessage("\t" + line.getData());
 						addLine(line);
 					}
@@ -290,7 +290,7 @@ public class FormWidget
 		super.onFinishableLine(event);
 		this.setFinishButtonsState(computeFinishButtonState());
 		// Si c'est la ligne de type qui est ré-éditée
-		if(event.getSource() instanceof FormClassLineWidget && this.getData().isTyped() && ! ((FormLineWidget) event.getSource()).getData().isFinished() && this.getData().isFinished()) {
+		if(event.getSource() instanceof FormClassLineWidget && this.getData().isTyped() && ! ((AbstractFormLineWidget) event.getSource()).getData().isFinished() && this.getData().isFinished()) {
 			this.getData().setFinished(false);
 			reload();
 		}
@@ -311,8 +311,8 @@ public class FormWidget
 //		ControlUtils.debugMessage("setFinishButtonsState " + state + " END");
 	}
 	
-	protected LinkedList<FormLineWidget> formLinesToWidgetLines() {
-		LinkedList<FormLineWidget> result = new LinkedList<FormLineWidget>();
+	protected LinkedList<AbstractFormLineWidget> formLinesToWidgetLines() {
+		LinkedList<AbstractFormLineWidget> result = new LinkedList<AbstractFormLineWidget>();
 		
 		Iterator<FormClassLine> itClassL = getData().typeLinesIterator();
 		while(itClassL.hasNext()) {
@@ -338,9 +338,9 @@ public class FormWidget
 		}
 
 		final FormLineComparator comp = new FormLineComparator();
-		Collections.sort(result, new Comparator<FormLineWidget>(){
+		Collections.sort(result, new Comparator<AbstractFormLineWidget>(){
 			@Override
-			public int compare(FormLineWidget o1, FormLineWidget o2) {
+			public int compare(AbstractFormLineWidget o1, AbstractFormLineWidget o2) {
 				if(o1 != null && o2 != null) {
 					return comp.compare(o1.getData(), o2.getData());
 				} else {
@@ -358,14 +358,14 @@ public class FormWidget
 	}
 	
 	@Override
-	public FormLineWidget getParentWidget() {
+	public AbstractFormLineWidget getParentWidget() {
 		if(super.getParentWidget() != null) {
-			return (FormLineWidget) super.getParentWidget();
+			return (AbstractFormLineWidget) super.getParentWidget();
 		}
 		return null;
 	}
 	
-	public void addLine(FormLineWidget line) {
+	public void addLine(AbstractFormLineWidget line) {
 		linesCol.add(line);
 		linesWidgets.addLast(line);
 		ViewUtils.connectFormEventChain(line, this);
@@ -476,9 +476,9 @@ public class FormWidget
 		this.profileCheckbox.setValue(val);
 		
 		if(! val) {
-			Iterator<FormLineWidget> itLine = this.linesWidgets.iterator();
+			Iterator<AbstractFormLineWidget> itLine = this.linesWidgets.iterator();
 			while(itLine.hasNext()) {
-				FormLineWidget line = itLine.next();
+				AbstractFormLineWidget line = itLine.next();
 				line.setSelectedForProfile(val);
 			}
 		}
@@ -489,9 +489,9 @@ public class FormWidget
 		super.setProfileMode(value);
 		
 		this.profileCheckbox.setVisible(value);
-		Iterator<FormLineWidget> itLine = this.linesWidgets.iterator();
+		Iterator<AbstractFormLineWidget> itLine = this.linesWidgets.iterator();
 		while(itLine.hasNext()) {
-			FormLineWidget line = itLine.next();
+			AbstractFormLineWidget line = itLine.next();
 			line.setProfileMode(value);
 		}
 		

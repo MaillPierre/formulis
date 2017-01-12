@@ -22,7 +22,7 @@ import com.github.gwtbootstrap.client.ui.IntegerBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 
-public abstract class FormLineWidget extends AbstractFormElementWidget 
+public abstract class AbstractFormLineWidget extends AbstractFormElementWidget 
 	implements ClickWidgetHandler {
 	
 	protected FluidRow element = new FluidRow();
@@ -71,7 +71,7 @@ public abstract class FormLineWidget extends AbstractFormElementWidget
 		FINISHED
 	}
 	
-	public FormLineWidget( FormLine l, FormWidget par) {
+	public AbstractFormLineWidget( FormLine l, FormWidget par) {
 		super(l, par);
 		
 		initWidget(element);

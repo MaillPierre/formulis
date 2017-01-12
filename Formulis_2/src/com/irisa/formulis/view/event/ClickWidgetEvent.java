@@ -1,8 +1,9 @@
 package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
-import com.irisa.formulis.view.form.suggest.SuggestionWidget;
+import com.irisa.formulis.view.form.suggest.VariableSuggestionWidget;
 
 /**
  * Event pour la gestion de clicks sur des widgets en interne puisque apparement on ne peux pas recréer des clickevent manuellement
@@ -18,7 +19,7 @@ public class ClickWidgetEvent {
 		this.source = src;
 	}
 	
-	public ClickWidgetEvent(SuggestionWidget src, SuggestionCallback cb) {
+	public ClickWidgetEvent(AbstractSuggestionWidget src, SuggestionCallback cb) {
 		this(src);
 		callback = cb;
 	}

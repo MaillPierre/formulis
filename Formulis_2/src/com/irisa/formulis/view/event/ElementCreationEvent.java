@@ -1,19 +1,19 @@
 package com.irisa.formulis.view.event;
 
-import com.irisa.formulis.view.form.FormLineWidget;
+import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
 public class ElementCreationEvent extends FormEvent {
 
 	protected String val;
 	
-	public ElementCreationEvent(FormLineWidget src, String value) {
+	public ElementCreationEvent(AbstractFormLineWidget src, String value) {
 		super(src);
 		val = value;
 	}
 	
 	@Override
-	public FormLineWidget getSource() {
-		return (FormLineWidget) super.getSource();
+	public AbstractFormLineWidget getSource() {
+		return (AbstractFormLineWidget) super.getSource();
 	}
 	
 	public String getValue() {
