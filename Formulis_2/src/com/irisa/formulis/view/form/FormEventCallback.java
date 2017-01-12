@@ -1,6 +1,7 @@
 package com.irisa.formulis.view.form;
 
 import com.irisa.formulis.control.Controller;
+import com.irisa.formulis.view.event.FormEvent;
 
 public interface FormEventCallback {
 

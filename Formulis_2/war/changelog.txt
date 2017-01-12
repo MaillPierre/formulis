@@ -9,6 +9,12 @@
 17/11/2016
 - Changement du système des suggestions, utilisation normale de GetCompletions sans "More general"
 
+08/12/2016
+- Correction d'un crash au passage des valeur à la création d'un formulaire anonyme
+
+13/12/2016
+- On peut configurer le serveur SEWELIS interrogé simplement en éditant une valeur d'un petit dictionnaire JS dans index.html
+
 TODO:
 - Suppression des étapes intermédiaires (une seul type) de l'historique (+++)
 - Remise à zéro de l'indice d'historique de la barre d'adresse lorsque nécessaire (ou trouver un moyen de rendre chaque session unique) (+++)

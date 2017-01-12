@@ -5,7 +5,7 @@ import com.irisa.formulis.view.form.FormEventCallback;
 
 public abstract class FormEvent {
 	
-	protected Widget source;
+	protected Widget source = null;
 	protected FormEventCallback callback = null;
 	
 	public FormEvent(Widget src) {

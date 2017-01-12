@@ -465,6 +465,48 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e);
 		}
 	}
+	
+	public void sewelisResultsOfStatement(String statString ) {
+		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
+		String resultsOfStatementRequestString = serverAdress + "/resultsOfStatement?userKey=" + userKey ;
+		resultsOfStatementRequestString += "&storeName=" + currentStore.getName(); 
+		resultsOfStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
+		navBar.setServerStatusMessage("Waiting...");
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, resultsOfStatementRequestString);
+
+		try {
+			builder.sendRequest(null, new RequestCallback() {			
+				@Override
+				public void onError(Request request, Throwable exception) {
+					ControlUtils.exceptionMessage(exception);
+				}
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						Document statusDoc = XMLParser.parse(response.getText());
+						Element docElement = statusDoc.getDocumentElement();
+						String status = docElement.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(status == "ok") {
+							ControlUtils.debugMessage(docElement);
+						} else {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+							}
+						}
+					} else {
+						// TODO GESTION DES MESSAGE D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+					}
+				}
+			});
+		} catch (RequestException e) {
+			ControlUtils.exceptionMessage(e);
+		}
+	}
 
 
 	// STORES LISTS
@@ -852,11 +894,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	private void sewelisRunStatement(String statString) {
 		ControlUtils.debugMessage("runStatement (" + statString + ") ");
-		String insertIncrementRequestString = serverAdress + "/runStatement?userKey=" + userKey ;
-		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-		insertIncrementRequestString += "&statement=" + URL.encodeQueryString(statString);
+		String runStatementRequestString = serverAdress + "/runStatement?userKey=" + userKey ;
+		runStatementRequestString += "&storeName=" + currentStore.getName(); 
+		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, insertIncrementRequestString);
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, runStatementRequestString);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -2145,7 +2187,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		} catch (SerializingException | InvalidHistoryState e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ControlUtils.exceptionMessage(e);
+//			e.printStackTrace();
 		}
 		
 	}
