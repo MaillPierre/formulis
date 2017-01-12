@@ -61,7 +61,7 @@ import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
 import com.irisa.formulis.view.form.FormLineWidget.LINE_STATE;
-import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 /**
  * controller of all client-server interactions

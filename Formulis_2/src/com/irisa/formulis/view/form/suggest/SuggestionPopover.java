@@ -11,24 +11,24 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class CustomSuggestionPopover extends PopupPanel {
+public class SuggestionPopover extends PopupPanel {
 	
-	private CustomSuggestionWidget source;
-	private LinkedList<CustomSuggestion> content = new LinkedList<CustomSuggestion>();
+	private SuggestionWidget source;
+	private LinkedList<Suggestion> content = new LinkedList<Suggestion>();
 	private VerticalPanel panel = new VerticalPanel();
 	private MenuBar suggestionBar = new MenuBar(true);
 	private MenuItem moreElementsItem;
 	private MenuItem newElementItem;
 	private boolean canCreateNewElement = true;
 	
-	public CustomSuggestionPopover(CustomSuggestionWidget src) {
+	public SuggestionPopover(SuggestionWidget src) {
 		super(true);
 		
 		this.setVisible(false);
 		this.source = src;
 		this.add(panel);
 		panel.add(suggestionBar);
-		setMoreCompletionsMode(false);
+//		setMoreCompletionsMode(false);
 		newElementItem = new MenuItem("New element", new ScheduledCommand() {
 			@Override
 			public void execute() {
@@ -58,12 +58,12 @@ public class CustomSuggestionPopover extends PopupPanel {
 		this.suggestionBar.focus();
 	}
 	
-	public void setContent(Collection<CustomSuggestion> c) {
-		content = new LinkedList<CustomSuggestion>(c);
+	public void setContent(Collection<Suggestion> c) {
+		content = new LinkedList<Suggestion>(c);
 		refreshSuggestion();
 	}
 	
-	public void addContent(Collection<CustomSuggestion> c) {
+	public void addContent(Collection<Suggestion> c) {
 		content.addAll(c);
 		refreshSuggestion();
 	}
@@ -73,9 +73,9 @@ public class CustomSuggestionPopover extends PopupPanel {
 		this.setVisible(true);
 		suggestionBar.clearItems();
 		LinkedList<MenuItem> itemList = new LinkedList<MenuItem>();
-		Iterator<CustomSuggestion> itContent = content.iterator();
+		Iterator<Suggestion> itContent = content.iterator();
 		while(itContent.hasNext()) {
-			final CustomSuggestion sugg = itContent.next();
+			final Suggestion sugg = itContent.next();
 			MenuItem item = new MenuItem(sugg.getHtmlRepresentation(), true, new Scheduler.ScheduledCommand() {
 				@Override
 				public void execute() {
@@ -99,26 +99,26 @@ public class CustomSuggestionPopover extends PopupPanel {
 		this.showRelativeTo(source);
 	}
 	
-	public void setMoreCompletionsMode(boolean mode) {
-		if(mode) {
-			moreElementsItem = new MenuItem("Less general", new ScheduledCommand() {
-				@Override
-				public void execute() {
-					hide();
-					source.fireLessCompletionsEvent();
-					source.setMoreCompletionMode(false);
-				}
-			});
-		} else {
-			moreElementsItem = new MenuItem("More general", new ScheduledCommand() {
-				@Override
-				public void execute() {
-					hide();
-					source.fireMoreCompletionsEvent();
-					source.setMoreCompletionMode(true);
-				}
-			});
-		}
-	}
+//	public void setMoreCompletionsMode(boolean mode) {
+//		if(mode) {
+//			moreElementsItem = new MenuItem("Less general", new ScheduledCommand() {
+//				@Override
+//				public void execute() {
+//					hide();
+//					source.fireLessCompletionsEvent();
+//					source.setMoreCompletionMode(false);
+//				}
+//			});
+//		} else {
+//			moreElementsItem = new MenuItem("More general", new ScheduledCommand() {
+//				@Override
+//				public void execute() {
+//					hide();
+//					source.fireMoreCompletionsEvent();
+//					source.setMoreCompletionMode(true);
+//				}
+//			});
+//		}
+//	}
 
 }

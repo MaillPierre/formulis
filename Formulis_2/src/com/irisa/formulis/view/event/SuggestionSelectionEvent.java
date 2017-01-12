@@ -1,20 +1,20 @@
 package com.irisa.formulis.view.event;
 
-import com.irisa.formulis.view.form.suggest.CustomSuggestion;
+import com.irisa.formulis.view.form.suggest.Suggestion;
 
 public class SuggestionSelectionEvent {
 
-	private CustomSuggestion suggestion;
+	private Suggestion suggestion;
 	
-	public SuggestionSelectionEvent(CustomSuggestion suggest) {
+	public SuggestionSelectionEvent(Suggestion suggest) {
 		this.suggestion = suggest;
 	}
 
-	public CustomSuggestion getSuggestion() {
+	public Suggestion getSuggestion() {
 		return suggestion;
 	}
 
-	public void setSuggestion(CustomSuggestion suggest) {
+	public void setSuggestion(Suggestion suggest) {
 		this.suggestion = suggest;
 	}
 	

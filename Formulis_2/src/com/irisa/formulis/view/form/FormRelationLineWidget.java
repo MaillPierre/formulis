@@ -41,7 +41,7 @@ import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget;
+import com.irisa.formulis.view.form.suggest.SuggestionWidget;
 
 public class FormRelationLineWidget 
 	extends FormLineWidget 
@@ -142,7 +142,7 @@ public class FormRelationLineWidget
 //		ControlUtils.debugMessage("FormRelationLineWidget setLineState");
 		switch(state) {
 		case SUGGESTIONS:
-			CustomSuggestionWidget sugg = new CustomSuggestionWidget(this);
+			SuggestionWidget sugg = new SuggestionWidget(this);
 			sugg.addSuggestionSelectionHandler(this);
 			sugg.addMoreCompletionsHandler(this);
 			sugg.addLessCompletionsHandler(this);
@@ -219,11 +219,11 @@ public class FormRelationLineWidget
 //		ControlUtils.debugMessage("FormRelationLineWidget onClickWidgetEvent " + event.getSource().getClass().getSimpleName());
 		if(event.getSource() == this.fixedElement) {
 			fireLineSelectionEvent();
-		} else if(this.variableElement instanceof CustomSuggestionWidget) {
-			CustomSuggestionWidget sugg = (CustomSuggestionWidget) this.variableElement;
-			if(! sugg.isMoreCompletionMode()) {
+		} else if(this.variableElement instanceof SuggestionWidget) {
+			SuggestionWidget sugg = (SuggestionWidget) this.variableElement;
+//			if(! sugg.isMoreCompletionMode()) {
 				fireLineSelectionEvent(event.getCallback());
-			}
+//			}
 		} else if(this.variableElement instanceof SelectCreateWidget){
 			try {
 				FormElement newElem =  this.getVariableElement().getData();

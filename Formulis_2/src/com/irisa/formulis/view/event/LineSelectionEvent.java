@@ -2,7 +2,7 @@ package com.irisa.formulis.view.event;
 
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.form.AbstractFormElementWidget;
-import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 /**
  * Selection d'une ligne, changement de statement, mise à jour des données

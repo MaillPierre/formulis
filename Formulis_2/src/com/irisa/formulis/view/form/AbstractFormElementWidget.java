@@ -39,7 +39,7 @@ import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.ReloadHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
-import com.irisa.formulis.view.form.suggest.CustomSuggestionWidget.SuggestionCallback;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		implements FormEventChainHandler, HasFormEventChainHandlers {

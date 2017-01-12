@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-public class CustomSuggestionOracle {
+public class SuggestionOracle {
 
-	private LinkedList<CustomSuggestion> suggestions = new LinkedList<CustomSuggestion>();
+	private LinkedList<Suggestion> suggestions = new LinkedList<Suggestion>();
 	
-	public CustomSuggestionOracle() {
+	public SuggestionOracle() {
 	}
 
 	/**
@@ -18,12 +18,12 @@ public class CustomSuggestionOracle {
      * @param limit The maximum number of results to return 
      * @return A collection of increment suggestions that match.
      */
-	public Collection<CustomSuggestion> matchingIncrement(String query, int limit) {
-		LinkedList<CustomSuggestion> matchingIncrement = new LinkedList<CustomSuggestion>();
+	public Collection<Suggestion> matchingIncrement(String query, int limit) {
+		LinkedList<Suggestion> matchingIncrement = new LinkedList<Suggestion>();
 
 		if(! suggestions.isEmpty()) {
 			// rendu des valeurs uniques
-			LinkedList<CustomSuggestion> tmpSuggestions = new LinkedList<CustomSuggestion>(new HashSet<CustomSuggestion>(suggestions) );
+			LinkedList<Suggestion> tmpSuggestions = new LinkedList<Suggestion>(new HashSet<Suggestion>(suggestions) );
 			// tri des suggestions par ratio left
 			Collections.sort(tmpSuggestions);
              
@@ -52,7 +52,7 @@ public class CustomSuggestionOracle {
 			// On remplit les places restantes dans la liste de suggestion avec celles qui apparaissent dans l'ordre
 			int index = 0;
 			while(count < limit && index < tmpSuggestions.size()) {
-				CustomSuggestion sugg = tmpSuggestions.get(index);
+				Suggestion sugg = tmpSuggestions.get(index);
 				if(! matchingIncrement.contains(sugg)) {
 					matchingIncrement.add(sugg);
 					count++;
@@ -63,12 +63,12 @@ public class CustomSuggestionOracle {
 		return matchingIncrement;
 	}
       
-	public void setSuggestions(Collection<CustomSuggestion> c) {
+	public void setSuggestions(Collection<Suggestion> c) {
 		clear();
 		suggestions.addAll(c);
 	}
 
-  	public void add(CustomSuggestion customSuggestion) {
+  	public void add(Suggestion customSuggestion) {
   		suggestions.add(customSuggestion);
   	}
 
@@ -76,14 +76,14 @@ public class CustomSuggestionOracle {
     	suggestions.clear();
     }
 
-    public boolean remove(CustomSuggestion o) {
+    public boolean remove(Suggestion o) {
     	if ( suggestions.isEmpty()) {
         	return suggestions.remove(o);
         }
         return false;
     }
     
-    public boolean contains(CustomSuggestion s) {
+    public boolean contains(Suggestion s) {
     	return this.suggestions.contains(s);
     }
 
