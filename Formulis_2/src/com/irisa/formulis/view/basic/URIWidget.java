@@ -33,12 +33,6 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	private LinkedList<DescribeUriHandler> describeUriHandlers = new LinkedList<DescribeUriHandler>();
 	private String uriDesc = null;
 	
-	public interface DescribeUriCallback extends FormEventCallback {
-		
-		public void call(String description);
-		
-	}
-
 	public URIWidget(URI u, AbstractFormulisWidget par) {
 		super(u, par);
 		initWidget(element);
@@ -124,7 +118,7 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	}
 	
 	public FormEventCallback getTooltipCallback() {
-		return new DescribeUriCallback() {
+		return new DescribeUriEvent.DescribeUriCallback() {
 			@Override
 			public void call(String desc) {
 				ControlUtils.debugMessage("URIWidget getTooltipCallback call \"" + desc + "\" ");
@@ -153,8 +147,16 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	}
 
 	@Override
+	public void fireDescribeUriEvent(FormEventCallback cb, URI u) {
+		fireDescribeUriEvent(new DescribeUriEvent(this, cb, u));
+	}
+	
+	public void fireDescribeUriEvent(URIWidget uri, FormEventCallback cb) {
+		fireDescribeUriEvent(new DescribeUriEvent(uri, cb, this.getData()));
+	}
+	
 	public void fireDescribeUriEvent(FormEventCallback cb) {
-		fireDescribeUriEvent(new DescribeUriEvent(this, cb));
+		fireDescribeUriEvent(this, cb);
 	}
 
 	@Override

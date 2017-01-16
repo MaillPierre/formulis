@@ -10,13 +10,8 @@ public abstract class CompletionEvent extends FormEvent {
 		super(src);
 	}
 
-	public CompletionEvent(Widget src, com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback suggestionCallback) {
+	public CompletionEvent(Widget src, SuggestionCallback suggestionCallback) {
 		super(src, suggestionCallback);
-	}
-
-	@Override
-	public AbstractSuggestionWidget getSource() {
-		return (AbstractSuggestionWidget)super.getSource(); 
 	}
 	
 	@Override

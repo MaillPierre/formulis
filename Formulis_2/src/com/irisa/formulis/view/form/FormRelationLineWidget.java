@@ -258,7 +258,7 @@ public class FormRelationLineWidget
 	}
 
 	@Override
-	public void onSelection(SuggestionSelectionEvent event) {
+	public void onSuggestionSelection(SuggestionSelectionEvent event) {
 //		ControlUtils.debugMessage("FormRelationLineWidget onSelection (" + event.getSuggestion().getElement() + ") ");
 		try {
 			FormElement elem = event.getSuggestion().getElement();

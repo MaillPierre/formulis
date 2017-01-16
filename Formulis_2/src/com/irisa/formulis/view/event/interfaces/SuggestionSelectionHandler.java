@@ -4,6 +4,6 @@ import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 
 public interface SuggestionSelectionHandler {
 
-	public void onSelection(SuggestionSelectionEvent event);
+	public void onSuggestionSelection(SuggestionSelectionEvent event);
 	
 }

@@ -31,6 +31,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.Dictionary;
 import java.util.MissingResourceException;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
@@ -49,6 +50,7 @@ import com.irisa.formulis.model.form.*;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractDataWidget;
+import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FooterWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
@@ -887,6 +889,69 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		ControlUtils.debugMessage("FIN getPlaceStatement " );
 	}
 
+	/**
+	 * Set the current place to the place corresponding to the Uri passed in parameter 
+	 * @param statString statement LispQL
+	 * @param event whit the callback to be called in success
+	 */
+	public void sewelisGetPlaceUri(final URI uri, final FormEvent event) {
+		ControlUtils.debugMessage("getPlaceUri( " + uri.getUri() + " ) " );
+		if(currentStore != null) {
+			String placeStatementRequestString = serverAdress + "/getPlaceUri?";
+			placeStatementRequestString += "userKey=" + userKey;
+			placeStatementRequestString += "&storeName=" + currentStore.getName();
+			placeStatementRequestString += "&uri=" + URL.encodeQueryString(uri.getUri());
+			navBar.setServerStatusMessage("Waiting...");
+			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+			try {
+				builder.sendRequest(null, new RequestCallback() {			
+					@Override
+					public void onError(Request request, Throwable exception) {
+						ControlUtils.exceptionMessage(exception);
+					}
+
+					@Override
+					public void onResponseReceived(Request request, Response response) {
+						//						displayDebugMessage("onResponseReceived");
+						if (200 == response.getStatusCode()) {
+							Document homePlaceDoc = XMLParser.parse(response.getText());
+							Element homePlaceElem = homePlaceDoc.getDocumentElement();
+							String status = homePlaceElem.getAttribute("status");
+							navBar.setServerStatusMessage(status);
+							if(homePlaceElem.getNodeName() == "getPlaceUri" && status == "ok") {
+								Node placeNode = homePlaceElem.getFirstChild();
+								if(placeNode.getNodeName() == "place") {
+									try {
+										Place tmpPlace = Parser.parsePlace(placeNode);
+										if(event instanceof DescribeUriEvent) {
+											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString());
+										}
+									} catch (XMLParsingException e) {
+										ControlUtils.exceptionMessage(e);
+									}
+								} else {
+									// FIXME GESTION DES MESSAGES D'ERREUR
+									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+								}
+							} else {
+								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+								navBar.setServerStatusHovertext(message);
+							}
+						} else {
+							// FIXME GESTION DES MESSAGES D'ERREUR
+							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						}
+					}
+				});
+			} catch (Exception e) {
+				ControlUtils.debugMessage("sewelisGetPlaceStatement EXCEPTION");
+				ControlUtils.exceptionMessage(e);
+			}
+		}
+		ControlUtils.debugMessage("FIN getPlaceStatement " );
+	}
+
 
 	/**
 	 * Run the given statement, eg. used to create entities
@@ -971,14 +1036,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									do {
 										try {
 											Increment inc = Parser.parseIncrement(currNode);
-											ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
+//											ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
 											if(inc.getKind() != KIND.CLASS 
 													&& inc.getKind() != KIND.INVERSEPROPERTY 
 													&& inc.getKind() != KIND.OPERATOR
 													&& inc.getKind() != KIND.PROPERTY
 													&& inc.getKind() != KIND.RELATION) {
 												result.addFirst(inc);
-												ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
+//												ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 											}
 										} catch (XMLParsingException e) {
 											ControlUtils.exceptionMessage(e);
@@ -1237,59 +1302,60 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event event with a URIWidget at its source
 	 */
 	public void sewelisUriDescription(final DescribeUriEvent event) {
-		String showMoreRequestString = serverAdress + "/uriDescription?userKey=" + userKey ;
-		showMoreRequestString += "&storeName=" + currentStore.getName(); 
-		showMoreRequestString += "&userkey=" + this.userKey;
-		showMoreRequestString += "&uri=" + event.getSource().getData().getUri();
-
-		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
-
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status != "ok") {
-							ControlUtils.debugMessage("sewelisUriDescription ERROR " + status);
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage( message);
-								navBar.setServerStatusHovertext(message);
-							}
-						} else {
-							Node root = docElement.getFirstChild();
-							try {
-
-								ControlUtils.debugMessage("uridescription statement statement: " + root.toString());
-								SafeHtml stat = ViewUtils.toSimpleHtml(Parser.parseDisplayNode(root));
-								
-								if(stat != null) {
-									event.getCallback().call(stat.asString());
-								}
-							} catch (XMLParsingException e) {
-								ControlUtils.exceptionMessage(e);
-								ControlUtils.debugMessage("uridescription statement parse failed");
-							}
-						}
-					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}
-				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+//		String showMoreRequestString = serverAdress + "/uriDescription?userKey=" + userKey ;
+//		showMoreRequestString += "&storeName=" + currentStore.getName(); 
+//		showMoreRequestString += "&userkey=" + this.userKey;
+//		showMoreRequestString += "&uri=" + event.getUri();
+//
+//		navBar.setServerStatusMessage("Waiting...");
+//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
+//
+//		try {
+//			builder.sendRequest(null, new RequestCallback() {			
+//				@Override
+//				public void onError(Request request, Throwable exception) {
+//					ControlUtils.exceptionMessage(exception);
+//				}
+//
+//				@Override
+//				public void onResponseReceived(Request request, Response response) {
+//					if (200 == response.getStatusCode()) {
+//						Document statusDoc = XMLParser.parse(response.getText());
+//						Element docElement = statusDoc.getDocumentElement();
+//						String status = docElement.getAttribute("status");
+//						navBar.setServerStatusMessage(status);
+//						if(status != "ok") {
+//							ControlUtils.debugMessage("sewelisUriDescription ERROR " + status);
+//							if(docElement.getFirstChild().getNodeName() == "message") {
+//								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+//								ControlUtils.debugMessage( message);
+//								navBar.setServerStatusHovertext(message);
+//							}
+//						} else {
+//							Node root = docElement.getFirstChild();
+////							try {
+//
+//								ControlUtils.debugMessage("uridescription statement statement: " + root.toString());
+////								SafeHtml stat = ViewUtils.toSimpleHtml(Parser.parseDisplayNode(root));
+//								
+////								if(stat != null) {
+//									event.getCallback().call(root.toString());
+////								}
+////							} catch (XMLParsingException e) {
+////								ControlUtils.exceptionMessage(e);
+////								ControlUtils.debugMessage("uridescription statement parse failed");
+////							}
+//						}
+//					} else {
+//						// TODO GESTION DES MESSAGE D'ERREUR
+//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+//					}
+//				}
+//			});
+//		} catch (RequestException e) {
+//			ControlUtils.exceptionMessage(e);
+//		}
+		sewelisGetPlaceStatement(this.lispqlStatementQuery(event.getUri()), event);
 	}
 	/**
 	 * Define a new prefixed namespace for the current store 
@@ -1949,17 +2015,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
-		ControlUtils.debugMessage("Controller onCompletionAsked");
+		ControlUtils.debugMessage("Controller onCompletionAsked from " + event.getSource().getClass().getSimpleName());
 		// COMPLETIONS DEMANDEES
 		// Les completions doivent être rechargée pour correspondre au statement
-		// FIXME Comented for testing
-//		if(event.getCallback() != null) {
-//			event.getCallback().call(this); 
-//		}
-		// FIXME Comented for testing
 		sewelisGetCompletions(event.getSearch(), event);
-		
-//		incrementNumberOfActions();
 	}
 
 	/**
@@ -1970,28 +2029,37 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onStatementChange(StatementChangeEvent event) {
+		ControlUtils.debugMessage("Controller onStatementChange");
+		try{
 		// CHANGEMENT DE STATEMENT
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
-		if(event.getSource() instanceof FormWidget) {
+		if(event.getSource() instanceof FormWidget || event.getSource() instanceof FormClassLineWidget) {
+			ControlUtils.debugMessage("Controller onStatementChange BY A FORM OR A CLASS");
 			event.getCallback().call(this);
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			if(widSource.getData().isFinishable()) {
-//				ControlUtils.debugMessage("onStatementChange CHANGE BY A FINISHED LINE");
+				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
-//				ControlUtils.debugMessage("onStatementChange CHANGE BY A LINE");
+				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE " + event.getCallback().getClass().getSimpleName());
 				if(event.getCallback() instanceof SuggestionCallback) {
 					SuggestionCallback callback = (SuggestionCallback) event.getCallback();
 					onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
 				}
 			}
-		} else if(event.getSource() instanceof FormRelationLineWidget) {
-			event.getCallback().call(this);
+//		} else if(event.getSource() instanceof FormClassLineWidget) {
+////			ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A CLASS");
+//			event.getCallback().call(this);
 		}
 		refreshAnswers();
 		
 //		incrementNumberOfActions();
+		}
+		catch(Exception e) {
+			ControlUtils.exceptionMessage(e);
+		}
+		ControlUtils.debugMessage("Controller onStatementChange END");
 	}
 
 	/**
@@ -2050,9 +2118,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onDescribeUri(DescribeUriEvent event) {
-//		URIWidget widSource = event.getSource();
-//		URI dataSource = widSource.getData();
-		sewelisUriDescription(event);
+//		sewelisUriDescription(event);
+		sewelisGetPlaceUri(event.getUri(), event);
 	}
 
 	/**
@@ -2064,8 +2131,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(this.getPlace().hasMore()) {
 			sewelisShowMost(event);
 		} else {
-			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData(), true);
-			sewelisGetPlaceStatement(queryString, event);		
+			if(event.getSource() instanceof AbstractFormulisWidget) {
+				String queryString = lispqlStatementQuery(((AbstractFormulisWidget) event.getSource()).getParentWidget().getData(), true);
+				sewelisGetPlaceStatement(queryString, event);		
+			}
 		}
 
 		incrementNumberOfActions();
@@ -2078,9 +2147,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //			ControlUtils.debugMessage("onLessCompletions showLeast");
 			sewelisShowLeast(event);
 		} else {
-			String queryString = lispqlStatementQuery(event.getSource().getParentWidget().getData());
-//			ControlUtils.debugMessage("onLessCompletions " + queryString);
-			sewelisGetPlaceStatement(queryString, event);	
+			if(event.getSource() instanceof AbstractFormulisWidget) {
+				String queryString = lispqlStatementQuery(((AbstractFormulisWidget) event.getSource()).getParentWidget().getData());
+	//			ControlUtils.debugMessage("onLessCompletions " + queryString);
+				sewelisGetPlaceStatement(queryString, event);
+			}
 		}
 	}
 //

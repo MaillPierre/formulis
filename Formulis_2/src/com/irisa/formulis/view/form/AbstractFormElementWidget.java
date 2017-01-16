@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
+import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.ClassCreationEvent;
@@ -152,8 +153,8 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireDescribeUriEvent(FormEventCallback cb) {
-		DescribeUriEvent event = new DescribeUriEvent(this, cb);
+	public void fireDescribeUriEvent(FormEventCallback cb, URI uri) {
+		DescribeUriEvent event = new DescribeUriEvent(this, cb, uri);
 		fireDescribeUriEvent(event);
 	}
 

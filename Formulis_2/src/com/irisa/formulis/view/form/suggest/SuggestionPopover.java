@@ -10,8 +10,11 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
+import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 
-public class SuggestionPopover extends PopupPanel {
+public class SuggestionPopover extends PopupPanel implements HasSuggestionSelectionHandler {
 	
 	private AbstractSuggestionWidget source;
 	private LinkedList<Suggestion> content = new LinkedList<Suggestion>();
@@ -20,6 +23,8 @@ public class SuggestionPopover extends PopupPanel {
 	private MenuItem moreElementsItem;
 	private MenuItem newElementItem;
 	private boolean canCreateNewElement = true;
+	
+	private LinkedList<SuggestionSelectionHandler> suggestionSelectionHandlers = new LinkedList<SuggestionSelectionHandler>();
 	
 	public SuggestionPopover(AbstractSuggestionWidget src) {
 		super(true);
@@ -80,7 +85,7 @@ public class SuggestionPopover extends PopupPanel {
 				@Override
 				public void execute() {
 					hide();
-					source.suggestionSelected(sugg);
+					fireSuggestionSelection(sugg);
 				}
 			});
 			item.addStyleName("weblis-suggestion-menuitem");
@@ -97,6 +102,24 @@ public class SuggestionPopover extends PopupPanel {
 //		suggestionBar.focus();
 
 		this.showRelativeTo(source);
+	}
+
+	public void fireSuggestionSelection(Suggestion sugg) {
+		fireSuggestionSelection(new SuggestionSelectionEvent(sugg));
+	}
+
+	@Override
+	public void fireSuggestionSelection(SuggestionSelectionEvent event) {
+		Iterator<SuggestionSelectionHandler> itHand = this.suggestionSelectionHandlers.iterator();
+		while(itHand.hasNext()) {
+			SuggestionSelectionHandler hand = itHand.next();
+			hand.onSuggestionSelection(event);
+		}
+	}
+
+	@Override
+	public void addSuggestionSelectionHandler(SuggestionSelectionHandler handler) {
+		suggestionSelectionHandlers.add(handler);
 	}
 	
 //	public void setMoreCompletionsMode(boolean mode) {

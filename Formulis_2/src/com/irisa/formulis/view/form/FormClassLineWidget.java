@@ -12,6 +12,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileLine;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.FormElementConversionException;
@@ -21,7 +22,9 @@ import com.irisa.formulis.view.FormulisWidgetFactory;
 import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.DescribeUriEvent.DescribeUriCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
@@ -232,8 +235,29 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 
 	@Override
-	public void onSelection(SuggestionSelectionEvent event) {
-		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion());
+	public void onSuggestionSelection(SuggestionSelectionEvent event) {
+//		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion() + " " + event.getSuggestion().getElement().getClass().getSimpleName());
+		if(event.getSuggestion().getElement() instanceof URI) {
+			DescribeUriEvent descEvent = null;
+			DescribeUriCallback	cb = getUriDescriptionCallback();
+			URI u = (URI)event.getSuggestion().getElement();
+			descEvent = new DescribeUriEvent(this, cb, u);
+				this.fireDescribeUriEvent(descEvent);
+		}
+	}
+	
+	public DescribeUriCallback getUriDescriptionCallback() {
+		return new DescribeUriEvent.DescribeUriCallback() {
+			@Override
+			public void call(Controller control) {
+				ControlUtils.debugMessage("DescribeUriCallback call(Controller) shouldn't happen");
+			}
+			
+			@Override
+			public void call(String description) {
+				ControlUtils.debugMessage("DescribeUriCallback call " + description);
+			}
+		};
 	}
 	
 }

@@ -46,7 +46,7 @@ implements ValueChangeHandler<String>, HasValueChangeHandlers<String>,
 HasCompletionAskedHandler, 
 //HasLessCompletionsHandler, 
 //HasMoreCompletionsHandler, 
-HasSuggestionSelectionHandler, 
+SuggestionSelectionHandler, HasSuggestionSelectionHandler, 
 HasElementCreationHandler,
 FocusHandler, 
 KeyDownHandler,
@@ -71,6 +71,7 @@ HasKeyUpHandlers {
 		initWidget(element);
 		
 		popover = new SuggestionPopover(this);
+		popover.addSuggestionSelectionHandler(this);
 		
 		element.addFocusHandler(this);
 		element.addValueChangeHandler(this);
@@ -116,7 +117,7 @@ HasKeyUpHandlers {
 
 	@Override
 	public void onClick(ClickEvent event) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget onClick popovershowing:" + popover.isShowing());
+//		ControlUtils.debugMessage("AbstractSuggestionWidget onClick popovershowing:" + popover.isShowing());
 		if(! waitingFor) {
 			fireLineSelectionEvent();
 		}
@@ -142,7 +143,7 @@ HasKeyUpHandlers {
 	
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget onValueChange");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget onValueChange");
 //		fireCompletionAskedEvent(); // FIXME commented for testing
 		fireCompletionAskedEvent(event.getValue());
 		this.getParentWidget().getData().setTempValue(event.getValue());
@@ -160,20 +161,20 @@ HasKeyUpHandlers {
 	
 	@Override
 	public void fireCompletionAskedEvent() {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent");
 		fireCompletionAskedEvent(getValue());
 	}
 	
 	@Override
 	public void fireCompletionAskedEvent(String search) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent");
 		CompletionAskedEvent event = new CompletionAskedEvent(this, this.getSetCallback(), search);
 		fireCompletionAskedEvent(event);
 	}
 
 	@Override
 	public void fireCompletionAskedEvent(CompletionAskedEvent event) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent " + event.getSearch());
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireCompletionAskedEvent " + event.getSearch());
 		waitingFor = true;
 		Iterator<CompletionAskedHandler> itHand = this.completionAskedHandlers.iterator();
 		while(itHand.hasNext()) {
@@ -241,11 +242,11 @@ HasKeyUpHandlers {
 
 	@Override
 	public void fireSuggestionSelection(SuggestionSelectionEvent event) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireSuggestionSelection ");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireSuggestionSelection ");
 		Iterator<SuggestionSelectionHandler> itHand = this.suggestionSelectionHandlers.iterator();
 		while(itHand.hasNext()) {
 			SuggestionSelectionHandler hand = itHand.next();
-			hand.onSelection(event);
+			hand.onSuggestionSelection(event);
 		}
 	}
 
@@ -258,7 +259,7 @@ HasKeyUpHandlers {
 
 	@Override
 	public void fireElementCreationEvent(String value) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireElementCreationEvent " + value);
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireElementCreationEvent " + value);
 		this.fireElementCreationEvent(new ElementCreationEvent(this.getParentWidget(), getValue()));
 	}
 

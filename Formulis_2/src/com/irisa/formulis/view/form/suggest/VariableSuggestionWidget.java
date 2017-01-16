@@ -45,6 +45,11 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	public VariableSuggestionWidget(FormRelationLineWidget par) {
 		super(null, par );
 	}
+
+	@Override
+	public void onSuggestionSelection(SuggestionSelectionEvent event) {
+		fireSuggestionSelection(event);
+	}
 	
 	public void onKeyDown(KeyDownEvent event) {
 		super.onKeyDown(event); 
