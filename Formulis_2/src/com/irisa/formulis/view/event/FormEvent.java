@@ -2,7 +2,8 @@ package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.view.form.FormEventCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
 
 public abstract class FormEvent {
 	
@@ -13,10 +14,10 @@ public abstract class FormEvent {
 		this.source = src;
 	}
 	
-	public FormEvent(Widget src, FormEventCallback formEventCallback) {
+	public FormEvent(Widget src, FormEventCallback cb) {
 		this(src);
 //		ControlUtils.debugMessage("DescribeUriEvent( " + src+", " + formEventCallback + " )");
-		callback = formEventCallback;
+		callback = cb;
 	}
 	
 	public Widget getSource() {

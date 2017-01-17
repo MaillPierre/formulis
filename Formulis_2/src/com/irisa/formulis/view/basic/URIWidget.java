@@ -13,9 +13,12 @@ import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
+import com.irisa.formulis.view.event.callback.StringCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
+import com.irisa.formulis.view.event.callback.AbstractStringCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
 import com.irisa.formulis.view.event.interfaces.HasDescribeUriHandler;
-import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
 import java.util.Iterator;
@@ -118,7 +121,7 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	}
 	
 	public FormEventCallback getTooltipCallback() {
-		return new DescribeUriEvent.DescribeUriCallback() {
+		return new AbstractStringCallback() {
 			@Override
 			public void call(String desc) {
 				ControlUtils.debugMessage("URIWidget getTooltipCallback call \"" + desc + "\" ");
@@ -127,11 +130,6 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 
 				tooltip.reconfigure();
 				tooltip.show();
-			}
-			
-			@Override
-			public void call(Controller control) {
-				// Should never happen
 			}
 		};
 	}
@@ -147,15 +145,15 @@ public class URIWidget extends AbstractFormulisWidget implements HasDescribeUriH
 	}
 
 	@Override
-	public void fireDescribeUriEvent(FormEventCallback cb, URI u) {
+	public void fireDescribeUriEvent(ActionCallback cb, URI u) {
 		fireDescribeUriEvent(new DescribeUriEvent(this, cb, u));
 	}
 	
-	public void fireDescribeUriEvent(URIWidget uri, FormEventCallback cb) {
+	public void fireDescribeUriEvent(URIWidget uri, ActionCallback cb) {
 		fireDescribeUriEvent(new DescribeUriEvent(uri, cb, this.getData()));
 	}
 	
-	public void fireDescribeUriEvent(FormEventCallback cb) {
+	public void fireDescribeUriEvent(ActionCallback cb) {
 		fireDescribeUriEvent(this, cb);
 	}
 

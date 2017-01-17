@@ -24,7 +24,8 @@ import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
-import com.irisa.formulis.view.event.DescribeUriEvent.DescribeUriCallback;
+import com.irisa.formulis.view.event.callback.AbstractStringCallback;
+import com.irisa.formulis.view.event.callback.StringCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
@@ -239,20 +240,15 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 //		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion() + " " + event.getSuggestion().getElement().getClass().getSimpleName());
 		if(event.getSuggestion().getElement() instanceof URI) {
 			DescribeUriEvent descEvent = null;
-			DescribeUriCallback	cb = getUriDescriptionCallback();
+			StringCallback	cb = getUriDescriptionCallback();
 			URI u = (URI)event.getSuggestion().getElement();
 			descEvent = new DescribeUriEvent(this, cb, u);
 				this.fireDescribeUriEvent(descEvent);
 		}
 	}
 	
-	public DescribeUriCallback getUriDescriptionCallback() {
-		return new DescribeUriEvent.DescribeUriCallback() {
-			@Override
-			public void call(Controller control) {
-				ControlUtils.debugMessage("DescribeUriCallback call(Controller) shouldn't happen");
-			}
-			
+	public StringCallback getUriDescriptionCallback() {
+		return new AbstractStringCallback() {			
 			@Override
 			public void call(String description) {
 				ControlUtils.debugMessage("DescribeUriCallback call " + description);

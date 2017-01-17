@@ -21,6 +21,7 @@ public class Suggestions {
 	
 	private HashMap<String, Increment> relationIdIncrementMap;
 	private HashMap<String, Increment> entityIdIncrementMap;
+	private HashMap<String, Transformation> transformNameMap;
 	
 	private Controller control;
 	
@@ -36,6 +37,7 @@ public class Suggestions {
 		transformationSuggestions = new LinkedList<Transformation>();
 		relationIdIncrementMap = new HashMap<String, Increment>();
 		entityIdIncrementMap = new HashMap<String, Increment>();
+		transformNameMap = new HashMap<String, Transformation>();
 	}
 
 	public boolean canInsertEntity() {
@@ -150,10 +152,16 @@ public class Suggestions {
 	
 	public void addTransformationSuggestions(Transformation t) {
 		this.transformationSuggestions.add(t);
+		this.transformNameMap.put(t.getName(), t);
 	}
 	
 	public void addAllTransformationSuggestions(LinkedList<Transformation> l) {
-		this.transformationSuggestions.addAll(l);
+		Iterator<Transformation> itTrans = l.iterator();
+		while(itTrans.hasNext()) {
+			Transformation trans = itTrans.next();
+			addTransformationSuggestions(trans);
+		}
+		
 	}
 	
 	public Increment entityIncrementById(String incId) {
@@ -162,6 +170,13 @@ public class Suggestions {
 	
 	public Increment relationIncrementById(String incId) {
 		return this.relationIdIncrementMap.get(incId);
+	}
+	
+	public Transformation transformationbyName(String name) {
+		if(this.transformNameMap.containsKey(name)) {
+			return this.transformNameMap.get(name);
+		}
+		return null;
 	}
 	
 	@Override
@@ -173,7 +188,8 @@ public class Suggestions {
 			Iterator<Increment> itRel = relationSuggestions.iterator();
 			while(itRel.hasNext()) {
 				Increment inc = itRel.next();
-				result += ViewUtils.getHTMLSpaceString() + inc + ViewUtils.getHTMLBreakLineString();
+//				result += ViewUtils.getHTMLSpaceString() + inc + ViewUtils.getHTMLBreakLineString();
+				result += " " + inc.toString() + "\n";
 			}
 		}
 		if(canInsertEntity) {
@@ -181,8 +197,17 @@ public class Suggestions {
 			Iterator<Increment> itEnt = entitySuggestions.iterator();
 			while(itEnt.hasNext()) {
 				Increment inc = itEnt.next();
-				result += ViewUtils.getHTMLSpaceString() + inc + ViewUtils.getHTMLBreakLineString();
+//				result += ViewUtils.getHTMLSpaceString() + inc + ViewUtils.getHTMLBreakLineString();
+				result += " " + inc.toString() + "\n";
 			}
+		}
+		
+		result += "Transformations: ";
+		Iterator<Transformation> itTran = transformationSuggestions.iterator();
+		while(itTran.hasNext()) {
+			Transformation inc = itTran.next();
+//			result += ViewUtils.getHTMLSpaceString() + inc + ViewUtils.getHTMLBreakLineString();
+			result += " " + inc.toString() + "\n";
 		}
 		
 		return result;

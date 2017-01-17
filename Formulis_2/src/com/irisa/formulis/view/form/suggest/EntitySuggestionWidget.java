@@ -17,11 +17,11 @@ import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
-import com.irisa.formulis.view.event.DescribeUriEvent.DescribeUriCallback;
+import com.irisa.formulis.view.event.callback.AbstractActionCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
 import com.irisa.formulis.view.event.interfaces.HasDescribeUriHandler;
 import com.irisa.formulis.view.form.FormClassLineWidget;
-import com.irisa.formulis.view.form.FormEventCallback;
 
 public class EntitySuggestionWidget extends AbstractSuggestionWidget implements HasDescribeUriHandler {
 	
@@ -76,7 +76,7 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 	public SuggestionCallback getLineSelectionCompletionsCallback() {
 		return new SuggestionCallback(this) {
 			@Override
-			public void call(Controller control) {
+			public void call() {
 //				ControlUtils.debugMessage("EntitySuggestionWidget getLineSelectionCompletionsCallback call");
 				this.source.fireCompletionAskedEvent();				
 			}
@@ -88,10 +88,10 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 //		ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback");
 		return new SuggestionCallback(this){
 			@Override
-			public void call(Controller control) {
+			public void call() {
 //				ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback call currentCompletions: " + control.getPlace().getCurrentCompletions());
-				if(control.getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 
 					waitingFor = false;
 				}
@@ -106,12 +106,12 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 //		ControlUtils.debugMessage("EntitySuggestionWidget getAddCallback");
 		return new SuggestionCallback(this){
 			@Override
-			public void call(Controller control) {
+			public void call() {
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 //				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
 
-				if(control.getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 					source.showSuggestions();
 				}
 			}
@@ -129,7 +129,7 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 	}
 
 	@Override
-	public void fireDescribeUriEvent(FormEventCallback cb, URI uri) {
+	public void fireDescribeUriEvent(ActionCallback cb, URI uri) {
 		fireDescribeUriEvent(new DescribeUriEvent(this.getParentWidget(), cb, uri));
 	}
 

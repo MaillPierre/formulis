@@ -60,6 +60,10 @@ import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.*;
+import com.irisa.formulis.view.event.callback.AbstractActionCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
+import com.irisa.formulis.view.event.callback.ObjectCallback;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
 import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
@@ -894,8 +898,74 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param statString statement LispQL
 	 * @param event whit the callback to be called in success
 	 */
+	public void sewelisApplyTransformation(final Place place, final String transformationName, final FormEvent event) {
+		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
+		if(currentStore != null) {
+			String placeStatementRequestString = serverAdress + "/applyTransformation?";
+			placeStatementRequestString += "userKey=" + userKey;
+			placeStatementRequestString += "&storeName=" + currentStore.getName();
+			placeStatementRequestString += "&placeId=" + place.getId();
+			placeStatementRequestString += "&transformation=" + transformationName;
+			navBar.setServerStatusMessage("Waiting...");
+			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+			try {
+				builder.sendRequest(null, new RequestCallback() {			
+					@Override
+					public void onError(Request request, Throwable exception) {
+						ControlUtils.exceptionMessage(exception);
+					}
+
+					@Override
+					public void onResponseReceived(Request request, Response response) {
+						//						displayDebugMessage("onResponseReceived");
+						if (200 == response.getStatusCode()) {
+							Document homePlaceDoc = XMLParser.parse(response.getText());
+							Element homePlaceElem = homePlaceDoc.getDocumentElement();
+							String status = homePlaceElem.getAttribute("status");
+							navBar.setServerStatusMessage(status);
+							if(homePlaceElem.getNodeName() == "applyTransformationResponse" && status == "ok") {
+								Node placeNode = homePlaceElem.getFirstChild();
+								if(placeNode.getNodeName() == "place") {
+									try {
+										Place tmpPlace = Parser.parsePlace(placeNode);
+										if(event instanceof DescribeUriEvent) {
+											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString() );
+										}  else if(event.getCallback() instanceof ActionCallback){
+											((ActionCallback) event.getCallback()).call();
+										}
+									} catch (XMLParsingException e) {
+										ControlUtils.exceptionMessage(e);
+									}
+								} else {
+									// FIXME GESTION DES MESSAGES D'ERREUR
+									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+								}
+							} else {
+								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+								navBar.setServerStatusHovertext(message);
+							}
+						} else {
+							// FIXME GESTION DES MESSAGES D'ERREUR
+							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						}
+					}
+				});
+			} catch (Exception e) {
+				ControlUtils.debugMessage("sewelisApplyTransformation EXCEPTION");
+				ControlUtils.exceptionMessage(e);
+			}
+		}
+		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
+	}
+
+	/**
+	 * Set the current place to the place corresponding to the Uri passed in parameter 
+	 * @param statString statement LispQL
+	 * @param event whit the callback to be called in success
+	 */
 	public void sewelisGetPlaceUri(final URI uri, final FormEvent event) {
-		ControlUtils.debugMessage("getPlaceUri( " + uri.getUri() + " ) " );
+		ControlUtils.debugMessage("sewelisGetPlaceUri( " + uri.getUri() + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceUri?";
 			placeStatementRequestString += "userKey=" + userKey;
@@ -918,13 +988,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Element homePlaceElem = homePlaceDoc.getDocumentElement();
 							String status = homePlaceElem.getAttribute("status");
 							navBar.setServerStatusMessage(status);
-							if(homePlaceElem.getNodeName() == "getPlaceUri" && status == "ok") {
+							if(homePlaceElem.getNodeName() == "getPlaceUriResponse" && status == "ok") {
 								Node placeNode = homePlaceElem.getFirstChild();
 								if(placeNode.getNodeName() == "place") {
 									try {
 										Place tmpPlace = Parser.parsePlace(placeNode);
 										if(event instanceof DescribeUriEvent) {
-											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString());
+											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString() + " " + tmpPlace.getSuggestions().toString());
+										} else if(event.getCallback() instanceof ObjectCallback){
+											((ObjectCallback) event.getCallback()).call(tmpPlace);
 										}
 									} catch (XMLParsingException e) {
 										ControlUtils.exceptionMessage(e);
@@ -945,11 +1017,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					}
 				});
 			} catch (Exception e) {
-				ControlUtils.debugMessage("sewelisGetPlaceStatement EXCEPTION");
+				ControlUtils.debugMessage("sewelisGetPlaceUri EXCEPTION");
 				ControlUtils.exceptionMessage(e);
 			}
 		}
-		ControlUtils.debugMessage("FIN getPlaceStatement " );
+		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
 	}
 
 
@@ -1065,8 +1137,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 										}
 									}
 									if(!result.isEmpty()) {
-										place.setCurrentCompletions(result);
-										event.getCallback().call(instance());
+										place.setCurrentCompletions(result);  
+										if(event.getCallback() instanceof ActionCallback){
+											((ActionCallback) event.getCallback()).call();
+										}
 									}
 								}
 							}
@@ -1112,7 +1186,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 								if(event != null) {
-									event.getCallback().call(instance());
+									if(event.getCallback() instanceof ActionCallback){
+										((ActionCallback) event.getCallback()).call();
+									}
 								}
 							}
 						} else {
@@ -1169,7 +1245,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								loadPlace(placeNode);
 								
 								if(event != null) {
-									event.getCallback().call(instance());
+									if(event.getCallback() instanceof ActionCallback){
+										((ActionCallback) event.getCallback()).call();
+									}
 								}
 							}
 						} else {
@@ -1224,7 +1302,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 								if(event != null && event.getCallback() != null /*&& event instanceof LessCompletionsEvent*/) {
-									event.getCallback().call(instance());
+									if(event.getCallback() instanceof ActionCallback){
+										((ActionCallback) event.getCallback()).call();
+									}
 								}
 							}
 						} else {
@@ -1276,7 +1356,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 								if(event != null) {
-									event.getCallback().call(instance());
+									if(event.getCallback() instanceof ActionCallback){
+										((ActionCallback) event.getCallback()).call();
+									}
 								}
 							}
 						} else {
@@ -1355,7 +1437,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		} catch (RequestException e) {
 //			ControlUtils.exceptionMessage(e);
 //		}
-		sewelisGetPlaceStatement(this.lispqlStatementQuery(event.getUri()), event);
+		
+		// Really wanted to use a simple FormEvent here ...
+		sewelisGetPlaceUri(event.getUri(), new StatementChangeEvent((AbstractFormulisWidget) event.getSource(), new ObjectCallback() {
+			@Override
+			public void call(Object object) {
+				if(object instanceof Place) {
+					sewelisApplyTransformation((Place)object, "Describe", event);
+				}
+			}
+		}));
 	}
 	/**
 	 * Define a new prefixed namespace for the current store 
@@ -1363,14 +1454,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param adress
 	 */
 	public void sewelisDefineNamespace(String prefix, String adress) {
-		String showMoreRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
-		showMoreRequestString += "&storeName=" + currentStore.getName(); 
-		showMoreRequestString += "&userkey=" + this.userKey;
-		showMoreRequestString += "&prefix=" + prefix;
-		showMoreRequestString += "&uri=" + adress;
+		String defineNameRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
+		defineNameRequestString += "&storeName=" + currentStore.getName(); 
+		defineNameRequestString += "&userkey=" + this.userKey;
+		defineNameRequestString += "&prefix=" + prefix;
+		defineNameRequestString += "&uri=" + adress;
 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(defineNameRequestString));
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1496,12 +1587,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param followUp event whose callback will be called in case of success
 	 */
 	public void sewelisChangeFocus(String focusId, final FormEvent followUp) {
-		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
-		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-		insertIncrementRequestString += "&placeId=" + place.getId(); 
-		insertIncrementRequestString += "&focusId=" + focusId;
+		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
+		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
+		changeFocusRequestString += "&placeId=" + place.getId(); 
+		changeFocusRequestString += "&focusId=" + focusId;
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(changeFocusRequestString));
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
 				@Override
@@ -1525,8 +1616,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
 									if(followUp instanceof StatementChangeEvent) {
 										onStatementChange((StatementChangeEvent) followUp);
-									} else if(followUp.getCallback() != null) {
-										followUp.getCallback().call(instance());
+									} else if(followUp.getCallback() != null && followUp.getCallback() instanceof ActionCallback){
+											((ActionCallback) followUp.getCallback()).call();
 									}
 								}
 							}
@@ -1969,7 +2060,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		// SELECTION DE LIGNE
 		// la selection d'une ligne entraine un changement de statement
 
-		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource() + " )");
+		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource().getClass().getSimpleName() + " )");
 		this.place.clearCurrentCompletions();
 		// La source est forcément une ligne
 		AbstractFormLineWidget widSource = (AbstractFormLineWidget)event.getSource();
@@ -1979,18 +2070,31 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		String queryLineLispql = lispqlStatementQuery(dataSource);
 
 		// Si c'est une relatio ou un form typé et qu'on a un callback pour renvoyer des données, c'est une demande de suggestions
-		if(dataSource instanceof FormRelationLine || (dataSource instanceof FormClassLine && ! dataSourceParent.isAnonymous() && event.getCallback() != null)) {
+		if(dataSource instanceof FormRelationLine ) {
 			ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
 			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
 			} else {
-				event.getCallback().call(this);
+				if(event.getCallback() instanceof ActionCallback){
+					((ActionCallback) event.getCallback()).call();
+				}
 			}
 		}
 		else if(dataSource instanceof FormClassLine) { // Selection d'une classe
 			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
 			// Si c'est une classe de litteral
 			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
+			
+			// Demande de completion pour la ligne de type
+			} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
+				if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+					queryLineLispql = lispqlStatementQuery(dataSourceParent);
+					sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, event.getCallback()));
+				} else {
+					if(event.getCallback() instanceof ActionCallback){
+						((ActionCallback) event.getCallback()).call();
+					}
+				}
 
 				// si le form n'a pas encore de type
 			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
@@ -2015,7 +2119,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
-		ControlUtils.debugMessage("Controller onCompletionAsked from " + event.getSource().getClass().getSimpleName());
+		ControlUtils.debugMessage("Controller onCompletionAsked " + event.getSearch() + " from " + event.getSource().getClass().getSimpleName());
 		// COMPLETIONS DEMANDEES
 		// Les completions doivent être rechargée pour correspondre au statement
 		sewelisGetCompletions(event.getSearch(), event);
@@ -2035,7 +2139,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
 		if(event.getSource() instanceof FormWidget || event.getSource() instanceof FormClassLineWidget) {
 			ControlUtils.debugMessage("Controller onStatementChange BY A FORM OR A CLASS");
-			event.getCallback().call(this);
+			if(event.getCallback() instanceof ActionCallback){
+				((ActionCallback) event.getCallback()).call();
+			}
 		} else if(event.getSource() instanceof FormRelationLineWidget) {
 			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 			if(widSource.getData().isFinishable()) {
@@ -2117,9 +2223,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Call sewelisUriDescription
 	 */
 	@Override
-	public void onDescribeUri(DescribeUriEvent event) {
-//		sewelisUriDescription(event);
-		sewelisGetPlaceUri(event.getUri(), event);
+	public void onDescribeUri(final DescribeUriEvent event) {
+		sewelisUriDescription(event);
 	}
 
 	/**
@@ -2215,7 +2320,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
 //		ControlUtils.debugMessage("Controller onFinishForm");
-		event.getCallback().call(this);
+		if(event.getCallback() instanceof ActionCallback){
+			((ActionCallback) event.getCallback()).call();
+		}
 		finish( ( (FormWidget)event.getSource()));
 //		ControlUtils.debugMessage("Controller onFinishForm END");
 	}

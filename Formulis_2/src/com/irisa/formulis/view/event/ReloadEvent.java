@@ -1,11 +1,11 @@
 package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.irisa.formulis.view.form.FormEventCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
 
 public class ReloadEvent extends FormEvent {
 
-	public ReloadEvent(Widget src, FormEventCallback formEventCallback) {
+	public ReloadEvent(Widget src, ActionCallback formEventCallback) {
 		super(src, formEventCallback);
 	}
 

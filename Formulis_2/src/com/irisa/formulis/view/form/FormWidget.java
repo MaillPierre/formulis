@@ -42,6 +42,9 @@ import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.FinishableLineEvent;
+import com.irisa.formulis.view.event.callback.AbstractActionCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
 
 /**
@@ -167,8 +170,8 @@ public class FormWidget
 	public FormCallback getLoadCallback() {
 		return new FormCallback(this) {
 			@Override
-			public void call(Controller control) {
-				control.loadFormContent(this.getSource());
+			public void call() {
+				Controller.instance().loadFormContent(this.getSource());
 			}
 		};
 	}
@@ -180,8 +183,8 @@ public class FormWidget
 	public FormCallback getAppendCallback() {
 		return new FormCallback(this) {
 			@Override
-			public void call(Controller control) {
-				control.appendFormContent(this.getSource());
+			public void call() {
+				Controller.instance().appendFormContent(this.getSource());
 			}
 		};
 	}
@@ -189,7 +192,7 @@ public class FormWidget
 	public FormCallback getSubmittedCallback() {
 		return new FormCallback(this) {
 			@Override
-			public void call(Controller control) {
+			public void call() {
 				this.getSource().getData().setFinished(true);
 				this.getSource().reload();
 			}
@@ -504,7 +507,7 @@ public class FormWidget
 		}
 	}
 	
-	public abstract class FormCallback implements FormEventCallback {
+	public abstract class FormCallback extends AbstractActionCallback {
 
 		private FormWidget source;
 		

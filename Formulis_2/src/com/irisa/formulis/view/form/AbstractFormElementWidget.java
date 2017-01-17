@@ -23,6 +23,7 @@ import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.ReloadEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangeEvent;
+import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
@@ -153,7 +154,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireDescribeUriEvent(FormEventCallback cb, URI uri) {
+	public void fireDescribeUriEvent(ActionCallback cb, URI uri) {
 		DescribeUriEvent event = new DescribeUriEvent(this, cb, uri);
 		fireDescribeUriEvent(event);
 	}
@@ -234,7 +235,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireFinishFormEvent(boolean state, FormEventCallback callback) {
+	public void fireFinishFormEvent(boolean state, ActionCallback callback) {
 		if(this instanceof FormWidget) {
 			FinishFormEvent event = new FinishFormEvent((FormWidget) this, state, callback);
 			fireFinishFormEvent(event);
@@ -401,7 +402,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireMoreFormLinesEvent(FormEventCallback cb) {
+	public void fireMoreFormLinesEvent(ActionCallback cb) {
 		this.fireMoreFormLinesEvent(new MoreFormLinesEvent(this, cb));
 	}
 
@@ -483,7 +484,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void fireReloadEvent(FormEventCallback cb) {
+	public void fireReloadEvent(ActionCallback cb) {
 			fireReloadEvent(new ReloadEvent(this, cb));
 	}
 	

@@ -27,6 +27,9 @@ import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.callback.AbstractActionCallback;
+import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
@@ -38,7 +41,6 @@ import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
-import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 
 public abstract class AbstractSuggestionWidget  extends AbstractFormulisWidget 
@@ -303,7 +305,7 @@ HasKeyUpHandlers {
 		return this.element.addKeyUpHandler(handler);
 	}
 
-	public abstract class SuggestionCallback implements FormEventCallback {
+	public abstract class SuggestionCallback extends AbstractActionCallback {
 		
 		protected AbstractSuggestionWidget source;
 		

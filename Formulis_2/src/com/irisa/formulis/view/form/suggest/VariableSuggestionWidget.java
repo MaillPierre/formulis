@@ -25,6 +25,7 @@ import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
+import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
@@ -35,7 +36,6 @@ import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.FormEventCallback;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 
 public class VariableSuggestionWidget extends AbstractSuggestionWidget {
@@ -94,7 +94,7 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	public SuggestionCallback getLineSelectionCompletionsCallback() {
 		return new SuggestionCallback(this) {
 			@Override
-			public void call(Controller control) {
+			public void call() {
 				this.source.fireCompletionAskedEvent();
 			}
 		};
@@ -107,7 +107,7 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	public SuggestionCallback getSetCallback() {
 		return new SuggestionCallback(this){
 			@Override
-			public void call(Controller control) {
+			public void call() {
 //				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call");
 //				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
 //				this.source.oracle.clear();
@@ -119,8 +119,8 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 //				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 //				ControlUtils.debugMessage("CustomSuggestionWidget SetCallback call END");
 
-				if(control.getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 
 					waitingFor = false;
 				}
@@ -137,7 +137,7 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	public SuggestionCallback getAddCallback() {
 		return new SuggestionCallback(this){
 			@Override
-			public void call(Controller control) {
+			public void call() {
 //				Collection<Increment> increments = control.getPlace().getSuggestions().getEntitySuggestions();
 //				Iterator<Increment> itInc = increments.iterator();
 //				while(itInc.hasNext()) {
@@ -147,8 +147,8 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
 //				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
 
-				if(control.getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(control.getPlace().getCurrentCompletions());
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 					source.showSuggestions();
 				}
 			}
