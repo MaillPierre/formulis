@@ -9,7 +9,7 @@ import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.form.AbstractFormElementWidget;
 
-public class DescribeUriEvent extends FormEvent {
+public class DescribeUriEvent extends AbstractFormEvent {
 	
 	private URI uriToDescribe = null;
 
@@ -21,10 +21,6 @@ public class DescribeUriEvent extends FormEvent {
 	
 	public URI getUri() {
 		return uriToDescribe;
-	}
-	
-	public StringCallback getCallback() {
-		return (StringCallback) super.getCallback();
 	}
 
 }

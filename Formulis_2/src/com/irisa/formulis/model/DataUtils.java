@@ -272,4 +272,16 @@ public class DataUtils {
 		return "en";
 	}
 
+	public static Form ressourceDescStatementToForm(Statement stat) throws FormElementConversionException {
+		Form result = new Form(null);
+		
+		// On va partir de la structure attendue d'un statement qui décrit une ressource
+		LinkedList<BasicElement> firstElem = getFirstDisplayableElements(stat.getContent());
+		if(firstElem.size() == 1 && firstElem.getFirst() instanceof Pair) {
+			return pairToForm((Pair) firstElem.getFirst(), null);
+		}
+		
+		return result;
+	}
+
 }

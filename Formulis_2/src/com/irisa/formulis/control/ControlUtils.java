@@ -130,6 +130,8 @@ public class ControlUtils {
 			return false;
 		}
 	}
+	
+	public static int queryTimeout = 10000; // in milliseconds
 
 	public static URI thingUri = new URI("thing", KIND.CLASS, "");
 	public static Keyword thingKeyword = new Keyword("thing");

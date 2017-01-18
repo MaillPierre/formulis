@@ -41,7 +41,6 @@ import com.google.gwt.xml.client.XMLParser;
 import com.google.gwt.xml.client.impl.DOMParseException;
 import com.irisa.formulis.control.access.LoginToken;
 import com.irisa.formulis.control.access.NewUserToken;
-import com.irisa.formulis.control.async.PlaceRequestCallback;
 import com.irisa.formulis.control.profile.Profile;
 import com.irisa.formulis.model.*;
 import com.irisa.formulis.model.basic.*;
@@ -61,6 +60,8 @@ import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.callback.AbstractActionCallback;
+import com.irisa.formulis.view.event.callback.AbstractFormCallback;
+import com.irisa.formulis.view.event.callback.AbstractStringCallback;
 import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.callback.ObjectCallback;
@@ -308,6 +309,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisPing() throws RequestException {
 		String pingRequestString = serverAdress + "/ping";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(pingRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		navBar.setServerStatusMessage("Waiting...");
 		builder.sendRequest(null, new RequestCallback() {	
@@ -344,6 +346,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(registerRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {
@@ -390,6 +393,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		navBar.setServerStatusMessage("Waiting...");
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(loginRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {
@@ -439,6 +443,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		navBar.setServerStatusMessage("Waiting...");
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(logoutRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 		try {
 			builder.sendRequest(null, new RequestCallback() {
 
@@ -479,6 +484,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		resultsOfStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, resultsOfStatementRequestString);
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -524,6 +530,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String visibleStoresRequestString = serverAdress + "/visibleStores?";
 			visibleStoresRequestString += "userKey=" + userKey;
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(visibleStoresRequestString));
+			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			navBar.setServerStatusMessage("Retrieving stores...");
 			builder.sendRequest(null, new RequestCallback() {			
 				@Override
@@ -611,6 +618,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				storeXmlnsRequestString += "userKey=" + userKey;
 				storeXmlnsRequestString += "&storeName=" + currentStore.getName();
 				RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(storeXmlnsRequestString));
+				builder.setTimeoutMillis(ControlUtils.queryTimeout);
 				navBar.setServerStatusMessage("Retrieving namespaces...");
 				builder.sendRequest(null, new RequestCallback() {			
 					@Override
@@ -713,6 +721,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
+			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
 					@Override
@@ -769,6 +778,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
+			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
 					@Override
@@ -829,7 +839,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param statString statement LispQL
 	 * @param event transmitted to changeFocus
 	 */
-	public void sewelisGetPlaceStatement(final String statString, final FormEvent event) {
+	public void sewelisGetPlaceStatement(final String statString, final AbstractFormEvent event) {
 		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
@@ -838,6 +848,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
 					@Override
@@ -898,7 +909,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param statString statement LispQL
 	 * @param event whit the callback to be called in success
 	 */
-	public void sewelisApplyTransformation(final Place place, final String transformationName, final FormEvent event) {
+	public void sewelisApplyTransformation(final Place place, final String transformationName, final AbstractFormEvent event) {
 		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/applyTransformation?";
@@ -907,16 +918,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "&placeId=" + place.getId();
 			placeStatementRequestString += "&transformation=" + transformationName;
 			navBar.setServerStatusMessage("Waiting...");
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+//			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+//			builder.setTimeoutMillis(queryTimeout);
 			try {
-				builder.sendRequest(null, new RequestCallback() {			
+				AbstractSewelisRequest request = new AbstractSewelisRequest() {
+					
 					@Override
-					public void onError(Request request, Throwable exception) {
-						ControlUtils.exceptionMessage(exception);
-					}
-
-					@Override
-					public void onResponseReceived(Request request, Response response) {
+					public void onServerResponseReceived(Request request, Response response) {
 						//						displayDebugMessage("onResponseReceived");
 						if (200 == response.getStatusCode()) {
 							Document homePlaceDoc = XMLParser.parse(response.getText());
@@ -928,12 +936,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								if(placeNode.getNodeName() == "place") {
 									try {
 										Place tmpPlace = Parser.parsePlace(placeNode);
-										if(event instanceof DescribeUriEvent) {
-											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString() );
+										if(event.getCallback() instanceof AbstractStringCallback) {
+											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() );
 										}  else if(event.getCallback() instanceof ActionCallback){
 											((ActionCallback) event.getCallback()).call();
+										} else if(event.getCallback() instanceof AbstractFormCallback) {
+											((AbstractFormCallback)event.getCallback()).call(DataUtils.ressourceDescStatementToForm(tmpPlace.getStatement()));
 										}
-									} catch (XMLParsingException e) {
+									} catch (XMLParsingException | FormElementConversionException | ClassCastException e) {
 										ControlUtils.exceptionMessage(e);
 									}
 								} else {
@@ -950,7 +960,52 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 						}
 					}
-				});
+				};
+				request.send(placeStatementRequestString);
+//				builder.sendRequest(null, new RequestCallback() {			
+//					@Override
+//					public void onError(Request request, Throwable exception) {
+//						ControlUtils.exceptionMessage(exception);
+//					}
+
+//					@Override
+//					public void onResponseReceived(Request request, Response response) {
+//						//						displayDebugMessage("onResponseReceived");
+//						if (200 == response.getStatusCode()) {
+//							Document homePlaceDoc = XMLParser.parse(response.getText());
+//							Element homePlaceElem = homePlaceDoc.getDocumentElement();
+//							String status = homePlaceElem.getAttribute("status");
+//							navBar.setServerStatusMessage(status);
+//							if(homePlaceElem.getNodeName() == "applyTransformationResponse" && status == "ok") {
+//								Node placeNode = homePlaceElem.getFirstChild();
+//								if(placeNode.getNodeName() == "place") {
+//									try {
+//										Place tmpPlace = Parser.parsePlace(placeNode);
+//										if(event.getCallback() instanceof AbstractStringCallback) {
+//											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() );
+//										}  else if(event.getCallback() instanceof ActionCallback){
+//											((ActionCallback) event.getCallback()).call();
+//										} else if(event.getCallback() instanceof AbstractFormCallback) {
+//											((AbstractFormCallback)event.getCallback()).call(DataUtils.ressourceDescStatementToForm(tmpPlace.getStatement()));
+//										}
+//									} catch (XMLParsingException | FormElementConversionException | ClassCastException e) {
+//										ControlUtils.exceptionMessage(e);
+//									}
+//								} else {
+//									// FIXME GESTION DES MESSAGES D'ERREUR
+//									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+//								}
+//							} else {
+//								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+//								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+//								navBar.setServerStatusHovertext(message);
+//							}
+//						} else {
+//							// FIXME GESTION DES MESSAGES D'ERREUR
+//							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+//						}
+//					}
+//				});
 			} catch (Exception e) {
 				ControlUtils.debugMessage("sewelisApplyTransformation EXCEPTION");
 				ControlUtils.exceptionMessage(e);
@@ -964,7 +1019,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param statString statement LispQL
 	 * @param event whit the callback to be called in success
 	 */
-	public void sewelisGetPlaceUri(final URI uri, final FormEvent event) {
+	public void sewelisGetPlaceUri(final URI uri, final AbstractFormEvent event) {
 		ControlUtils.debugMessage("sewelisGetPlaceUri( " + uri.getUri() + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceUri?";
@@ -973,6 +1028,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "&uri=" + URL.encodeQueryString(uri.getUri());
 			navBar.setServerStatusMessage("Waiting...");
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
+			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			try {
 				builder.sendRequest(null, new RequestCallback() {			
 					@Override
@@ -993,8 +1049,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								if(placeNode.getNodeName() == "place") {
 									try {
 										Place tmpPlace = Parser.parsePlace(placeNode);
-										if(event instanceof DescribeUriEvent) {
-											((DescribeUriEvent)event).getCallback().call(tmpPlace.getStatement().toString() + " " + tmpPlace.getSuggestions().toString());
+										if(event.getCallback() instanceof AbstractStringCallback) {
+											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() + " " + tmpPlace.getSuggestions().toString());
 										} else if(event.getCallback() instanceof ObjectCallback){
 											((ObjectCallback) event.getCallback()).call(tmpPlace);
 										}
@@ -1036,6 +1092,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, runStatementRequestString);
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1077,13 +1134,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param match partial string to be matched
 	 * @param event Event whose callback will be used in case of success
 	 */
-	public void sewelisGetCompletions(final String match, final FormEvent event) {
+	public void sewelisGetCompletions(final String match, final AbstractFormEvent event) {
 		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
 		getCompletionsRequestString += "&storeName=" + currentStore.getName(); 
 		getCompletionsRequestString += "&placeId=" + place.getId(); 
 		getCompletionsRequestString += "&matchingKey=" + match;
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(getCompletionsRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1160,13 +1218,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Corresponding function to sur showMost SEWLIS API function, return the most relaxed suggestions reachable
 	 * @param event whose callback will be run in case of success
 	 */
-	public void sewelisShowMost(final FormEvent event) {
+	public void sewelisShowMost(final AbstractFormEvent event) {
 		String showMostRequestString = serverAdress + "/showMost?userKey=" + userKey ;
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
 		showMostRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMostRequestString));
-
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
 				@Override
@@ -1218,12 +1276,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Corresponding function to sur showMore SEWLIS API function, return the next reachable relaxed suggestions
 	 * @param event whose callback will be run in case of success
 	 */
-	public void sewelisShowMore(final FormEvent event) {
+	public void sewelisShowMore(final AbstractFormEvent event) {
 		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1276,12 +1335,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Corresponding function to sur showLess SEWLIS API function, reduce the relaxation of suggestions by one rank
 	 * @param event whose callback will be run in case of success
 	 */
-	public void sewelisShowLess(final FormEvent event) {
+	public void sewelisShowLess(final AbstractFormEvent event) {
 		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLessRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1330,12 +1390,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Corresponding function to showLeast SEWELIS API function, reduce the relaxation of suggestions to 0
 	 * @param event whose callback will be run in case of success
 	 */
-	public void sewelisShowLeast(final FormEvent event) {
+	public void sewelisShowLeast(final AbstractFormEvent event) {
 		String showLeastRequestString = serverAdress + "/showLeast?userKey=" + userKey ;
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
 		showLeastRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLeastRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1438,15 +1499,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //			ControlUtils.exceptionMessage(e);
 //		}
 		
-		// Really wanted to use a simple FormEvent here ...
-		sewelisGetPlaceUri(event.getUri(), new StatementChangeEvent((AbstractFormulisWidget) event.getSource(), new ObjectCallback() {
-			@Override
-			public void call(Object object) {
-				if(object instanceof Place) {
-					sewelisApplyTransformation((Place)object, "Describe", event);
+		sewelisGetPlaceUri(event.getUri(), new AbstractFormEvent( event.getSource(), new ObjectCallback() {
+				@Override
+				public void call(Object object) {
+					if(object instanceof Place) {
+						sewelisApplyTransformation((Place)object, "Describe", event);
+					}
 				}
-			}
-		}));
+			}) {
+		});
 	}
 	/**
 	 * Define a new prefixed namespace for the current store 
@@ -1462,6 +1523,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(defineNameRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
@@ -1586,13 +1648,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param focusId number of the element in the statement
 	 * @param followUp event whose callback will be called in case of success
 	 */
-	public void sewelisChangeFocus(String focusId, final FormEvent followUp) {
+	public void sewelisChangeFocus(String focusId, final AbstractFormEvent followUp) {
 		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
 		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
 		changeFocusRequestString += "&placeId=" + place.getId(); 
 		changeFocusRequestString += "&focusId=" + focusId;
 		navBar.setServerStatusMessage("Waiting...");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(changeFocusRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 		try {
 			builder.sendRequest(null, new RequestCallback() {			
 				@Override

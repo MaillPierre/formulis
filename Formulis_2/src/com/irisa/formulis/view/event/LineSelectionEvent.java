@@ -7,7 +7,7 @@ import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionC
 /**
  * Selection d'une ligne, changement de statement, mise à jour des données
  */
-public class LineSelectionEvent  extends FormEvent  {
+public class LineSelectionEvent  extends AbstractFormEvent  {
 	
 	public LineSelectionEvent(AbstractFormulisWidget src) {
 		super(src);

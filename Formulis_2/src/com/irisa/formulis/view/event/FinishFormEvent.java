@@ -3,7 +3,7 @@ package com.irisa.formulis.view.event;
 import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.form.FormWidget;
 
-public class FinishFormEvent extends FormEvent {
+public class FinishFormEvent extends AbstractFormEvent {
 
 	private boolean finishState = false;
 	

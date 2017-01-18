@@ -2,7 +2,7 @@ package com.irisa.formulis.view.event;
 
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
-public class FinishableLineEvent extends FormEvent {
+public class FinishableLineEvent extends AbstractFormEvent {
 
 	private boolean finishState = false;
 	

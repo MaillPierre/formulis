@@ -9,7 +9,7 @@ import com.irisa.formulis.view.event.callback.FormEventCallback;
  * @author pmaillot
  *
  */
-public class StatementChangeEvent extends FormEvent {
+public class StatementChangeEvent extends AbstractFormEvent {
 	
 	public StatementChangeEvent(AbstractFormulisWidget src) {
 		super(src);

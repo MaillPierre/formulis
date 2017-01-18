@@ -2,7 +2,7 @@ package com.irisa.formulis.view.event;
 
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
-public class ElementCreationEvent extends FormEvent {
+public class ElementCreationEvent extends AbstractFormEvent {
 
 	protected String val;
 	
