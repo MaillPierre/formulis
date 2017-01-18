@@ -9,14 +9,17 @@ import com.google.gwt.http.client.URL;
 
 public abstract class AbstractSewelisRequest {
 
-	public AbstractSewelisRequest() {
+	private String sentQuery;
+	
+	public AbstractSewelisRequest(String query) {
+		sentQuery = query;
 	}
-	public void send(final String query) {
-		send(query, "");
+	public void send() {
+		send("");
 	}
 
-	public void send(final String query, final String errorMessage) {
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(query));
+	public void send(final String errorMessage) {
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(sentQuery));
 		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
 		try {
@@ -36,7 +39,7 @@ public abstract class AbstractSewelisRequest {
 				}
 				
 			});
-		} catch (RequestException e) {
+		} catch (Exception e) {
 			ControlUtils.exceptionMessage(e);
 		}
 			

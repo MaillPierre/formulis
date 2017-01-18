@@ -308,18 +308,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void sewelisPing() throws RequestException {
 		String pingRequestString = serverAdress + "/ping";
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(pingRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
-
 		navBar.setServerStatusMessage("Waiting...");
-		builder.sendRequest(null, new RequestCallback() {	
-			@Override		
-			public void onError(Request request, Throwable exception) {
-				ControlUtils.exceptionMessage(exception);
-			}
 
+		AbstractSewelisRequest request = new AbstractSewelisRequest(pingRequestString) {
 			@Override
-			public void onResponseReceived(Request request, Response response) {
+			public void onServerResponseReceived(Request request, Response response) {
 				if (200 == response.getStatusCode()) {
 					Document statusDoc = XMLParser.parse(response.getText());
 					Element docElement = statusDoc.getDocumentElement();
@@ -330,7 +323,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-		});
+		};
+		request.send();
 	}
 
 	/**
@@ -343,42 +337,29 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		registerRequestString += "&userLogin=" + nu.getUserName();
 		registerRequestString += "&passwd=" + Crypto.getCryptedString(nu.getPassword(), Controller.serverAdress);
 		registerRequestString += "&email=" + nu.getEmail();
-
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(registerRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status.equals("ok")) {
-							sewelisLogin(new LoginToken(nu.getUserName(), nu.getPassword()));
-						} else {
-							ControlUtils.debugMessage(docElement.getNodeValue());
-							navBar.setServerStatusHovertext(docElement.getNodeValue());
-						}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(registerRequestString) {
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status.equals("ok")) {
+						sewelisLogin(new LoginToken(nu.getUserName(), nu.getPassword()));
 					} else {
-						// FIXME GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}					
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+						ControlUtils.debugMessage(docElement.getNodeValue());
+						navBar.setServerStatusHovertext(docElement.getNodeValue());
+					}
+				} else {
+					// FIXME GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+				}					
+			}
+		};
+		request.send();
 	}
 
 	/**
@@ -392,46 +373,32 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), Controller.serverAdress);
 		navBar.setServerStatusMessage("Waiting...");
 
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(loginRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
-
-		try {
-			builder.sendRequest(null, new RequestCallback() {
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						if(!status.equals("ok")) {
-							ControlUtils.debugMessage(docElement.getNodeValue());
-							navBar.setServerStatusHovertext(docElement.getNodeValue());
-						} else {
-							userLogin = t.getLogin();
-							userKey = docElement.getAttribute("userKey");
-							navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
-							navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
-							Cookies.setCookie(cookiesUserLogin, userLogin);
-							Cookies.setCookie(cookiesUserkey, userKey);
-							sewelisVisibleStores();
-						}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(loginRequestString) {
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					if(!status.equals("ok")) {
+						ControlUtils.debugMessage(docElement.getNodeValue());
+						navBar.setServerStatusHovertext(docElement.getNodeValue());
 					} else {
-						// FIXME GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-					}					
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
-
+						userLogin = t.getLogin();
+						userKey = docElement.getAttribute("userKey");
+						navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
+						navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
+						Cookies.setCookie(cookiesUserLogin, userLogin);
+						Cookies.setCookie(cookiesUserkey, userKey);
+						sewelisVisibleStores();
+					}
+				} else {
+					// FIXME GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+				}					
+			}
+		};
+		request.send();
 	}
 
 	/**
@@ -442,39 +409,29 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		logoutRequestString += "?userKey=" + userKey;
 		navBar.setServerStatusMessage("Waiting...");
 
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(logoutRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
-		try {
-			builder.sendRequest(null, new RequestCallback() {
+		AbstractSewelisRequest request = new AbstractSewelisRequest(logoutRequestString) {
 
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						if(!status.equals("ok")) {
-							ControlUtils.debugMessage(docElement.getNodeValue());
-							navBar.setServerStatusHovertext(docElement.getNodeValue());
-						} else {
-							Cookies.setCookie(cookiesUserLogin, "");
-							Cookies.setCookie(cookiesUserkey, "");
-						}
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					if(!status.equals("ok")) {
+						ControlUtils.debugMessage(docElement.getNodeValue());
+						navBar.setServerStatusHovertext(docElement.getNodeValue());
 					} else {
-						// FIXME GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						Cookies.setCookie(cookiesUserLogin, "");
+						Cookies.setCookie(cookiesUserkey, "");
 					}
+				} else {
+					// FIXME GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+			
+		};
+		request.send();
 	}
 	
 	public void sewelisResultsOfStatement(String statString ) {
@@ -483,41 +440,31 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		resultsOfStatementRequestString += "&storeName=" + currentStore.getName(); 
 		resultsOfStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, resultsOfStatementRequestString);
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							ControlUtils.debugMessage(docElement);
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
-							}
-						}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(resultsOfStatementRequestString) {
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						ControlUtils.debugMessage(docElement);
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+		};
+		request.send();
 	}
 
 
@@ -529,16 +476,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		try {
 			String visibleStoresRequestString = serverAdress + "/visibleStores?";
 			visibleStoresRequestString += "userKey=" + userKey;
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(visibleStoresRequestString));
-			builder.setTimeoutMillis(ControlUtils.queryTimeout);
 			navBar.setServerStatusMessage("Retrieving stores...");
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-				}
 
+			AbstractSewelisRequest request = new AbstractSewelisRequest(visibleStoresRequestString) {
 				@Override
-				public void onResponseReceived(Request request, Response response) {
+				public void onServerResponseReceived(Request request, Response response) {
 					if (200 == response.getStatusCode()) {
 						Document storeListDoc = XMLParser.parse(response.getText());
 						NodeList storeListNode = storeListDoc.getDocumentElement().getChildNodes();
@@ -571,7 +513,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
 				}
-			});
+			};
+			request.send();
 		}
 		catch(Exception e)
 		{
@@ -613,20 +556,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		 */
 		public void sewelisStoreXmlns() {
 			if(this.currentStore != null) {
-			try {
 				String storeXmlnsRequestString = serverAdress + "/storeXmlns?";
 				storeXmlnsRequestString += "userKey=" + userKey;
 				storeXmlnsRequestString += "&storeName=" + currentStore.getName();
-				RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(storeXmlnsRequestString));
-				builder.setTimeoutMillis(ControlUtils.queryTimeout);
 				navBar.setServerStatusMessage("Retrieving namespaces...");
-				builder.sendRequest(null, new RequestCallback() {			
-					@Override
-					public void onError(Request request, Throwable exception) {
-					}
 
+				AbstractSewelisRequest request = new AbstractSewelisRequest(storeXmlnsRequestString) {
 					@Override
-					public void onResponseReceived(Request request, Response response) {
+					public void onServerResponseReceived(Request request, Response response) {
 						if (200 == response.getStatusCode()) {
 							Document storeListDoc = XMLParser.parse(response.getText());
 							Element docElement = storeListDoc.getDocumentElement();
@@ -657,12 +594,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 						}
 					}
-				});
-			}
-			catch(Exception e)
-			{
-				ControlUtils.exceptionMessage(e);
-			}
+				};
+				request.send();
 			}
 		}
 	//
@@ -720,49 +653,41 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
-			builder.setTimeoutMillis(ControlUtils.queryTimeout);
-			try {
-				builder.sendRequest(null, new RequestCallback() {			
-					@Override
-					public void onError(Request request, Throwable exception) {
-						ControlUtils.debugMessage("getPlaceRoot() ERROR " + exception.getMessage());
-					}
 
-					@Override
-					public void onResponseReceived(Request request, Response response) {
-						if (200 == response.getStatusCode()) {
-							Document homePlaceDoc = XMLParser.parse(response.getText());
-							Element homePlaceElem = homePlaceDoc.getDocumentElement();
-							String status = homePlaceElem.getAttribute("status");
-							navBar.setServerStatusMessage(status);
-							if(homePlaceElem.getNodeName() == "getPlaceRootResponse" && homePlaceElem.getAttribute("status") == "ok") {
-								Node placeNode = homePlaceElem.getFirstChild();
-								if(placeNode.getNodeName() == "place") {
-									loadPlace(placeNode);
-									loadFormContent();
-								} else {
-									// FIXME GESTION DES MESSAGES D'ERREUR
-									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
-								}
+			AbstractSewelisRequest request = new AbstractSewelisRequest(placeHomeRequestString){
+
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						Document homePlaceDoc = XMLParser.parse(response.getText());
+						Element homePlaceElem = homePlaceDoc.getDocumentElement();
+						String status = homePlaceElem.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(homePlaceElem.getNodeName() == "getPlaceRootResponse" && homePlaceElem.getAttribute("status") == "ok") {
+							Node placeNode = homePlaceElem.getFirstChild();
+							if(placeNode.getNodeName() == "place") {
+								loadPlace(placeNode);
+								loadFormContent();
 							} else {
-								navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
-								if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-									String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-									ControlUtils.debugMessage(message );
-									navBar.setServerStatusHovertext(message);
-								}
+								// FIXME GESTION DES MESSAGES D'ERREUR
+								ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
 							}
 						} else {
-							// FIXME GESTION DES MESSAGES D'ERREUR
-							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+							navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
+							if(homePlaceElem.getFirstChild().getNodeName() == "message") {
+								String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage(message );
+								navBar.setServerStatusHovertext(message);
+							}
 						}
+					} else {
+						// FIXME GESTION DES MESSAGES D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
-				});
-			} catch (RequestException e) {
-				ControlUtils.debugMessage("SewelisGetPlaceRoot ERROR " + e);
-				ControlUtils.exceptionMessage(e);
-			}
+				}
+				
+			};
+			request.send("getPlaceRoot() ERROR ");
 		}
 //		ControlUtils.debugMessage("FIN getPlaceRoot");
 	}
@@ -777,55 +702,46 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(placeHomeRequestString));
-			builder.setTimeoutMillis(ControlUtils.queryTimeout);
-			try {
-				builder.sendRequest(null, new RequestCallback() {			
-					@Override
-					public void onError(Request request, Throwable exception) {
-						Window.alert("getPlaceHome() ERROR " + exception.getMessage());
-					}
 
-					@Override
-					public void onResponseReceived(Request request, Response response) {
-						if (200 == response.getStatusCode()) {
-							try {
-								Document homePlaceDoc = XMLParser.parse(response.getText());
-								Element homePlaceElem = homePlaceDoc.getDocumentElement();
-								String status = homePlaceElem.getAttribute("status");
-								navBar.setServerStatusMessage(status);
-								if(homePlaceElem.getNodeName() == "getPlaceHomeResponse" && homePlaceElem.getAttribute("status") == "ok") {
-									Node placeNode = homePlaceElem.getFirstChild();
-									if(placeNode.getNodeName() == "place") {
-										loadPlace(placeNode);
-//										getRootForm();
-										setCurrentForm( newForm());
-										loadFormContent();
-									} else {
-										if(placeNode.getNodeName() == "message") {
-											ControlUtils.debugMessage( placeNode.getFirstChild().getNodeValue());
-										}
-									}
+			AbstractSewelisRequest request = new AbstractSewelisRequest(placeHomeRequestString) {
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						try {
+							Document homePlaceDoc = XMLParser.parse(response.getText());
+							Element homePlaceElem = homePlaceDoc.getDocumentElement();
+							String status = homePlaceElem.getAttribute("status");
+							navBar.setServerStatusMessage(status);
+							if(homePlaceElem.getNodeName() == "getPlaceHomeResponse" && homePlaceElem.getAttribute("status") == "ok") {
+								Node placeNode = homePlaceElem.getFirstChild();
+								if(placeNode.getNodeName() == "place") {
+									loadPlace(placeNode);
+//									getRootForm();
+									setCurrentForm( newForm());
+									loadFormContent();
 								} else {
-									navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
-									if(homePlaceElem.getFirstChild().getNodeName() == "message") {
-										String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-										ControlUtils.debugMessage(message );
-										navBar.setServerStatusHovertext(message);
+									if(placeNode.getNodeName() == "message") {
+										ControlUtils.debugMessage( placeNode.getFirstChild().getNodeValue());
 									}
 								}
-							} catch(DOMParseException e) {
-								ControlUtils.exceptionMessage(e);
+							} else {
+								navBar.setServerStatusMessage(homePlaceElem.getAttribute("status"));
+								if(homePlaceElem.getFirstChild().getNodeName() == "message") {
+									String message = homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+									ControlUtils.debugMessage(message );
+									navBar.setServerStatusHovertext(message);
+								}
 							}
-						} else {
-							// FIXME GESTION DES MESSAGES D'ERREUR
-							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						} catch(DOMParseException e) {
+							ControlUtils.exceptionMessage(e);
 						}
+					} else {
+						// FIXME GESTION DES MESSAGES D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
-				});
-			} catch (RequestException e) {
-				ControlUtils.exceptionMessage(e);
-			}
+				}
+			};
+			request.send("getPlaceHome() ERROR ");
 		}
 		ControlUtils.debugMessage("FIN getPlaceHome");
 	}
@@ -847,59 +763,51 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 			navBar.setServerStatusMessage("Waiting...");
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
-			builder.setTimeoutMillis(ControlUtils.queryTimeout);
-			try {
-				builder.sendRequest(null, new RequestCallback() {			
-					@Override
-					public void onError(Request request, Throwable exception) {
-						ControlUtils.exceptionMessage(exception);
-					}
+			
 
-					@Override
-					public void onResponseReceived(Request request, Response response) {
-						//						displayDebugMessage("onResponseReceived");
-						if (200 == response.getStatusCode()) {
-							Document homePlaceDoc = XMLParser.parse(response.getText());
-							Element homePlaceElem = homePlaceDoc.getDocumentElement();
-							String status = homePlaceElem.getAttribute("status");
-							navBar.setServerStatusMessage(status);
-							if(homePlaceElem.getNodeName() == "getPlaceStatementResponse" && status == "ok") {
-								Node placeNode = homePlaceElem.getFirstChild();
-								if(placeNode.getNodeName() == "place") {
-									loadPlace(placeNode);
-									lastRequestPlace = statString;
+			AbstractSewelisRequest request = new AbstractSewelisRequest(placeStatementRequestString){
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					//						displayDebugMessage("onResponseReceived");
+					if (200 == response.getStatusCode()) {
+						Document homePlaceDoc = XMLParser.parse(response.getText());
+						Element homePlaceElem = homePlaceDoc.getDocumentElement();
+						String status = homePlaceElem.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(homePlaceElem.getNodeName() == "getPlaceStatementResponse" && status == "ok") {
+							Node placeNode = homePlaceElem.getFirstChild();
+							if(placeNode.getNodeName() == "place") {
+								loadPlace(placeNode);
+								lastRequestPlace = statString;
 
-									// TODO Rustine pour gérer le focus renvoyé par getPlaceStatement = a étudier
-									// Le focused est placé à la racine du statement, ce qui ne permet pas d'avoir de suggestions pour l'objet qui nous interesse
-									// La rustine déplace le focused au premier focus de la formule (2 numéro après, premier élément da la première Pair)
-									// SALE
-									try {
-										String focusedId = place.getStatement().getFocusedDisplay();
-										String targetFocusId = String.valueOf(Integer.valueOf(focusedId) - 1);
-										sewelisChangeFocus(targetFocusId, event);
-									} catch(Exception e) {
-										ControlUtils.exceptionMessage( e);
-									}
-								} else {
-									// FIXME GESTION DES MESSAGES D'ERREUR
-									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+								// TODO Rustine pour gérer le focus renvoyé par getPlaceStatement = a étudier
+								// Le focused est placé à la racine du statement, ce qui ne permet pas d'avoir de suggestions pour l'objet qui nous interesse
+								// La rustine déplace le focused au premier focus de la formule (2 numéro après, premier élément da la première Pair)
+								// SALE
+								try {
+									String focusedId = place.getStatement().getFocusedDisplay();
+									String targetFocusId = String.valueOf(Integer.valueOf(focusedId) - 1);
+									sewelisChangeFocus(targetFocusId, event);
+								} catch(Exception e) {
+									ControlUtils.exceptionMessage( e);
 								}
 							} else {
-								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
-								navBar.setServerStatusHovertext(message);
+								// FIXME GESTION DES MESSAGES D'ERREUR
+								ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
 							}
 						} else {
-							// FIXME GESTION DES MESSAGES D'ERREUR
-							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+							String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+							ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+							navBar.setServerStatusHovertext(message);
 						}
+					} else {
+						// FIXME GESTION DES MESSAGES D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
-				});
-			} catch (Exception e) {
-				ControlUtils.debugMessage("sewelisGetPlaceStatement EXCEPTION");
-				ControlUtils.exceptionMessage(e);
-			}
+				}
+			};
+			request.send("sewelisGetPlaceStatement EXCEPTION");
+			
 		}
 		ControlUtils.debugMessage("FIN getPlaceStatement " );
 	}
@@ -912,16 +820,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisApplyTransformation(final Place place, final String transformationName, final AbstractFormEvent event) {
 		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
 		if(currentStore != null) {
-			String placeStatementRequestString = serverAdress + "/applyTransformation?";
-			placeStatementRequestString += "userKey=" + userKey;
-			placeStatementRequestString += "&storeName=" + currentStore.getName();
-			placeStatementRequestString += "&placeId=" + place.getId();
-			placeStatementRequestString += "&transformation=" + transformationName;
+			String applyTransformationRequestString = serverAdress + "/applyTransformation?";
+			applyTransformationRequestString += "userKey=" + userKey;
+			applyTransformationRequestString += "&storeName=" + currentStore.getName();
+			applyTransformationRequestString += "&placeId=" + place.getId();
+			applyTransformationRequestString += "&transformation=" + transformationName;
 			navBar.setServerStatusMessage("Waiting...");
-//			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
-//			builder.setTimeoutMillis(queryTimeout);
 			try {
-				AbstractSewelisRequest request = new AbstractSewelisRequest() {
+				AbstractSewelisRequest request = new AbstractSewelisRequest(applyTransformationRequestString) {
 					
 					@Override
 					public void onServerResponseReceived(Request request, Response response) {
@@ -961,51 +867,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						}
 					}
 				};
-				request.send(placeStatementRequestString);
-//				builder.sendRequest(null, new RequestCallback() {			
-//					@Override
-//					public void onError(Request request, Throwable exception) {
-//						ControlUtils.exceptionMessage(exception);
-//					}
-
-//					@Override
-//					public void onResponseReceived(Request request, Response response) {
-//						//						displayDebugMessage("onResponseReceived");
-//						if (200 == response.getStatusCode()) {
-//							Document homePlaceDoc = XMLParser.parse(response.getText());
-//							Element homePlaceElem = homePlaceDoc.getDocumentElement();
-//							String status = homePlaceElem.getAttribute("status");
-//							navBar.setServerStatusMessage(status);
-//							if(homePlaceElem.getNodeName() == "applyTransformationResponse" && status == "ok") {
-//								Node placeNode = homePlaceElem.getFirstChild();
-//								if(placeNode.getNodeName() == "place") {
-//									try {
-//										Place tmpPlace = Parser.parsePlace(placeNode);
-//										if(event.getCallback() instanceof AbstractStringCallback) {
-//											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() );
-//										}  else if(event.getCallback() instanceof ActionCallback){
-//											((ActionCallback) event.getCallback()).call();
-//										} else if(event.getCallback() instanceof AbstractFormCallback) {
-//											((AbstractFormCallback)event.getCallback()).call(DataUtils.ressourceDescStatementToForm(tmpPlace.getStatement()));
-//										}
-//									} catch (XMLParsingException | FormElementConversionException | ClassCastException e) {
-//										ControlUtils.exceptionMessage(e);
-//									}
-//								} else {
-//									// FIXME GESTION DES MESSAGES D'ERREUR
-//									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
-//								}
-//							} else {
-//								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-//								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
-//								navBar.setServerStatusHovertext(message);
-//							}
-//						} else {
-//							// FIXME GESTION DES MESSAGES D'ERREUR
-//							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//						}
-//					}
-//				});
+				request.send();
 			} catch (Exception e) {
 				ControlUtils.debugMessage("sewelisApplyTransformation EXCEPTION");
 				ControlUtils.exceptionMessage(e);
@@ -1027,55 +889,45 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&uri=" + URL.encodeQueryString(uri.getUri());
 			navBar.setServerStatusMessage("Waiting...");
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, placeStatementRequestString);
-			builder.setTimeoutMillis(ControlUtils.queryTimeout);
-			try {
-				builder.sendRequest(null, new RequestCallback() {			
-					@Override
-					public void onError(Request request, Throwable exception) {
-						ControlUtils.exceptionMessage(exception);
-					}
 
-					@Override
-					public void onResponseReceived(Request request, Response response) {
-						//						displayDebugMessage("onResponseReceived");
-						if (200 == response.getStatusCode()) {
-							Document homePlaceDoc = XMLParser.parse(response.getText());
-							Element homePlaceElem = homePlaceDoc.getDocumentElement();
-							String status = homePlaceElem.getAttribute("status");
-							navBar.setServerStatusMessage(status);
-							if(homePlaceElem.getNodeName() == "getPlaceUriResponse" && status == "ok") {
-								Node placeNode = homePlaceElem.getFirstChild();
-								if(placeNode.getNodeName() == "place") {
-									try {
-										Place tmpPlace = Parser.parsePlace(placeNode);
-										if(event.getCallback() instanceof AbstractStringCallback) {
-											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() + " " + tmpPlace.getSuggestions().toString());
-										} else if(event.getCallback() instanceof ObjectCallback){
-											((ObjectCallback) event.getCallback()).call(tmpPlace);
-										}
-									} catch (XMLParsingException e) {
-										ControlUtils.exceptionMessage(e);
+			AbstractSewelisRequest request = new AbstractSewelisRequest(placeStatementRequestString) {
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					//						displayDebugMessage("onResponseReceived");
+					if (200 == response.getStatusCode()) {
+						Document homePlaceDoc = XMLParser.parse(response.getText());
+						Element homePlaceElem = homePlaceDoc.getDocumentElement();
+						String status = homePlaceElem.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(homePlaceElem.getNodeName() == "getPlaceUriResponse" && status == "ok") {
+							Node placeNode = homePlaceElem.getFirstChild();
+							if(placeNode.getNodeName() == "place") {
+								try {
+									Place tmpPlace = Parser.parsePlace(placeNode);
+									if(event.getCallback() instanceof AbstractStringCallback) {
+										((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() + " " + tmpPlace.getSuggestions().toString());
+									} else if(event.getCallback() instanceof ObjectCallback){
+										((ObjectCallback) event.getCallback()).call(tmpPlace);
 									}
-								} else {
-									// FIXME GESTION DES MESSAGES D'ERREUR
-									ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+								} catch (XMLParsingException e) {
+									ControlUtils.exceptionMessage(e);
 								}
 							} else {
-								String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
-								navBar.setServerStatusHovertext(message);
+								// FIXME GESTION DES MESSAGES D'ERREUR
+								ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
 							}
 						} else {
-							// FIXME GESTION DES MESSAGES D'ERREUR
-							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+							String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+							ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+							navBar.setServerStatusHovertext(message);
 						}
+					} else {
+						// FIXME GESTION DES MESSAGES D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
-				});
-			} catch (Exception e) {
-				ControlUtils.debugMessage("sewelisGetPlaceUri EXCEPTION");
-				ControlUtils.exceptionMessage(e);
-			}
+				}
+			};
+			request.send("sewelisGetPlaceUri EXCEPTION");
 		}
 		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
 	}
@@ -1091,42 +943,34 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		runStatementRequestString += "&storeName=" + currentStore.getName(); 
 		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, runStatementRequestString);
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(runStatementRequestString) {
 
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-//							getRootForm();
-//							sewelisGetPlaceHome();
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
-							}
-						}
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+//						getRootForm();
+//						sewelisGetPlaceHome();
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+			
+		};
+		request.send();
 	}
 
 	/**
@@ -1140,78 +984,70 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		getCompletionsRequestString += "&placeId=" + place.getId(); 
 		getCompletionsRequestString += "&matchingKey=" + match;
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(getCompletionsRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
+		
+		AbstractSewelisRequest request = new AbstractSewelisRequest(getCompletionsRequestString) {
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node responseNode = docElement.getFirstChild();
-							if(responseNode.getNodeName().equals("completions")) {
-								LinkedList<Increment> result = new LinkedList<Increment>();
-								if(responseNode.hasChildNodes()) {
-									Node currNode = responseNode.getFirstChild();
-									do {
-										try {
-											Increment inc = Parser.parseIncrement(currNode);
-//											ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
-											if(inc.getKind() != KIND.CLASS 
-													&& inc.getKind() != KIND.INVERSEPROPERTY 
-													&& inc.getKind() != KIND.OPERATOR
-													&& inc.getKind() != KIND.PROPERTY
-													&& inc.getKind() != KIND.RELATION) {
-												result.addFirst(inc);
-//												ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
-											}
-										} catch (XMLParsingException e) {
-											ControlUtils.exceptionMessage(e);
-										}
-										currNode = currNode.getNextSibling();
-									}
-									while(currNode != null);
-									Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
-									while(itInc.hasNext()){
-										Increment inc = itInc.next();
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						Node responseNode = docElement.getFirstChild();
+						if(responseNode.getNodeName().equals("completions")) {
+							LinkedList<Increment> result = new LinkedList<Increment>();
+							if(responseNode.hasChildNodes()) {
+								Node currNode = responseNode.getFirstChild();
+								do {
+									try {
+										Increment inc = Parser.parseIncrement(currNode);
+//										ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
 										if(inc.getKind() != KIND.CLASS 
-										&& inc.getKind() != KIND.INVERSEPROPERTY 
-										&& inc.getKind() != KIND.OPERATOR
-										&& inc.getKind() != KIND.PROPERTY
-										&& inc.getKind() != KIND.RELATION
-										&& ! result.contains(inc)) {
-											result.addLast(inc);
+												&& inc.getKind() != KIND.INVERSEPROPERTY 
+												&& inc.getKind() != KIND.OPERATOR
+												&& inc.getKind() != KIND.PROPERTY
+												&& inc.getKind() != KIND.RELATION) {
+											result.addFirst(inc);
 //											ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 										}
+									} catch (XMLParsingException e) {
+										ControlUtils.exceptionMessage(e);
 									}
-									if(!result.isEmpty()) {
-										place.setCurrentCompletions(result);  
-										if(event.getCallback() instanceof ActionCallback){
-											((ActionCallback) event.getCallback()).call();
-										}
+									currNode = currNode.getNextSibling();
+								}
+								while(currNode != null);
+								Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
+								while(itInc.hasNext()){
+									Increment inc = itInc.next();
+									if(inc.getKind() != KIND.CLASS 
+									&& inc.getKind() != KIND.INVERSEPROPERTY 
+									&& inc.getKind() != KIND.OPERATOR
+									&& inc.getKind() != KIND.PROPERTY
+									&& inc.getKind() != KIND.RELATION
+									&& ! result.contains(inc)) {
+										result.addLast(inc);
+//										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
+									}
+								}
+								if(!result.isEmpty()) {
+									place.setCurrentCompletions(result);  
+									if(event.getCallback() instanceof ActionCallback){
+										((ActionCallback) event.getCallback()).call();
 									}
 								}
 							}
 						}
-					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+			
+		};
+		request.send();
 	}
 
 	/**
@@ -1223,48 +1059,41 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
 		showMostRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMostRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
 
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node placeNode = docElement.getFirstChild();
-							if(placeNode.getNodeName().equals("place")) {
-								loadPlace(placeNode);
-								if(event != null) {
-									if(event.getCallback() instanceof ActionCallback){
-										((ActionCallback) event.getCallback()).call();
-									}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(showMostRequestString) {
+
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						Node placeNode = docElement.getFirstChild();
+						if(placeNode.getNodeName().equals("place")) {
+							loadPlace(placeNode);
+							if(event != null) {
+								if(event.getCallback() instanceof ActionCallback){
+									((ActionCallback) event.getCallback()).call();
 								}
-							}
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+			
+		};
+		request.send();
 	}
 
 	public void sewelisShowMore() {
@@ -1281,50 +1110,40 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node placeNode = docElement.getFirstChild();
-							if(placeNode.getNodeName().equals("place")) {
-								loadPlace(placeNode);
-								
-								if(event != null) {
-									if(event.getCallback() instanceof ActionCallback){
-										((ActionCallback) event.getCallback()).call();
-									}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(showMoreRequestString) {
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						Node placeNode = docElement.getFirstChild();
+						if(placeNode.getNodeName().equals("place")) {
+							loadPlace(placeNode);
+							
+							if(event != null) {
+								if(event.getCallback() instanceof ActionCallback){
+									((ActionCallback) event.getCallback()).call();
 								}
-							}
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+		};
+		request.send();
 	}
 	
 	public void sewelisShowLess() {
@@ -1340,49 +1159,41 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLessRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(showLessRequestString) {
 
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node placeNode = docElement.getFirstChild();
-							if(placeNode.getNodeName().equals("place")) {
-								loadPlace(placeNode);
-								if(event != null && event.getCallback() != null /*&& event instanceof LessCompletionsEvent*/) {
-									if(event.getCallback() instanceof ActionCallback){
-										((ActionCallback) event.getCallback()).call();
-									}
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						Node placeNode = docElement.getFirstChild();
+						if(placeNode.getNodeName().equals("place")) {
+							loadPlace(placeNode);
+							if(event != null && event.getCallback() != null /*&& event instanceof LessCompletionsEvent*/) {
+								if(event.getCallback() instanceof ActionCallback){
+									((ActionCallback) event.getCallback()).call();
 								}
-							}
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+			
+		};
+		request.send();
 	}
 
 
@@ -1395,49 +1206,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
 		showLeastRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showLeastRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status == "ok") {
-							Node placeNode = docElement.getFirstChild();
-							if(placeNode.getNodeName().equals("place")) {
-								loadPlace(placeNode);
-								if(event != null) {
-									if(event.getCallback() instanceof ActionCallback){
-										((ActionCallback) event.getCallback()).call();
-									}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(showLeastRequestString) {
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status == "ok") {
+						Node placeNode = docElement.getFirstChild();
+						if(placeNode.getNodeName().equals("place")) {
+							loadPlace(placeNode);
+							if(event != null) {
+								if(event.getCallback() instanceof ActionCallback){
+									((ActionCallback) event.getCallback()).call();
 								}
-							}
-						} else {
-							navBar.setServerStatusMessage(docElement.getAttribute("status"));
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								ControlUtils.debugMessage( docElement.getFirstChild().toString());
-								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
 						}
 					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+						navBar.setServerStatusMessage(docElement.getAttribute("status"));
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
+						}
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+		};
+		request.send();
 	}
 	
 	/**
@@ -1445,59 +1246,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event event with a URIWidget at its source
 	 */
 	public void sewelisUriDescription(final DescribeUriEvent event) {
-//		String showMoreRequestString = serverAdress + "/uriDescription?userKey=" + userKey ;
-//		showMoreRequestString += "&storeName=" + currentStore.getName(); 
-//		showMoreRequestString += "&userkey=" + this.userKey;
-//		showMoreRequestString += "&uri=" + event.getUri();
-//
-//		navBar.setServerStatusMessage("Waiting...");
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(showMoreRequestString));
-//
-//		try {
-//			builder.sendRequest(null, new RequestCallback() {			
-//				@Override
-//				public void onError(Request request, Throwable exception) {
-//					ControlUtils.exceptionMessage(exception);
-//				}
-//
-//				@Override
-//				public void onResponseReceived(Request request, Response response) {
-//					if (200 == response.getStatusCode()) {
-//						Document statusDoc = XMLParser.parse(response.getText());
-//						Element docElement = statusDoc.getDocumentElement();
-//						String status = docElement.getAttribute("status");
-//						navBar.setServerStatusMessage(status);
-//						if(status != "ok") {
-//							ControlUtils.debugMessage("sewelisUriDescription ERROR " + status);
-//							if(docElement.getFirstChild().getNodeName() == "message") {
-//								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
-//								ControlUtils.debugMessage( message);
-//								navBar.setServerStatusHovertext(message);
-//							}
-//						} else {
-//							Node root = docElement.getFirstChild();
-////							try {
-//
-//								ControlUtils.debugMessage("uridescription statement statement: " + root.toString());
-////								SafeHtml stat = ViewUtils.toSimpleHtml(Parser.parseDisplayNode(root));
-//								
-////								if(stat != null) {
-//									event.getCallback().call(root.toString());
-////								}
-////							} catch (XMLParsingException e) {
-////								ControlUtils.exceptionMessage(e);
-////								ControlUtils.debugMessage("uridescription statement parse failed");
-////							}
-//						}
-//					} else {
-//						// TODO GESTION DES MESSAGE D'ERREUR
-//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//					}
-//				}
-//			});
-//		} catch (RequestException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
 		
 		sewelisGetPlaceUri(event.getUri(), new AbstractFormEvent( event.getSource(), new ObjectCallback() {
 				@Override
@@ -1522,40 +1270,31 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		defineNameRequestString += "&uri=" + adress;
 
 		navBar.setServerStatusMessage("Waiting...");
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(defineNameRequestString));
-		builder.setTimeoutMillis(ControlUtils.queryTimeout);
-
-		try {
-			builder.sendRequest(null, new RequestCallback() {			
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {
-						Document statusDoc = XMLParser.parse(response.getText());
-						Element docElement = statusDoc.getDocumentElement();
-						String status = docElement.getAttribute("status");
-						navBar.setServerStatusMessage(status);
-						if(status != "ok") {
-							ControlUtils.debugMessage("sewelisDefineNamespace ERROR " + status);
-							if(docElement.getFirstChild().getNodeName() == "message") {
-								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
-								ControlUtils.debugMessage( message);
-								navBar.setServerStatusHovertext(message);
-							}
+		AbstractSewelisRequest request = new AbstractSewelisRequest(defineNameRequestString) {
+			
+			@Override
+			public void onServerResponseReceived(Request request, Response response) {
+				if (200 == response.getStatusCode()) {
+					Document statusDoc = XMLParser.parse(response.getText());
+					Element docElement = statusDoc.getDocumentElement();
+					String status = docElement.getAttribute("status");
+					navBar.setServerStatusMessage(status);
+					if(status != "ok") {
+						ControlUtils.debugMessage("sewelisDefineNamespace ERROR " + status);
+						if(docElement.getFirstChild().getNodeName() == "message") {
+							String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+							ControlUtils.debugMessage( message);
+							navBar.setServerStatusHovertext(message);
 						}
-					} else {
-						// TODO GESTION DES MESSAGE D'ERREUR
-						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
+				} else {
+					// TODO GESTION DES MESSAGE D'ERREUR
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
-			});
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+			}
+		};
+		request.send();
+		
 	}
 
 
@@ -1657,14 +1396,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(changeFocusRequestString));
 		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 		try {
-			builder.sendRequest(null, new RequestCallback() {			
+			AbstractSewelisRequest request = new AbstractSewelisRequest(changeFocusRequestString) {
+				
 				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.exceptionMessage(exception);
-				}
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
+				public void onServerResponseReceived(Request request, Response response) {
 					ControlUtils.debugMessage("Controller sewelisChangeFocus");
 					if (200 == response.getStatusCode()) {
 						Document statusDoc = XMLParser.parse(response.getText());
@@ -1698,8 +1433,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					}
 
 					ControlUtils.debugMessage("Controller sewelisChangeFocus END");
-				}
-			});
+				};
+			};
+			request.send();
 		} catch (Exception e) {
 			ControlUtils.debugMessage("SewelisChangeFocus EXCEPTION ");
 			ControlUtils.exceptionMessage(e);
@@ -2211,10 +1947,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
 			} else {
-				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE " + event.getCallback().getClass().getSimpleName());
-				if(event.getCallback() instanceof SuggestionCallback) {
-					SuggestionCallback callback = (SuggestionCallback) event.getCallback();
-					onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
+				if(event.getCallback() != null) {
+					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE " + event.getCallback().getClass().getSimpleName());
+					if(event.getCallback() instanceof SuggestionCallback) {
+						SuggestionCallback callback = (SuggestionCallback) event.getCallback();
+						onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
+					}
 				}
 			}
 //		} else if(event.getSource() instanceof FormClassLineWidget) {
