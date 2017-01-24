@@ -125,16 +125,26 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 	
 	protected void reload() {
+		ControlUtils.debugMessage("FormClassWidget reload " + this.getParentWidget().getData().getMainType() + " " +  this.getData());
 		elementRow.clear();
 		elementRow.add(fixedElement);
+		
 		if(this.getData().isFinished()) {
 			finish();
 		} else {
 			setLineState(LINE_STATE.SUGGESTIONS);
 		}
-		if(this.getParentWidget().getData().isTypeList()){
+		
+		if(this.getParentWidget().getData().isTypeList() ) {
+			hideLabelBox();
+		} 
+		if(this.getParentWidget().getData().isTyped() 
+				&& this.getParentWidget().getData().getMainType().equals(this.getData())) {
+			showLabelBox();
+		} else {
 			hideLabelBox();
 		}
+		
 		if(this.getData().getParent().isTypeList() || this.getData().getParent().isTyped()) {
 			this.removeLineButton.setEnabled(false);
 		}

@@ -62,7 +62,7 @@ public class FormCreateWidget extends AbstractCreateWidget {
 			// Creation d'un formulaire typé
 			URI classUri = new URI(classUriBox.getText(), KIND.CLASS, classNameBox.getText());
 			FormClassLine classLine = new FormClassLine(result, classUri);
-			result.setTypeLine(classLine);
+			result.setMainTypeLine(classLine);
 		} else {
 			// Creation d'un formulaire anonyme
 			

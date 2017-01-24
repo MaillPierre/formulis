@@ -1,7 +1,6 @@
 package com.irisa.formulis.control;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,8 +29,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.Dictionary;
 import java.util.MissingResourceException;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
@@ -53,17 +50,14 @@ import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.FooterWidget;
 import com.irisa.formulis.view.MainNavigationBar;
 import com.irisa.formulis.view.MainPage;
-import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.LoginWidget.LOGIN_STATE;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.*;
-import com.irisa.formulis.view.event.callback.AbstractActionCallback;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
 import com.irisa.formulis.view.event.callback.AbstractStringCallback;
 import com.irisa.formulis.view.event.callback.ActionCallback;
-import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.callback.ObjectCallback;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
@@ -1385,9 +1379,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * In SEWELIS Places, elements in statement can be set as focus, identified by numbers
 	 * With this function, the statement stay the same, but the place change
 	 * @param focusId number of the element in the statement
-	 * @param followUp event whose callback will be called in case of success
+	 * @param event event whose callback will be called in case of success
 	 */
-	public void sewelisChangeFocus(String focusId, final AbstractFormEvent followUp) {
+	public void sewelisChangeFocus(String focusId, final AbstractFormEvent event) {
 		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
 		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
 		changeFocusRequestString += "&placeId=" + place.getId(); 
@@ -1410,12 +1404,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							Node placeNode = docElement.getFirstChild();
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
-								if(followUp != null) {
-									ControlUtils.debugMessage("changeFocus followUp: " + followUp.getClass().getSimpleName());
-									if(followUp instanceof StatementChangeEvent) {
-										onStatementChange((StatementChangeEvent) followUp);
-									} else if(followUp.getCallback() != null && followUp.getCallback() instanceof ActionCallback){
-											((ActionCallback) followUp.getCallback()).call();
+								if(event != null) {
+									ControlUtils.debugMessage("changeFocus followUp: " + event.getClass().getSimpleName());
+									if(event instanceof StatementChangeEvent) {
+										onStatementChange((StatementChangeEvent) event);
+									} else if(event.getCallback() != null && event.getCallback() instanceof ActionCallback){
+											((ActionCallback) event.getCallback()).call();
 									}
 								}
 							}
@@ -1721,7 +1715,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private LinkedList<? extends FormLine> extractFinishedLines(Form f) {
 		LinkedList<FormLine> result = new LinkedList<FormLine>();
 		if(! f.isAnonymous()) {
-			result.add(f.getType());
+			result.add(f.getMainType());
 		}
 		Iterator<FormRelationLine> itRelL = f.relationLinesIterator();
 		while(itRelL.hasNext()) {
@@ -1752,7 +1746,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if(f.isFinishable()) {
 				result = f;
 			} else {
-				result.setTypeLine(f.getType());
+				result.setMainTypeLine(f.getMainType());
 				result.addAllLines(this.extractFinishedLines(f));
 			}
 		}
@@ -1887,6 +1881,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			// Demande de completion pour la ligne de type
 			} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
 				if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
 					queryLineLispql = lispqlStatementQuery(dataSourceParent);
 					sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, event.getCallback()));
 				} else {
@@ -1897,14 +1892,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 				// si le form n'a pas encore de type
 			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
-				dataSourceParent.addTypeLine((FormClassLine) dataSource, true);
-//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE");
+				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
+				dataSourceParent.setMainTypeLine((FormClassLine) dataSource);
+				widSourceParent.reload();
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 				
 				// Si la ligne avait déjà un type (retractation) et qu'on a pas fourni de callback
 			} else {
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
 				dataSourceParent.clear();
+				dataSourceParent.resetMainTypeLine();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
 				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
 			}
@@ -1946,14 +1943,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			if(widSource.getData().isFinishable()) {
 				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
 				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
-			} else {
-				if(event.getCallback() != null) {
-					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE " + event.getCallback().getClass().getSimpleName());
-					if(event.getCallback() instanceof SuggestionCallback) {
+			} else if(event.getCallback() != null && event.getCallback() instanceof SuggestionCallback) {
+						ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE");
 						SuggestionCallback callback = (SuggestionCallback) event.getCallback();
 						onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
-					}
-				}
 			}
 //		} else if(event.getSource() instanceof FormClassLineWidget) {
 ////			ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A CLASS");
@@ -2239,15 +2232,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					
 					
 	//				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
-					widSource.getData().clear();
+					widSource.getData().clearContent();
 
 					widSource.getData().setHasMore(this.place.hasMore());
 					
 					widSource.getData().addAllTypeLines(classLines);
 					
 					// Si il n'y a qu'un type proposé, on change le statement vers ce type
-					if(widSource.getData().isTyped()) {
+					if(widSource.getData().getTypeLines().size() == 1) {
 	//						ControlUtils.debugMessage("Controller loadFormContent typé" );
+							widSource.getData().setMainTypeLine(widSource.getData().getTypeLines().getFirst());
 							String queryString = lispqlStatementQuery(widSource.getData());
 							relationLines.clear();
 							this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));

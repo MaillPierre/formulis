@@ -125,10 +125,11 @@ public class FormClassLine extends FormLine {
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof FormClassLine) {
-			if(this.getEntityUri() != null) {
-				return this.getFixedElement().equals(((FormClassLine) o).getFixedElement()) && this.getEntityUri().equals(((FormClassLine) o).getEntityUri());
+			FormClassLine other = ((FormClassLine) o);
+			if(this.getEntityUri() != null && other.getEntityUri() != null) {
+				return this.getEntityUri().equals(other.getEntityUri());
 			}
-			return this.getFixedElement().equals(((FormClassLine) o).getFixedElement());
+			return this.getFixedElement().equals(other.getFixedElement());
 		}
 		return false;
 	}

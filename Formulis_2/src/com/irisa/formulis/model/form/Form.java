@@ -21,6 +21,8 @@ public class Form extends FormComponent {
 	private LinkedList<FormClassLine> typeLines = new LinkedList<FormClassLine>();
 	private boolean hasMoreFlag = false;
 	private boolean hasLessFlag = false;
+	
+	private FormClassLine mainTypeLine = null;
 
 	public Form(FormComponent par) {
 		super(par);
@@ -32,22 +34,18 @@ public class Form extends FormComponent {
 	}
 	
 	/**
-	 * A utiliser pour un form avec une seule ligne de type
-	 * @return la seul ligne de type, null sinon
-	 */
-	public FormClassLine getSetTypeLine() {
-		if(this.typeLines.size() == 1) {
-			return this.typeLines.getFirst();
-		}
-		return null;
-	}
-	
-	/**
 	 * Ajoute une ligne de type et efface les autres lignes
 	 * @param l
 	 */
-	public void setTypeLine(FormClassLine l) {
-		this.addTypeLine(l, true);
+	public void setMainTypeLine(FormClassLine l) {
+		clearContent();
+		this.addTypeLine(l);
+		this.mainTypeLine = l;
+	}
+	
+	public void resetMainTypeLine() {
+		this.typeLines.clear();
+		this.mainTypeLine = null;
 	}
 
 	public void addTypeLine(FormClassLine l) {
@@ -169,8 +167,9 @@ public class Form extends FormComponent {
 		return typeLines;
 	}
 	
-	public FormClassLine getType() {
-		return typeLines.getFirst();
+	public FormClassLine getMainType() {
+//		return typeLines.getFirst();
+		return this.mainTypeLine;
 	}
 	
 	public Iterator<FormRelationLine> relationLinesIterator() {
@@ -186,16 +185,17 @@ public class Form extends FormComponent {
 	}
 	
 	public boolean isTypeList() {
-		return this.typeLines.size() > 1;
+		return this.typeLines.size() > 1 && ! isTyped();
 	}
 	
 	public boolean isAnonymous() {
 //		return anonymous;
-		return this.typeLines.isEmpty() || (this.isTyped() && this.getType().isAnonymous());
+		return this.typeLines.isEmpty() || (this.isTyped() && this.getMainType().isAnonymous());
 	}
 	
 	public boolean isTyped() {
-		return this.typeLines.size() == 1;
+//		return this.typeLines.size() == 1;
+		return this.mainTypeLine != null;
 	}
 	
 	public void insertLine(int index, FormRelationLine line) {
@@ -217,9 +217,20 @@ public class Form extends FormComponent {
 		insertLine(index, line);
 	}
 	
-	public void clear() {
+	/**
+	 * Delete non-main types and relations
+	 */
+	public void clearContent() {
 		this.relationLines.clear();
-		this.typeLines.clear();
+		this.typeLines.clear();		
+	}
+	
+	/**
+	 * Delete everything
+	 */
+	public void clear() {
+		clearContent();
+		this.mainTypeLine = null;
 	}
 	
 	public void clearRelations() {
@@ -269,13 +280,13 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [ligne selectionnée] " + result);
 
 		// Ligne de type
-		if(! this.isAnonymous() && ! this.isTypeList()) {
+		if(! this.isAnonymous() && ! this.isTypeList() && this.getMainType() != null) {
 			if(isFinalRequest ) {
-				result += this.getType().getEntityUri().toLispql(isFinalRequest) + " " ;
+				result += this.getMainType().getEntityUri().toLispql(isFinalRequest) + " " ;
 //				result += this.getType().toLispql(isFinalRequest) + " ";
 			} 
 //			else {
-				result += "[ " + this.getType().toLispql(isFinalRequest) + " ";
+				result += "[ " + this.getMainType().toLispql(isFinalRequest) + " ";
 //			}
 			if(! otherlines.isEmpty()) {
 				result += " ; ";
@@ -293,9 +304,6 @@ public class Form extends FormComponent {
 		
 		// Ajout des autres lignes
 		if(! otherlines.isEmpty()) {
-//			if(this.typeLine != null || (selectedLine != null && selectedLine.getClass() == ClassLine.class)) {
-//				result += " ; ";
-//			}
 			Iterator<String> itSLines = otherlines.iterator();
 			while(itSLines.hasNext()) {
 				String sLine = itSLines.next();
@@ -322,13 +330,8 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [lien vers parent] " + result);
 		
 		// Fermeture de la requête
-//		if(selectedLine != null && selectedLine.getClass() == RelationLine.class && formLines.contains(selectedLine)) {
-//		if(! isFinalRequest || isAnonymous() || isTypeList()) {
-			result += " ]";
-//		}
-//		}
+		result += " ]";
 		
-//		ControlUtils.debugMessage("Form toLispql FIN ( selectedLine="+ (selectedLine != null) +" , isFinalRequest=" + isFinalRequest + ") result " + result);
 		return result;
 	}
 
@@ -418,7 +421,7 @@ public class Form extends FormComponent {
 			FormRelationLine rel = itRel.next();
 			result = result || rel.isFinishable();
 		}
-		return ((isTyped() && this.getType().isFinishable()) ||(result &&  isAnonymous()));
+		return ((isTyped() && this.getMainType().isFinishable()) ||(result &&  isAnonymous()));
 	}
 
 	@Override
