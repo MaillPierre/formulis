@@ -120,7 +120,7 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 
 	@Override
 	public void fireDescribeUriEvent(DescribeUriEvent event) {
-		ControlUtils.debugMessage("EntitySuggestionWidget fireDescribeUriEvent");
+//		ControlUtils.debugMessage("EntitySuggestionWidget fireDescribeUriEvent");
 		Iterator<DescribeUriHandler> itHand = this.describeUriHandlers.iterator();
 		while(itHand.hasNext()) {
 			DescribeUriHandler hand = itHand.next();

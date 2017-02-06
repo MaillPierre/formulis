@@ -153,6 +153,7 @@ public class FormWidget
 	
 	public FINISH_BUTTON_STATE computeFinishButtonState() {
 		if(getData() != null) {
+//			ControlUtils.debugMessage("FormWidget computeFinishButtonState finishable: "+ getData().isFinishable());
 			if(getData().isFinishable()) {
 				if(getData().isFinished()) {
 					return FINISH_BUTTON_STATE.FINISHED;
@@ -293,7 +294,10 @@ public class FormWidget
 		super.onFinishableLine(event);
 		this.setFinishButtonsState(computeFinishButtonState());
 		// Si c'est la ligne de type qui est ré-éditée
-		if(event.getSource() instanceof FormClassLineWidget && this.getData().isTyped() && ! ((AbstractFormLineWidget) event.getSource()).getData().isFinished() && this.getData().isFinished()) {
+		if(event.getSource() instanceof FormClassLineWidget 
+				&& this.getData().isTyped() 
+				&& ! ((AbstractFormLineWidget) event.getSource()).getData().isFinished() 
+					&& this.getData().isFinished()) {
 			this.getData().setFinished(false);
 			reload();
 		}

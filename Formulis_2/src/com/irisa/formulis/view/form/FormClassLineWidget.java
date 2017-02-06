@@ -221,6 +221,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
+		ControlUtils.debugMessage("FormClassLineWidget onValueChange " + event.getValue() + " " + (event.getSource() == this.labelUriBox));
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(event.getValue());
 			this.fireFinishableLineEvent(this.getFormLine().isFinishable());

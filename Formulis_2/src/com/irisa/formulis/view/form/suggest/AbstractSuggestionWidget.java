@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.form.FormElement;
@@ -52,6 +53,7 @@ SuggestionSelectionHandler, HasSuggestionSelectionHandler,
 HasElementCreationHandler,
 FocusHandler, 
 KeyDownHandler,
+KeyUpHandler,
 HasKeyUpHandlers {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
@@ -78,6 +80,7 @@ HasKeyUpHandlers {
 		element.addFocusHandler(this);
 		element.addValueChangeHandler(this);
 		element.addKeyDownHandler(this);
+		element.addKeyUpHandler(this);
 		element.addClickHandler(this);
 //		element.setWidth("100%");
 		element.addStyleName("input-block-level");
@@ -147,8 +150,13 @@ HasKeyUpHandlers {
 	public void onValueChange(ValueChangeEvent<String> event) {
 //		ControlUtils.debugMessage("AbstractSuggestionWidget onValueChange");
 //		fireCompletionAskedEvent(); // FIXME commented for testing
+		fireValueChangeEvent(event.getValue());
 		fireCompletionAskedEvent(event.getValue());
 		this.getParentWidget().getData().setTempValue(event.getValue());
+	}
+	
+	public void fireValueChangeEvent(String value) {
+		ValueChangeEvent.fire(this, value);
 	}
 
 	@Override
@@ -275,14 +283,14 @@ HasKeyUpHandlers {
 	}
 	
 	public void fireLineSelectionEvent() {
-		ControlUtils.debugMessage("AbstractSuggestionWidget fireLineSelectionEvent");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget fireLineSelectionEvent");
 		waitingFor = true;
 		this.getParentWidget().fireLineSelectionEvent(this.getLineSelectionCompletionsCallback());
 	}
 
 	@Override
 	public void onFocus(FocusEvent event) {
-		ControlUtils.debugMessage("AbstractSuggestionWidget onFocus");
+//		ControlUtils.debugMessage("AbstractSuggestionWidget onFocus");
 		if(! popover.isShowing()) {
 			fireLineSelectionEvent();
 		}
@@ -292,12 +300,20 @@ HasKeyUpHandlers {
 	public void onKeyDown(KeyDownEvent event) {
 		if(event.isDownArrow()) {
 			this.popover.focus();
+		} else {
+			this.fireValueChangeEvent(getValue());
 		}
+	}
+	
+	@Override
+	public void onKeyUp(KeyUpEvent event) {
+		this.fireValueChangeEvent(getValue());
 	}
 
 	@Override
 	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-		return this.element.addValueChangeHandler(handler);
+//		return this.element.addValueChangeHandler(handler);
+		return this.addHandler(handler, ValueChangeEvent.getType());
 	}
 
 	@Override

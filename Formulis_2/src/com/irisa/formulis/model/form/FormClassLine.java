@@ -80,7 +80,11 @@ public class FormClassLine extends FormLine {
 
 	public void setEntityLabel(String label) {
 		this.elementLabel = label;
-		setEntityUri(Controller.newElementUri(label));
+		if(label == "") {
+			setEntityUri(null);
+		} else {
+			setEntityUri(Controller.newElementUri(label));
+		}
 	}
 	
 	@Override
