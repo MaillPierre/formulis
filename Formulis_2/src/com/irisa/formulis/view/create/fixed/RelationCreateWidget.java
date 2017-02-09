@@ -10,6 +10,7 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.interfaces.HasRelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
@@ -24,7 +25,9 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 	private TextBox nameBox = new TextBox();
 	private Column nameBoxCol = new Column(8, nameBox);
 	private Button createButton = new Button("Create");
-	private Column createButtonCol = new Column(2, createButton);
+	private Button cancelButton = new Button("Cancel");
+	private HorizontalPanel buttonPanel = new HorizontalPanel();
+	private Column buttonCol = new Column(2, buttonPanel);
 
 	private LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	
@@ -43,10 +46,18 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 				}
 			}
 		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				parent.removeRelationCreationWidget();
+			}
+		});
 		
 		element.add(indentCol);
 		element.add(nameBoxCol);
-		element.add(createButtonCol);
+		buttonPanel.add(createButton);
+		buttonPanel.add(cancelButton);
+		element.add(buttonCol);
 		element.add(predentCol);
 	}
 	

@@ -213,6 +213,11 @@ public class FormRelationLineWidget
 		}
 //		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement END");
 	}
+	
+	public void resetLine() {
+		setLineState(LINE_STATE.SUGGESTIONS);
+		this.fireFinishableLineEvent(false);
+	}
 
 	@Override
 	public void onClickWidgetEvent(ClickWidgetEvent event)  { 
@@ -248,8 +253,7 @@ public class FormRelationLineWidget
 		}
 		else if(event.getSource() == this.resetElementButton) {
 //			ControlUtils.debugMessage("FormRelationLine onClick reset");
-			setLineState(LINE_STATE.SUGGESTIONS);
-			this.fireFinishableLineEvent(false);
+			resetLine();
 		} else if(event.getSource() == this.removeLineButton) {
 //			ControlUtils.debugMessage("FormRelationLine onClick remove");
 			fireRemoveLineEvent();

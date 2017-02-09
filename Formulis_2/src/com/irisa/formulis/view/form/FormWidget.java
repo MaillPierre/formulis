@@ -237,11 +237,21 @@ public class FormWidget
 		newElementRow.clear();
 		newElementRow.add(relationCreationWid);
 	}
+	
+	public void removeRelationCreationWidget(){
+		newElementRow.clear();
+		putElementCreationButtons();
+	}
 
 	public void putClassCreationWidget() {
 		newElementRow.clear();
 		newElementRow.add(classCreationWid);
 	}
+
+	public void removeClassCreationWidget() {
+		newElementRow.clear();
+		putElementCreationButtons();
+	}	
 	
 	public void clear() {
 		linesCol.clear();

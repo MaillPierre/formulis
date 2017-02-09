@@ -243,10 +243,10 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 //		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion() + " " + event.getSuggestion().getElement().getClass().getSimpleName());
 		if(event.getSuggestion().getElement() instanceof URI) {
 			DescribeUriEvent descEvent = null;
-			AbstractFormCallback	cb = getUriDescriptionCallback();
+			AbstractFormCallback cb = getUriDescriptionCallback();
 			URI u = (URI)event.getSuggestion().getElement();
 			descEvent = new DescribeUriEvent(this, cb, u);
-				this.fireDescribeUriEvent(descEvent);
+			this.fireDescribeUriEvent(descEvent);
 		}
 	}
 	
