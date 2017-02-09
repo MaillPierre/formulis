@@ -1,5 +1,6 @@
 package com.irisa.formulis.view;
 
+import java.rmi.UnexpectedException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -16,6 +17,7 @@ import com.irisa.formulis.model.answers.AnswersRow;
 import com.irisa.formulis.model.basic.BasicElement;
 import com.irisa.formulis.model.basic.Pair;
 import com.irisa.formulis.model.exception.FormElementConversionException;
+import com.irisa.formulis.model.exception.UnexpectedAction;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.view.custom.SimpleFormWidget;
 
@@ -43,12 +45,17 @@ public class AnswersWidget extends Composite {
 
 	private void loadAnswers() {
 		if(answers != null) {
-			loadAnswers(answers);
+			try {
+				loadAnswers(answers);
+			} catch (Exception e) {
+				ControlUtils.exceptionMessage(e);
+			}
 		}
 	}
 
-	private void loadAnswers(Answers a) {
+	private void loadAnswers(Answers a) throws UnexpectedAction {
 		answers = a;
+		ControlUtils.debugMessage("AnswerWidget loadAnswers Answers=" + a);
 
 		Iterator<AnswersHeader> itHeader = answers.headerColumnsIterator();
 		int colHeader = 0;
@@ -65,6 +72,7 @@ public class AnswersWidget extends Composite {
 		while(itRow.hasNext()) {
 			int numCol = 0;
 			AnswersRow row = itRow.next();
+			ControlUtils.debugMessage("AnswerWidget loadAnswers " + row);
 			Iterator<BasicElement> itElem = row.contentIterator();
 			while(itElem.hasNext()) {
 				try {
@@ -85,7 +93,7 @@ public class AnswersWidget extends Composite {
 							ControlUtils.exceptionMessage(e);
 							ControlUtils.debugMessage("EXCEPTION ANSWERS ROW FORM: " + rootElems);
 						}
-					} else if(rootElems.size() == 1){
+					} else /*if(rootElems.size() == 1)*/{
 						try {
 							SimpleFormWidget elemWid = ViewUtils.toSimpleWidget(elem);
 							elemWid.addHandler(new ClickHandler() {
@@ -99,6 +107,10 @@ public class AnswersWidget extends Composite {
 							ControlUtils.exceptionMessage(e);
 							ControlUtils.debugMessage("EXCEPTION ANSWERS ROW: BASIC " + elem.getClass());
 						}
+//					} else if (rootElems.size() == a.getHeaderColumns().size()) {
+//						ControlUtils.debugMessage("AnswersWidget loadAnswers " + rootElems);
+//					} else {
+//						throw new UnexpectedAction("Unexpected number of elements in the row");
 					}
 				} catch (FormElementConversionException e) {
 					table.setText(numRow, numCol, "ERROR " + e.getMessage());
@@ -113,7 +125,11 @@ public class AnswersWidget extends Composite {
 		this.setVisible(true);
 		table.clear(true);
 		if(a != null) {
-			loadAnswers(a);
+			try {
+				loadAnswers(a);
+			} catch (Exception e) {
+				ControlUtils.exceptionMessage(e);
+			}
 		}
 	}
 

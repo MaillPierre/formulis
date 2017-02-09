@@ -29,6 +29,9 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.Dictionary;
 import java.util.MissingResourceException;
+
+import org.eclipse.jdt.internal.core.NameLookup.Answer;
+
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
@@ -58,6 +61,7 @@ import com.irisa.formulis.view.event.*;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
 import com.irisa.formulis.view.event.callback.AbstractStringCallback;
 import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.callback.ObjectCallback;
 import com.irisa.formulis.view.event.interfaces.*;
 import com.irisa.formulis.view.form.*;
@@ -65,11 +69,13 @@ import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 /**
- * controller of all client-server interactions
- * Functions beginning with sewelis* are direct correspondance to the SEWELIS API
- * server adress is set by default to http://127.0.0.1:9999/ or set in a dictionnary on index.html
- * This class is the end of the event chain
- * Main method is onModuleLoad
+ * controller of all client-server and data manipulation interactions.
+ * Functions beginning with sewelis* are directly mapped to the SEWELIS API.
+ * server adress is set by default to http://127.0.0.1:9999/ or set in a dictionnary on index.html .
+ * This class is the end of the FormEvent event chain (Pattern Chain of responsibility).
+ * Main method is onModuleLoad.
+ * The application display and interact with several elements: one store, one Form (root of the displayed Form), a Place (containing suggestions and answers) 
+ * , and an answer containing the answers satisfying the current statement (IN PROGRESS)
  * @author pmaillot
  *
  */
@@ -91,6 +97,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Store currentStore = null;
 	private Place place = null;
 	private Form form = null;
+	private Answers rootAnswers = null; 
 	private String lastRequestPlace = "";
 
 	private String cookiesProfilesIndex = "FormulisProfile";
@@ -158,6 +165,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	private int getNumberOfActions() {
 		return numberOfActions;
+	}
+	
+	public Answers getRootAnswers() {
+		return this.rootAnswers;
+	}
+	
+	public void setRootAnswers(Answers ans) {
+		this.rootAnswers = ans;
 	}
 
 	// Profiles FIXME REMETTRE GESTION DES PROFILS ( HERE BE DRAGONS )
@@ -427,8 +442,15 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		};
 		request.send();
 	}
-	
+
 	public void sewelisResultsOfStatement(String statString ) {
+		sewelisResultsOfStatement(statString,(FormEventCallback) null);
+	}
+	public void sewelisResultsOfStatement(String statString, FormEvent event ) {
+		sewelisResultsOfStatement(statString, event.getCallback());
+	}
+	
+	public void sewelisResultsOfStatement(String statString, final FormEventCallback callback ) {
 		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
 		String resultsOfStatementRequestString = serverAdress + "/resultsOfStatement?userKey=" + userKey ;
 		resultsOfStatementRequestString += "&storeName=" + currentStore.getName(); 
@@ -444,7 +466,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					String status = docElement.getAttribute("status");
 					navBar.setServerStatusMessage(status);
 					if(status == "ok") {
-						ControlUtils.debugMessage(docElement);
+						if(callback != null) {
+							if(callback instanceof ObjectCallback) {
+								try {
+									Answers ans = Parser.parseAnswersResults(docElement.getFirstChild());
+									ControlUtils.debugMessage("sewelisResultsOfStatemennt Answer=" + ans);
+									((ObjectCallback) callback).call(ans);
+								} catch (XMLParsingException e) {
+									ControlUtils.exceptionMessage(e);
+								}
+							}
+						}
 					} else {
 						navBar.setServerStatusMessage(docElement.getAttribute("status"));
 						if(docElement.getFirstChild().getNodeName() == "message") {
@@ -1301,7 +1333,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //		ControlUtils.debugMessage("loadPlace " + placeNode.toString());
 		try {
 			place = Parser.parsePlace(placeNode);
-			refreshAnswers();
+//			refreshAnswers();
 //			ControlUtils.debugMessage("Place " + place.getSuggestions().getEntitySuggestions().size() + " answers " + place.getAnswers().getContentRows().size() + " entity suggestions " + place.getSuggestions().getRelationSuggestions().size() + " relations suggestions");
 		} catch (XMLParsingException e) {
 			ControlUtils.exceptionMessage(e);
@@ -1406,8 +1438,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								loadPlace(placeNode);
 								if(event != null) {
 									ControlUtils.debugMessage("changeFocus followUp: " + event.getClass().getSimpleName());
-									if(event instanceof StatementChangeEvent) {
-										onStatementChange((StatementChangeEvent) event);
+									if(event instanceof StatementChangedEvent) {
+										onStatementChanged((StatementChangedEvent) event);
 									} else if(event.getCallback() != null && event.getCallback() instanceof ActionCallback){
 											((ActionCallback) event.getCallback()).call();
 									}
@@ -1505,12 +1537,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Refresh the displayed answers from the place answers
 	 */
 	private void refreshAnswers() {
-		//		Utils.debugMessage("refreshAnswers " + place.getAnswers());
 		mainPage.ansWidget.setAnswers(place.getAnswers());
-		//		if(place.getAnswers().getCount() == 0 && place.hasMore()) {
-		//			showMore();
-		//		}
-		//		Utils.debugMessage("FIN refreshAnswers");
+//		sewelisResultsOfStatement(this.lispqlStatementQuery(form), new ObjectCallback() {
+//			
+//			@Override
+//			public void call(Object object) {
+//				if(object != null && object instanceof Answers) {
+//					setRootAnswers((Answers) object);
+//					mainPage.ansWidget.setAnswers((Answers) object);
+//				}
+//			}
+//		});
 	}
 
 	/**
@@ -1866,7 +1903,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(dataSource instanceof FormRelationLine ) {
 			ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
 			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSource, event.getCallback()));
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSource, event.getCallback()));
 			} else {
 				if(event.getCallback() instanceof ActionCallback){
 					((ActionCallback) event.getCallback()).call();
@@ -1883,7 +1920,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
 					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
 					queryLineLispql = lispqlStatementQuery(dataSourceParent);
-					sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, event.getCallback()));
+					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, event.getCallback()));
 				} else {
 					if(event.getCallback() instanceof ActionCallback){
 						((ActionCallback) event.getCallback()).call();
@@ -1895,7 +1932,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
 				dataSourceParent.setMainTypeLine((FormClassLine) dataSource);
 				widSourceParent.reload();
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
 				
 				// Si la ligne avait déjà un type (retractation) et qu'on a pas fourni de callback
 			} else {
@@ -1903,7 +1940,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				dataSourceParent.clear();
 				dataSourceParent.resetMainTypeLine();
 				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
-				sewelisGetPlaceStatement(queryFormLispql, new StatementChangeEvent(widSourceParent, widSourceParent.getLoadCallback()));
+				sewelisGetPlaceStatement(queryFormLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
 			}
 		}
 		incrementNumberOfActions();
@@ -1922,13 +1959,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
+	 * The statement has been changed
 	 * According to the event source:
 	 * - if it is a FormWidget, it will call the event callback
 	 * - if it is a finishable RelationLineWidget, it will call sewelisGetPlaceStatement
 	 * - if it is an empty line, it will call onCompletionsAsked (with the same event callback)
 	 */
 	@Override
-	public void onStatementChange(StatementChangeEvent event) {
+	public void onStatementChanged(StatementChangedEvent event) {
 		ControlUtils.debugMessage("Controller onStatementChange");
 		try{
 		// CHANGEMENT DE STATEMENT
@@ -1988,7 +2026,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	//			ViewUtils.connectFormEventChain(newFormWid, widSource);
 	
 				String queryLineLispql = lispqlStatementQuery(dataSource);
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangeEvent(newFormWid, newFormWid.getLoadCallback()));
+				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(newFormWid, newFormWid.getLoadCallback()));
 			} else {
 				widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget()), event.getValue()));
 			}
@@ -2184,7 +2222,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	protected void toRootForm() {
 		setCurrentForm( newForm());
-		sewelisGetPlaceStatement("get [ ]", new StatementChangeEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
+		sewelisGetPlaceStatement("get [ ]", new StatementChangedEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
 	}
 	
 	/**
@@ -2244,7 +2282,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							widSource.getData().setMainTypeLine(widSource.getData().getTypeLines().getFirst());
 							String queryString = lispqlStatementQuery(widSource.getData());
 							relationLines.clear();
-							this.sewelisGetPlaceStatement(queryString, new StatementChangeEvent(widSource, widSource.getLoadCallback()));
+							this.sewelisGetPlaceStatement(queryString, new StatementChangedEvent(widSource, widSource.getLoadCallback()));
 					} else if (widSource.getData().isTypeList()){ // C'est une liste de type
 						widSource.fireHistoryEvent();
 					}

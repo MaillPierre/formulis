@@ -157,87 +157,134 @@ public class Parser {
 
 		return result;
 	}
-
+	
+	/**
+	 * Parser for the Answers coming from getResultsOfStatement
+	 * @param node
+	 * @return
+	 * @throws XMLParsingException
+	 */
+	public static Answers parseAnswersResults(Node node) throws XMLParsingException {
+		return parseAnswers(node, true);
+	}
+	
+	/**
+	 * Parser pour les Answers contenus dans une requete type getPlace
+	 * @param node
+	 * @return
+	 * @throws XMLParsingException
+	 */
 	public static Answers parseAnswers(Node node) throws XMLParsingException {
-		//		Utils.debugMessage("parseAnswers " + node);
+		return parseAnswers(node, false);
+	}
+
+	/**
+	 * Parser for the Answers nodes, 
+	 * @param node
+	 * @param resultRows true if its a getResultStatement Node, false otherwise
+	 * @return
+	 * @throws XMLParsingException
+	 */
+	protected static Answers parseAnswers(Node node, boolean resultRows) throws XMLParsingException {
 		Answers result = new Answers();
 		int count = 0;
 		int start = 0;
 		int end = 0;
 		int size = 0;
 
-		if(node.getNodeName().equals("answers")) {
+		if(node.getNodeName().equals("answers") || node.getNodeName().equals("results") ) {
 			// Paging
-			Node pagingNode = node.getFirstChild();
-			if(pagingNode.getNodeName().equals("paging")) {
-				NamedNodeMap attrList = pagingNode.getAttributes();
-				count = Integer.parseInt(attrList.getNamedItem("count").getNodeValue());
-				start = Integer.parseInt(attrList.getNamedItem("start").getNodeValue());
-				end = Integer.parseInt(attrList.getNamedItem("end").getNodeValue());
-				size = Integer.parseInt(attrList.getNamedItem("size").getNodeValue());
-			} else {
-				throw new XMLParsingException("Expected paging node, got " + pagingNode );
-			}
-
-			// Header
-			Node columnsNode = pagingNode.getNextSibling();
-			if(columnsNode.getNodeName().equals("columns")) {
-				NodeList columns = columnsNode.getChildNodes();
-				for(int i = 0; i < columns.getLength(); i++) {
-					Node columnNode = columns.item(i);
-					if(columnNode.getNodeName().equals("column")) {
-						NamedNodeMap attrList = columnNode.getAttributes();
-						String name = attrList.getNamedItem("name").getNodeValue();
-						ORDER order = AnswersHeader.orderFromString(attrList.getNamedItem("order").getNodeValue());
-						String pattern = attrList.getNamedItem("pattern").getNodeValue();
-						AGGREGATION aggreg = AnswersHeader.aggregationFromString(attrList.getNamedItem("aggreg").getNodeValue());
-						boolean hidden = Boolean.parseBoolean(attrList.getNamedItem("hidden").getNodeValue());
-
-						AnswersHeader header = new AnswersHeader(name);
-						header.setAggreg(aggreg);
-						header.setHidden(hidden);
-						header.setOrder(order);
-						header.setPattern(pattern);
-
-						result.addHeaderColumn(header);
-					} else {
-						throw new XMLParsingException("Expected column node, got " + columnNode );
+			NodeList childList = node.getChildNodes();
+			for(int iNode = 0; iNode < childList.getLength(); iNode++) {
+				Node currentNode = childList.item(iNode);
+				if(currentNode.getNodeName().equals("paging")) {
+					NamedNodeMap attrList = currentNode.getAttributes();
+					if(attrList.getNamedItem("count") != null) {
+						count = Integer.parseInt(attrList.getNamedItem("count").getNodeValue());
 					}
-				}
-			} else {
-				throw new XMLParsingException("Expected columns node, got " + columnsNode );
-			}
-
-			// Rows
-			Node rowsNode = columnsNode.getNextSibling();
-			if(rowsNode.getNodeName().equals("rows")) {
-				NodeList rows = rowsNode.getChildNodes();
-				for(int i = 0; i < rows.getLength(); i++) {
-					Node rowNode = rows.item(i);
-					if(rowNode.getNodeName().equals("row")) {
-						AnswersRow aRow = parseAnswerRow(rowNode);
-
-						result.addContentRow(aRow);
-					} else {
-						throw new XMLParsingException("Expected row node, got " + rowNode );
+					if(attrList.getNamedItem("start") != null) {
+						start = Integer.parseInt(attrList.getNamedItem("start").getNodeValue());
 					}
+					if(attrList.getNamedItem("end") != null) {
+						end = Integer.parseInt(attrList.getNamedItem("end").getNodeValue());
+					}
+					if(attrList.getNamedItem("size") != null) {
+						size = Integer.parseInt(attrList.getNamedItem("size").getNodeValue());
+					}
+				} else if(currentNode.getNodeName().equals("columns")) {
+					NodeList columns = currentNode.getChildNodes();
+					for(int i = 0; i < columns.getLength(); i++) {
+						Node columnNode = columns.item(i);
+						if(columnNode.getNodeName().equals("column")) {
+							NamedNodeMap attrList = columnNode.getAttributes();
+							String name = "";
+							if(attrList.getNamedItem("name") != null) {
+								name = attrList.getNamedItem("name").getNodeValue();
+							}
+							ORDER order = ORDER.DEFAULT;
+							if(attrList.getNamedItem("order") != null) {
+								order = AnswersHeader.orderFromString(attrList.getNamedItem("order").getNodeValue());
+							}
+							String pattern = "";
+							if(attrList.getNamedItem("pattern") != null) {
+								pattern = attrList.getNamedItem("pattern").getNodeValue();
+							}
+							AGGREGATION aggreg = AGGREGATION.DEFAULT;
+							if(attrList.getNamedItem("aggreg") != null) {
+								aggreg = AnswersHeader.aggregationFromString(attrList.getNamedItem("aggreg").getNodeValue());
+							}
+							boolean hidden = false;
+							if(attrList.getNamedItem("hidden") != null) {
+								hidden = Boolean.parseBoolean(attrList.getNamedItem("hidden").getNodeValue());
+							}
+	
+							AnswersHeader header = new AnswersHeader(name);
+							header.setAggreg(aggreg);
+							header.setHidden(hidden);
+							header.setOrder(order);
+							header.setPattern(pattern);
+	
+							result.addHeaderColumn(header);
+						} else {
+							throw new XMLParsingException("Expected column node, got " + columnNode );
+						}
+					}
+				} else if(currentNode.getNodeName().equals("rows")) {
+					NodeList rows = currentNode.getChildNodes();
+					for(int i = 0; i < rows.getLength(); i++) {
+						Node rowNode = rows.item(i);
+						if(rowNode.getNodeName().equals("row")) {
+							AnswersRow aRow = null;
+							if(resultRows) {
+								aRow = parseAnswerResultRow(rowNode);
+							} else {
+								aRow = parseAnswerRow(rowNode);
+							}
+							
+							ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" row=" + aRow);
+							result.addContentRow(aRow);
+						} else {
+							throw new XMLParsingException("Expected row node, got " + rowNode );
+						}
+					}
+				} else {
+					throw new XMLParsingException("Expected rows, columns or paging node, got " + currentNode );
 				}
-			} else {
-				throw new XMLParsingException("Expected rows node, got " + rowsNode );
 			}
 
 		} else {
-			throw new XMLParsingException("Incorrect node name " + node.getNodeName() + " expected answers");
+			throw new XMLParsingException("Incorrect node name " + node.getNodeName() + " expected answers or results");
 		}
 
 		result.setCount(count);
 		result.setEnd(end);
 		result.setSize(size);
 		result.setStart(start);
+		ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" result=" + result);
 		return result;
 	}
 
-	private static AnswersRow parseAnswerRow(Node node) throws XMLParsingException {
+	protected static AnswersRow parseAnswerRow(Node node) throws XMLParsingException {
 		//		Utils.debugMessage("parseAnswerRow " + node);
 		AnswersRow result = new AnswersRow();
 		if(node.getNodeName().equals("row")) {
@@ -246,6 +293,26 @@ public class Parser {
 				Node cellNode = cellList.item(i);
 				if(cellNode.getNodeName().equals("cell")) {
 					result.addContent(parseDisplayNode(cellNode.getFirstChild(), null));
+				} else {
+					throw new XMLParsingException("Expected cell node, got " + cellNode );
+				}
+			}
+		} else {
+			throw new XMLParsingException("Incorrect node name " + node.getNodeName() + " expected row");
+		}
+		return result;
+	}
+
+	protected static AnswersRow parseAnswerResultRow(Node node) throws XMLParsingException {
+		AnswersRow result = new AnswersRow();
+		if(node.getNodeName().equals("row")) {
+			NodeList cellList = node.getChildNodes();
+			for(int i = 0; i < cellList.getLength(); i++) {
+				Node cellNode = cellList.item(i);
+				if(cellNode.getNodeName().equals("cell")) {
+					result.addContent(parseDisplayNode(cellNode.getFirstChild(), null));
+				} else if(parseDisplayNode(cellNode) != null) {
+					result.addContent(parseDisplayNode(cellNode));
 				} else {
 					throw new XMLParsingException("Expected cell node, got " + cellNode );
 				}
@@ -294,7 +361,10 @@ public class Parser {
 				}
 				return dis;
 			case "Focus":
-				String focusId = node.getAttributes().getNamedItem("id").getNodeValue();
+				String focusId = "";
+				if( node.getAttributes().getNamedItem("id") != null ) {
+					focusId = node.getAttributes().getNamedItem("id").getNodeValue();
+				}
 				Focus focus = new Focus(focusId, parent);
 				NodeList focusChildList = node.getChildNodes();
 				for(int i = 0; i < focusChildList.getLength(); i++) {
@@ -317,7 +387,10 @@ public class Parser {
 			case "Space":
 				break;
 			case "Pair":
-				String forceIndentString = node.getAttributes().getNamedItem("forceIndent").getNodeValue();
+				String forceIndentString = "false";
+				if(node.getAttributes().getNamedItem("forceIndent") != null) {
+					forceIndentString = node.getAttributes().getNamedItem("forceIndent").getNodeValue();
+				}
 				boolean forceIndent = forceIndentString.equals("true");
 				Pair pair = new Pair(forceIndent, parent);
 				NodeList pairChildList = node.getChildNodes();
@@ -331,8 +404,14 @@ public class Parser {
 				}
 				return pair;
 			case "URI":
-				String uriUri = node.getAttributes().getNamedItem("uri").getNodeValue();
-				URI.KIND urikind = URI.getKindFromString(node.getAttributes().getNamedItem("kind").getNodeValue());
+				String uriUri = "";
+				if(node.getAttributes().getNamedItem("uri") != null) {
+					uriUri = node.getAttributes().getNamedItem("uri").getNodeValue();
+				}
+				URI.KIND urikind = URI.KIND.ENTITY;
+				if(node.getAttributes().getNamedItem("kind") != null) {
+					urikind = URI.getKindFromString(node.getAttributes().getNamedItem("kind").getNodeValue());
+				}
 				String uriValue = uriUri; 
 				if(node.getFirstChild() != null) {
 					uriValue = node.getFirstChild().getNodeValue();
@@ -340,7 +419,10 @@ public class Parser {
 				URI uri = new URI(uriUri, urikind, uriValue);
 				return uri;
 			case "Typed":
-				String typedUri = node.getAttributes().getNamedItem("uri").getNodeValue();
+				String typedUri = null;
+				if(node.getAttributes().getNamedItem("uri") != null) {
+					typedUri = node.getAttributes().getNamedItem("uri").getNodeValue();
+				}
 				String typedValue = node.getFirstChild().getNodeValue();
 				Typed typed = new Typed(typedUri, typedValue);
 				return typed;

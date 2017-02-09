@@ -28,7 +28,8 @@ public class AnswersRow {
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof AnswersRow) {
-			return content.equals(((AnswersRow) o).content);
+//			return content.equals(((AnswersRow) o).content);
+			return content.toString().equals(((AnswersRow) o).content.toString());
 		}
 		return super.equals(o);
 	}

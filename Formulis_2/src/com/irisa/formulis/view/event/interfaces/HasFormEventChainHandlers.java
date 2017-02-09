@@ -14,6 +14,6 @@ HasMoreFormLinesHandler,
 HasRelationCreationHandler, 
 HasReloadHandler,
 HasRemoveLineHandler, 
-HasStatementChangeHandler {
+HasStatementChangedHandler {
 
 }

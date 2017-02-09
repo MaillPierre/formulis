@@ -14,6 +14,6 @@ MoreFormLinesHandler,
 RelationCreationHandler,
 ReloadHandler,
 RemoveLineHandler,
-StatementChangeHandler {
+StatementChangedHandler {
 
 }

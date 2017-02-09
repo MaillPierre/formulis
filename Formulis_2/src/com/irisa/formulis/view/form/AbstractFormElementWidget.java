@@ -22,7 +22,7 @@ import com.irisa.formulis.view.event.MoreFormLinesEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.ReloadEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
-import com.irisa.formulis.view.event.StatementChangeEvent;
+import com.irisa.formulis.view.event.StatementChangedEvent;
 import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
@@ -40,7 +40,7 @@ import com.irisa.formulis.view.event.interfaces.MoreFormLinesHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
 import com.irisa.formulis.view.event.interfaces.ReloadHandler;
 import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
-import com.irisa.formulis.view.event.interfaces.StatementChangeHandler;
+import com.irisa.formulis.view.event.interfaces.StatementChangedHandler;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
@@ -60,7 +60,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<ReloadHandler> reloadHandlers = new LinkedList<ReloadHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
-	protected LinkedList<StatementChangeHandler> statementChangeHandlers = new LinkedList<StatementChangeHandler>();
+	protected LinkedList<StatementChangedHandler> statementChangeHandlers = new LinkedList<StatementChangedHandler>();
 	protected boolean profileMode = false;
 
 	public AbstractFormElementWidget(FormElement d, AbstractFormulisWidget fParent) {
@@ -170,27 +170,27 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 
 	@Override
-	public void addStatementChangeHandler(StatementChangeHandler handler) {
+	public void addStatementChangeHandler(StatementChangedHandler handler) {
 		this.statementChangeHandlers.add(handler);
 	}
 	
 	@Override
 	public void fireStatementChangeEvent() {
-		StatementChangeEvent event = new StatementChangeEvent(this);
+		StatementChangedEvent event = new StatementChangedEvent(this);
 		fireStatementChangeEvent(event);
 	}
 
 	@Override
-	public void fireStatementChangeEvent(StatementChangeEvent event) {
-		Iterator<StatementChangeHandler> itHand = this.statementChangeHandlers.iterator();
+	public void fireStatementChangeEvent(StatementChangedEvent event) {
+		Iterator<StatementChangedHandler> itHand = this.statementChangeHandlers.iterator();
 		while(itHand.hasNext()) {
-			StatementChangeHandler hand = itHand.next();
-			hand.onStatementChange(event);
+			StatementChangedHandler hand = itHand.next();
+			hand.onStatementChanged(event);
 		}
 	}
 
 	@Override
-	public void onStatementChange(StatementChangeEvent event) {
+	public void onStatementChanged(StatementChangedEvent event) {
 		fireStatementChangeEvent(event);
 	}
 
