@@ -20,6 +20,7 @@ import com.irisa.formulis.view.create.variable.NumericCreateWidget;
 import com.irisa.formulis.view.create.variable.TextCreateWidget;
 import com.irisa.formulis.view.create.variable.TimeCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 import com.github.gwtbootstrap.client.ui.ListBox;
 
 public class SelectCreateWidget extends AbstractFormulisWidget implements ChangeHandler {
@@ -80,7 +81,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	}
 
 	@Override
-	public void addClickWidgetEventHandler(com.irisa.formulis.view.event.interfaces.ClickWidgetHandler handler) {
+	public void addClickWidgetEventHandler(ClickWidgetHandler handler) {
 		super.addClickWidgetEventHandler(handler);
 	}
 
@@ -106,7 +107,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	}
 	
 	public void setCreationType(String type) {
-		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
+//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
 		if(type.equals("date")) {
 			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date");
 			this.createWid = new DateCreateWidget(null);
@@ -146,7 +147,7 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 		if(this.oracle != null) {
 			this.createWid.setStartingValue(this.oracle.getStartValue());
 		}
-		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") FIN");
+//		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") FIN");
 	}
 
 }

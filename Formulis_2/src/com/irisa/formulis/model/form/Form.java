@@ -349,7 +349,8 @@ public class Form extends FormComponent {
 	public String toString() {
 		String result = "";
 		if(! this.isAnonymous() && ! this.isTypeList()) {
-			result += typeLines.getFirst().toLispql() + " ; ";
+//			result += typeLines.getFirst().toLispql() + " ; ";
+			result += this.mainTypeLine.toLispql() + " ; ";
 		}
 		if(! this.typeLines.isEmpty()) {
 			Iterator<FormClassLine> itClassLines = this.typeLinesIterator();

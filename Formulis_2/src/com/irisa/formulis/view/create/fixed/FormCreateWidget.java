@@ -65,7 +65,6 @@ public class FormCreateWidget extends AbstractCreateWidget {
 			result.setMainTypeLine(classLine);
 		} else {
 			// Creation d'un formulaire anonyme
-			
 		}
 		
 		return result;

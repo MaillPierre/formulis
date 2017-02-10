@@ -120,6 +120,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public static Controller instance() {
 		return _instance;
 	}
+	
+	public boolean isStoreSet() {
+		return this.currentStore != null;
+	}
 
 	/**
 	 * 
@@ -2250,9 +2254,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void loadFormContent(FormWidget widSource) {
 //		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
-		if(this.currentStore != null) {
-			widSource.setStoreIsSet(true);
-		}
 
 		if( widSource.getData() != null) {
 			if(this.isFormContentLoadable(widSource)) {

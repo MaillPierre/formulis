@@ -20,6 +20,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.view.AbstractFormulisWidget;
@@ -43,6 +44,7 @@ import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
+import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 public abstract class AbstractSuggestionWidget  extends AbstractFormulisWidget 
 implements ValueChangeHandler<String>, HasValueChangeHandlers<String>, 
@@ -139,12 +141,68 @@ HasKeyUpHandlers {
 	}
 	
 	public abstract void addSuggestionToOracle(Increment inc);
-	public abstract void addAllSuggestionToOracle(Collection<Increment> c);
+
+	/**
+	 * Call addSuggestionToOracle()
+	 * @param c
+	 */
+	public void addAllSuggestionToOracle(Collection<Increment> c) {
+		Iterator<Increment> itSugg = c.iterator();
+		while(itSugg.hasNext()) {
+			Increment inc = itSugg.next();
+			this.addSuggestionToOracle(inc);
+		}
+	}
 	public abstract void setOracleSuggestions(Collection<Increment> c);
+
+	/**
+	 * 
+	 * @return un callback à appeler des que les suggestions sont prètes
+	 */
+	public SuggestionCallback getLineSelectionCompletionsCallback() {
+		return new SuggestionCallback(this) {
+			@Override
+			public void call() {
+				this.source.fireCompletionAskedEvent();				
+			}
+		};
+	}
 	
-	public abstract SuggestionCallback getLineSelectionCompletionsCallback();
-	public abstract SuggestionCallback getSetCallback();
-	public abstract SuggestionCallback getAddCallback();
+	/**
+	 * 
+	 * @return un callback pour les evenement visant à remplacer les suggestions existantes par celle en mémoire
+	 */
+	public SuggestionCallback getSetCallback() {
+		return new SuggestionCallback(this){
+			@Override
+			public void call() {
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
+					waitingFor = false;
+				}
+				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+				source.showSuggestions();
+			}
+		};
+	}
+
+	/**
+	 * 
+	 * @return un callback pour les evenement visant à ajouter des suggestions aux existantes
+	 */
+	public SuggestionCallback getAddCallback() {
+		return new SuggestionCallback(this){
+			@Override
+			public void call() {
+				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+					waitingFor = false;
+					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
+					source.showSuggestions();
+				}
+			}
+		};
+	}
 	
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {

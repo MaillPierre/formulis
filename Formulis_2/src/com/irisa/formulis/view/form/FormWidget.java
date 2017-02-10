@@ -66,8 +66,10 @@ public class FormWidget
 	private FluidRow newElementRow = new FluidRow();
 	private Button newRelationButton = new Button("New line");
 	private Button newClassButton = new Button("New class");
+	private Button forceCreationButton = new Button("Force creation");
 	private Column newRelationCol = new Column(6, newRelationButton);
 	private Column newClassCol = new Column(6, newClassButton);
+	private Column forceCreationCol = new Column(4, forceCreationButton);
 	private RelationCreateWidget relationCreationWid = new RelationCreateWidget(this);
 	private ClassCreateWidget classCreationWid = new ClassCreateWidget(this);
 	
@@ -107,8 +109,8 @@ public class FormWidget
 		finishCol.add(reloadButton);
 		newRelationButton.setBlock(true);
 		newClassButton.setBlock(true);
-		newElementRow.add(newRelationCol);
-		newElementRow.add(newClassCol);
+		forceCreationButton.setBlock(true);
+		putElementCreationButtons();
 		relationCreationWid.addRelationCreationHandler(this);
 		classCreationWid.addClassCreationHandler(this);
 		controlCol.add(profileCheckbox);
@@ -117,6 +119,7 @@ public class FormWidget
 		newRelationButton.setEnabled(false);
 		newClassButton.addClickHandler(this);
 		newClassButton.setEnabled(false);
+		forceCreationButton.addClickHandler(this);
 		
 		finishButton.addClickHandler(this);
 		finishButton.setBlock(true);
@@ -141,14 +144,6 @@ public class FormWidget
 		dragLineHand = new LineDragHandler(this);
 		
 		reload();
-	}
-	
-	public boolean isStoreIsSet() {
-		return this.storeSet;
-	}
-	
-	public void setStoreIsSet(boolean storeIsSet) {
-		this.storeSet = storeIsSet;
 	}
 	
 	public FINISH_BUTTON_STATE computeFinishButtonState() {
@@ -217,6 +212,7 @@ public class FormWidget
 		} 
 		newRelationButton.setEnabled(false);
 		newClassButton.setEnabled(false);
+		forceCreationButton.setEnabled(false);
 		
 //		this.finishButton.setVisible(! getData().isEmpty());
 //		this.finishButton.setEnabled(false);
@@ -231,6 +227,14 @@ public class FormWidget
 		newElementRow.clear();
 		newElementRow.add(newRelationCol);
 		newElementRow.add(newClassCol);
+		if(! this.getData().isRoot()) {
+			newRelationCol.setSize(4);
+			newClassCol.setSize(4);
+			newElementRow.add(forceCreationCol);
+		} else {
+			newRelationCol.setSize(6);
+			newClassCol.setSize(6);
+		}
 	}
 	
 	public void putRelationCreationWidget(){
@@ -261,7 +265,7 @@ public class FormWidget
 	}
 	
 	public void reload() {
-//		ControlUtils.debugMessage("FormWidget reload");
+		ControlUtils.debugMessage("FormWidget reload ");
 		if(getData() != null ) {
 			if(! getData().isEmpty() ) {
 				if(getData().isFinished()) {
@@ -276,18 +280,10 @@ public class FormWidget
 						addLine(line);
 					}
 				} 
-				
-				newClassButton.setEnabled(isStoreIsSet() 
-						&& (this.getData().isEmpty() 
-								|| this.getData().isAnonymous() 
-								|| this.getData().isTypeList())
-						&& ! this.getData().isFinished());
-				newRelationButton.setEnabled(isStoreIsSet() 
-						&& (this.getData().isEmpty() 
-								|| this.getData().isAnonymous() 
-								|| this.getData().isTyped())
-						&& ! this.getData().isFinished());
 			}
+			
+			newClassButton.setEnabled(newClassButtonCanBeEnabled());
+			newRelationButton.setEnabled(newRelationButtonCanBeEnabled());
 		}
 		this.finishButton.setVisible(getData() != null && ! getData().isEmpty());
 //		this.finishButton.setEnabled(getData() != null && ! getData().isFinished());
@@ -295,7 +291,24 @@ public class FormWidget
 		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore() && ! getData().isFinished()); // TODO uncomment to reactivate More Form
 //			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
 		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty() && ! getData().isFinished());	
-//		ControlUtils.debugMessage("FormWidget reload END");
+		ControlUtils.debugMessage("FormWidget reload END newClassButtonCanBeEnabled:" + newClassButtonCanBeEnabled() + " newRelationButtonCanBeEnabled:" + newRelationButtonCanBeEnabled());
+	}
+	
+	protected boolean newClassButtonCanBeEnabled() {
+		return Controller.instance().isStoreSet() 
+				&& (this.getData().isEmpty() 
+						|| this.getData().isAnonymous() 
+						|| this.getData().isTypeList())
+				&& ! this.getData().isFinished();
+	}
+	
+	protected boolean newRelationButtonCanBeEnabled() {
+		ControlUtils.debugMessage("FormWidget newRelationButtonCanBeEnabled storeSet:"+ Controller.instance().isStoreSet()   +" empty:" + this.getData().isEmpty() + " anonymous:" + this.getData().isAnonymous() + " typeList:" + this.getData().isTyped());
+		return Controller.instance().isStoreSet()  
+				&& (this.getData().isEmpty() 
+						|| this.getData().isAnonymous() 
+						|| this.getData().isTyped())
+				&& ! this.getData().isFinished();
 	}
 	
 	@Override
@@ -427,6 +440,8 @@ public class FormWidget
 			fireMoreFormLinesEvent(getAppendCallback());
 		} else if(event.getSource() == this.reloadButton) {
 			fireReloadEvent(getAppendCallback());
+		} else if(event.getSource() == this.forceCreationButton && this.getParentWidget() instanceof FormRelationLineWidget) {
+			((FormRelationLineWidget) this.getParentWidget()).forceCreation();
 		}
 	}
 

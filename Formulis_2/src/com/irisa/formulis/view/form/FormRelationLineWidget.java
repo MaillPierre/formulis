@@ -187,7 +187,7 @@ public class FormRelationLineWidget
 	
 	@Override
 	public void setVariableElement(AbstractFormulisWidget nWid) {
-//		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement");
+		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement " + nWid.getClass().getSimpleName());
 		if(nWid != null) {
 			nWid.addClickWidgetEventHandler(this);
 			if(nWid instanceof AbstractFormElementWidget) {
@@ -207,6 +207,9 @@ public class FormRelationLineWidget
 			elementRow.add(fixedElement);
 			elementRow.add(variableElement);
 			elementRow.setCellWidth(nWid, "100%");
+			if(variableElement instanceof FormWidget) {
+				((FormWidget) variableElement).reload();
+			}
 		} else {
 			variableElementCol.clear();
 			elementRow.add(fixedElement);
@@ -217,6 +220,10 @@ public class FormRelationLineWidget
 	public void resetLine() {
 		setLineState(LINE_STATE.SUGGESTIONS);
 		this.fireFinishableLineEvent(false);
+	}
+	
+	public void forceCreation() {
+		setLineState(LINE_STATE.CREATION);
 	}
 
 	@Override
@@ -229,9 +236,10 @@ public class FormRelationLineWidget
 		} else if(this.variableElement instanceof SelectCreateWidget){
 			try {
 				FormElement newElem =  this.getVariableElement().getData();
-				setVariableElement(FormulisWidgetFactory.getWidget( newElem, this));
+				AbstractFormulisWidget newElemWidget = FormulisWidgetFactory.getWidget( newElem, this);
+				setVariableElement(newElemWidget);
 				getData().setVariableElement(newElem);
-				setLineState(LINE_STATE.FINISHED);
+//				setLineState(LINE_STATE.FINISHED);
 			} catch (FormElementConversionException e) {
 				ControlUtils.exceptionMessage(e);
 			}

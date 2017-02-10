@@ -49,16 +49,6 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 	}
 
 	@Override
-	public void addAllSuggestionToOracle(Collection<Increment> c) {
-//		ControlUtils.debugMessage("EntitySuggestionWidget addAllSuggestionToOracle " + c);
-		Iterator<Increment> itSugg = c.iterator();
-		while(itSugg.hasNext()) {
-			Increment inc = itSugg.next();
-			this.addSuggestionToOracle(inc);
-		}
-	}
-
-	@Override
 	public void setOracleSuggestions(Collection<Increment> c) {
 //		ControlUtils.debugMessage("EntitySuggestionWidget setOracleSuggestions " + c);
 		LinkedList<Suggestion> suggs = new LinkedList<Suggestion>();
@@ -72,51 +62,40 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 		this.oracle.setSuggestions(suggs);
 	}
 
-	@Override
-	public SuggestionCallback getLineSelectionCompletionsCallback() {
-		return new SuggestionCallback(this) {
-			@Override
-			public void call() {
-//				ControlUtils.debugMessage("EntitySuggestionWidget getLineSelectionCompletionsCallback call");
-				this.source.fireCompletionAskedEvent();				
-			}
-		};
-	}
-
-	@Override
-	public SuggestionCallback getSetCallback() {
-//		ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback");
-		return new SuggestionCallback(this){
-			@Override
-			public void call() {
-//				ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback call currentCompletions: " + control.getPlace().getCurrentCompletions());
-				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
-
-					waitingFor = false;
-				}
-				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
-				source.showSuggestions();
-			}
-		};
-	}
-
-	@Override
-	public SuggestionCallback getAddCallback() {
-//		ControlUtils.debugMessage("EntitySuggestionWidget getAddCallback");
-		return new SuggestionCallback(this){
-			@Override
-			public void call() {
-				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
-//				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
-
-				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
-					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
-					source.showSuggestions();
-				}
-			}
-		};
-	}
+//	@Override
+//	public SuggestionCallback getSetCallback() {
+////		ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback");
+//		return new SuggestionCallback(this){
+//			@Override
+//			public void call() {
+////				ControlUtils.debugMessage("EntitySuggestionWidget getSetCallback call currentCompletions: " + control.getPlace().getCurrentCompletions());
+//				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+//					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
+//
+//					waitingFor = false;
+//				}
+//				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+//				source.showSuggestions();
+//			}
+//		};
+//	}
+//
+//	@Override
+//	public SuggestionCallback getAddCallback() {
+////		ControlUtils.debugMessage("EntitySuggestionWidget getAddCallback");
+//		return new SuggestionCallback(this){
+//			@Override
+//			public void call() {
+//				popover.setContent(this.source.oracle.matchingIncrement(getValue(), limit));
+////				this.source.setMoreCompletionMode(! control.getPlace().hasMore()); // TODO gestion des "More" a ajouter pour relachement suggestion
+//
+//				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
+//					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
+//					source.showSuggestions();
+//				}
+//			}
+//		};
+//	}
 
 	@Override
 	public void fireDescribeUriEvent(DescribeUriEvent event) {

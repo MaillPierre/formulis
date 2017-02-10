@@ -55,7 +55,7 @@ public class AnswersWidget extends Composite {
 
 	private void loadAnswers(Answers a) throws UnexpectedAction {
 		answers = a;
-		ControlUtils.debugMessage("AnswerWidget loadAnswers Answers=" + a);
+//		ControlUtils.debugMessage("AnswerWidget loadAnswers Answers=" + a);
 
 		Iterator<AnswersHeader> itHeader = answers.headerColumnsIterator();
 		int colHeader = 0;
@@ -72,7 +72,7 @@ public class AnswersWidget extends Composite {
 		while(itRow.hasNext()) {
 			int numCol = 0;
 			AnswersRow row = itRow.next();
-			ControlUtils.debugMessage("AnswerWidget loadAnswers " + row);
+//			ControlUtils.debugMessage("AnswerWidget loadAnswers " + row);
 			Iterator<BasicElement> itElem = row.contentIterator();
 			while(itElem.hasNext()) {
 				try {

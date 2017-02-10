@@ -261,7 +261,7 @@ public class Parser {
 								aRow = parseAnswerRow(rowNode);
 							}
 							
-							ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" row=" + aRow);
+//							ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" row=" + aRow);
 							result.addContentRow(aRow);
 						} else {
 							throw new XMLParsingException("Expected row node, got " + rowNode );
@@ -280,7 +280,7 @@ public class Parser {
 		result.setEnd(end);
 		result.setSize(size);
 		result.setStart(start);
-		ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" result=" + result);
+//		ControlUtils.debugMessage("Parser parseAnswers results=" + resultRows +" result=" + result);
 		return result;
 	}
 
