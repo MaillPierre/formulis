@@ -42,6 +42,7 @@ import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
 import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.AbstractFormElementWidget;
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
@@ -51,7 +52,8 @@ implements ValueChangeHandler<String>, HasValueChangeHandlers<String>,
 HasCompletionAskedHandler, 
 //HasLessCompletionsHandler, 
 //HasMoreCompletionsHandler, 
-SuggestionSelectionHandler, HasSuggestionSelectionHandler, 
+SuggestionSelectionHandler, 
+HasSuggestionSelectionHandler, 
 HasElementCreationHandler,
 FocusHandler, 
 KeyDownHandler,
@@ -69,10 +71,11 @@ HasKeyUpHandlers {
 	protected SuggestionPopover popover = null;
 	
 	protected boolean waitingFor = false;
+	protected boolean suggestionOnly = false;
 	
 	protected static int limit = 10;
 
-	public AbstractSuggestionWidget(FormElement d, AbstractFormLineWidget fParent) {
+	public AbstractSuggestionWidget(FormElement d, AbstractFormulisWidget fParent) {
 		super(d, fParent);
 		initWidget(element);
 		
@@ -97,6 +100,14 @@ HasKeyUpHandlers {
 		});
 	}
 	
+	public void setSuggestionOnly(boolean suggOnly) {
+		this.suggestionOnly = suggOnly;
+	}
+	
+	public boolean isSuggestionOnly() {
+		return this.suggestionOnly;
+	}
+	
 	public String getValue() {
 		return this.element.getValue();
 	}
@@ -116,16 +127,11 @@ HasKeyUpHandlers {
 	public void setPlaceholder(String placeholder) {
 		element.setPlaceholder(placeholder);
 	}
-	
-	@Override
-	public AbstractFormLineWidget getParentWidget() {
-		return (AbstractFormLineWidget) super.getParentWidget();
-	}
 
 	@Override
 	public void onClick(ClickEvent event) {
 //		ControlUtils.debugMessage("AbstractSuggestionWidget onClick popovershowing:" + popover.isShowing());
-		if(! waitingFor) {
+		if(! waitingFor || ! popover.isShowing()) {
 			fireLineSelectionEvent();
 		}
 	}
@@ -176,6 +182,7 @@ HasKeyUpHandlers {
 		return new SuggestionCallback(this){
 			@Override
 			public void call() {
+				ControlUtils.debugMessage("SuggestionCallback setCallback call");
 				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
 					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 					waitingFor = false;
@@ -210,7 +217,9 @@ HasKeyUpHandlers {
 //		fireCompletionAskedEvent(); // FIXME commented for testing
 		fireValueChangeEvent(event.getValue());
 		fireCompletionAskedEvent(event.getValue());
-		this.getParentWidget().getData().setTempValue(event.getValue());
+		if(getParentWidget() instanceof AbstractFormLineWidget) {
+			((AbstractFormLineWidget) this.getParentWidget()).getData().setTempValue(event.getValue());
+		}
 	}
 	
 	public void fireValueChangeEvent(String value) {
@@ -322,13 +331,16 @@ HasKeyUpHandlers {
 	 * Retransmet l'event avec le getValue
 	 */
 	public void fireElementCreationEvent() {
-		this.getParentWidget().fireElementCreationEvent(getValue());
+		if(getParentWidget() instanceof AbstractFormLineWidget) {
+			((AbstractFormLineWidget) this.getParentWidget()).fireElementCreationEvent(getValue());
+		}
 	}
 
 	@Override
 	public void fireElementCreationEvent(String value) {
-//		ControlUtils.debugMessage("AbstractSuggestionWidget fireElementCreationEvent " + value);
-		this.fireElementCreationEvent(new ElementCreationEvent(this.getParentWidget(), getValue()));
+		if(getParentWidget() instanceof AbstractFormLineWidget) {
+			this.fireElementCreationEvent(new ElementCreationEvent((AbstractFormLineWidget) this.getParentWidget(), getValue()));
+		}
 	}
 
 	@Override
@@ -342,8 +354,10 @@ HasKeyUpHandlers {
 	
 	public void fireLineSelectionEvent() {
 //		ControlUtils.debugMessage("AbstractSuggestionWidget fireLineSelectionEvent");
-		waitingFor = true;
-		this.getParentWidget().fireLineSelectionEvent(this.getLineSelectionCompletionsCallback());
+		if(getParentWidget() instanceof AbstractFormLineWidget) {
+			waitingFor = true;
+			((AbstractFormLineWidget) this.getParentWidget()).fireLineSelectionEvent(this.getLineSelectionCompletionsCallback());
+		}
 	}
 
 	@Override

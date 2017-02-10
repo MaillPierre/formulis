@@ -42,7 +42,7 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 
 	@Override
 	public void addSuggestionToOracle(Increment inc) {
-//		ControlUtils.debugMessage("EntitySuggestionWidget addSuggestionToOracle" + inc);
+		ControlUtils.debugMessage("EntitySuggestionWidget addSuggestionToOracle " + inc.getKind());
 		if(inc.getKind() == KIND.ENTITY ) {
 			this.oracle.add(new Suggestion(inc));
 		}
@@ -50,14 +50,13 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 
 	@Override
 	public void setOracleSuggestions(Collection<Increment> c) {
-//		ControlUtils.debugMessage("EntitySuggestionWidget setOracleSuggestions " + c);
 		LinkedList<Suggestion> suggs = new LinkedList<Suggestion>();
 		Iterator<Increment> itInc = c.iterator();
 		while(itInc.hasNext()) {
 			Increment inc = itInc.next();
-//			if(inc.getKind() == KIND.ENTITY) {
+			if(inc.getKind() == KIND.ENTITY) {
 				suggs.add(new Suggestion(inc));
-//			}
+			}
 		}
 		this.oracle.setSuggestions(suggs);
 	}

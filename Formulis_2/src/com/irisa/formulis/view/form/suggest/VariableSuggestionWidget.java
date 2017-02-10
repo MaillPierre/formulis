@@ -62,7 +62,11 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 	}
 	
 	public void addSuggestionToOracle(Increment inc) {
-		if(inc.getKind() == KIND.ENTITY || inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.CLASS || inc.getKind() == KIND.SOMETHING) {
+		if(inc.getKind() == KIND.ENTITY 
+//				|| inc.getKind() == KIND.PROPERTY 
+//				|| inc.getKind() == KIND.CLASS 
+				|| inc.getKind() == KIND.SOMETHING 
+				|| inc.getKind() == KIND.LITERAL) {
 			this.oracle.add(new Suggestion(inc));
 		}
 	}
@@ -72,7 +76,11 @@ public class VariableSuggestionWidget extends AbstractSuggestionWidget {
 		Iterator<Increment> itInc = c.iterator();
 		while(itInc.hasNext()) {
 			Increment inc = itInc.next();
-			if(inc.getKind() == KIND.ENTITY || inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.CLASS || inc.getKind() == KIND.SOMETHING) {
+			if(inc.getKind() == KIND.ENTITY 
+//					|| inc.getKind() == KIND.PROPERTY 
+//					|| inc.getKind() == KIND.CLASS 
+					|| inc.getKind() == KIND.SOMETHING 
+					|| inc.getKind() == KIND.LITERAL) {
 				suggs.add(new Suggestion(inc));
 			}
 		}

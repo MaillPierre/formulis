@@ -12,7 +12,8 @@ public class Increment implements Comparable<Increment>{
 		OPERATOR,
 		PROPERTY,
 		INVERSEPROPERTY,
-		RELATION
+		RELATION,
+		LITERAL
 	}
 	
 	private String id;
@@ -131,6 +132,9 @@ public class Increment implements Comparable<Increment>{
 		case "inverseProperty":
 			result = KIND.INVERSEPROPERTY;
 		break;
+		case "literal":
+			result = KIND.LITERAL;
+		break;
 		}
 		
 		return result;
@@ -159,6 +163,9 @@ public class Increment implements Comparable<Increment>{
 		break;
 		case INVERSEPROPERTY:
 			result = "inverseProperty";
+		break;
+		case LITERAL:
+			result = "literal";
 		break;
 		}
 		return result;

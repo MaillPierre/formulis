@@ -115,7 +115,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 	
 	protected void reload() {
-		ControlUtils.debugMessage("FormClassWidget reload " + this.getParentWidget().getData().getMainType() + " " +  this.getData());
+//		ControlUtils.debugMessage("FormClassWidget reload " + this.getParentWidget().getData().getMainType() + " " +  this.getData());
 		elementRow.clear();
 		elementRow.add(fixedElement);
 		
@@ -198,7 +198,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	
 	@Override
 	public void onClick(ClickEvent event) {
-		ControlUtils.debugMessage("FormClassLine onClick");
+//		ControlUtils.debugMessage("FormClassLine onClick");
 		if(event.getSource() == this.resetElementButton) {
 //			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
@@ -211,7 +211,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
-		ControlUtils.debugMessage("FormClassLineWidget onValueChange " + event.getValue() + " " + (event.getSource() == this.labelUriBox));
+//		ControlUtils.debugMessage("FormClassLineWidget onValueChange " + event.getValue() + " " + (event.getSource() == this.labelUriBox));
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(event.getValue());
 			this.fireFinishableLineEvent(this.getFormLine().isFinishable());

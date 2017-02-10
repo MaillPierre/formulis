@@ -20,7 +20,10 @@ import com.irisa.formulis.view.create.variable.NumericCreateWidget;
 import com.irisa.formulis.view.create.variable.TextCreateWidget;
 import com.irisa.formulis.view.create.variable.TimeCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
+import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
+import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.github.gwtbootstrap.client.ui.ListBox;
 
 public class SelectCreateWidget extends AbstractFormulisWidget implements ChangeHandler {
@@ -109,26 +112,26 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 	public void setCreationType(String type) {
 //		ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ")");
 		if(type.equals("date")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date");
 			this.createWid = new DateCreateWidget(null);
 		} else if(type.equals("date-year")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-year");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-year");
 			this.createWid = new DateCreateWidget(null);
 			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYear.getUri());
 		} else if(type.equals("date-month")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-month");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-month");
 			this.createWid = new DateCreateWidget(null);
 			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonth.getUri());
 		} else if(type.equals("date-day")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-day");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-day");
 			this.createWid = new DateCreateWidget(null);
 			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdDay.getUri());
 		} else if(type.equals("date-monthday")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-monthday");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-monthday");
 			this.createWid = new DateCreateWidget(null);
 			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri());
 		} else if(type.equals("date-yearmonth")) {
-			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-yearmonth");
+//			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-yearmonth");
 			this.createWid = new DateCreateWidget(null);
 			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri());
 		} else if(type.equals("time")) {

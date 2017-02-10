@@ -15,6 +15,11 @@
 13/12/2016
 - On peut configurer le serveur SEWELIS interrogé simplement en éditant une valeur d'un petit dictionnaire JS dans index.html
 
+20/02/2017
+(Changements omis)
+- Possibilité de forcer la création d'un élément de zéro sans guidage ("Force creation")
+- Suggestions d'entités existantes lors de l'écriture du label d'un form (chargement de la description existante pas encore implémenté)
+
 TODO:
 - Suppression des étapes intermédiaires (une seul type) de l'historique (+++)
 - Remise à zéro de l'indice d'historique de la barre d'adresse lorsque nécessaire (ou trouver un moyen de rendre chaque session unique) (+++)

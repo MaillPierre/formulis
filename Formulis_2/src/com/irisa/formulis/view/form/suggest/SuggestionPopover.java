@@ -34,16 +34,16 @@ public class SuggestionPopover extends PopupPanel implements HasSuggestionSelect
 		this.add(panel);
 		panel.add(suggestionBar);
 //		setMoreCompletionsMode(false);
-		newElementItem = new MenuItem("New element", new ScheduledCommand() {
-			@Override
-			public void execute() {
-				hide();
-				source.fireElementCreationEvent(source.getValue());
-			}
-		});
+			newElementItem = new MenuItem("New element", new ScheduledCommand() {
+				@Override
+				public void execute() {
+					hide();
+					source.fireElementCreationEvent(source.getValue());
+				}
+			});
 		
 		this.showRelativeTo(source);
-		setCanCreateNewElement(canCreateNewElement);
+		setCanCreateNewElement(! this.source.isSuggestionOnly());
 		this.suggestionBar.addStyleName("weblis-suggestion-frame");
 		
 		refreshSuggestion();

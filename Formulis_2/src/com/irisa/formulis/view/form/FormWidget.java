@@ -66,7 +66,7 @@ public class FormWidget
 	private FluidRow newElementRow = new FluidRow();
 	private Button newRelationButton = new Button("New line");
 	private Button newClassButton = new Button("New class");
-	private Button forceCreationButton = new Button("Force creation");
+	private Button forceCreationButton = new Button("No guiding");
 	private Column newRelationCol = new Column(6, newRelationButton);
 	private Column newClassCol = new Column(6, newClassButton);
 	private Column forceCreationCol = new Column(4, forceCreationButton);
@@ -250,6 +250,9 @@ public class FormWidget
 	public void putClassCreationWidget() {
 		newElementRow.clear();
 		newElementRow.add(classCreationWid);
+		if(this.getParentWidget() instanceof FormRelationLineWidget) {
+			this.getParentWidget().fireLineSelectionEvent(classCreationWid.getSetCallback());
+		}
 	}
 
 	public void removeClassCreationWidget() {

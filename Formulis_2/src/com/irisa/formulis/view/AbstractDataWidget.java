@@ -13,9 +13,9 @@ public abstract class AbstractDataWidget extends Composite {
 	}
 	
 	public FormElement getData() {
-		if(data == null) {
-			ControlUtils.debugMessage(this.getClass()+" DATA NULL");
-		}
+//		if(data == null) {
+//			ControlUtils.debugMessage(this.getClass()+" DATA NULL");
+//		}
 		return data;
 	}
 }

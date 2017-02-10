@@ -1009,6 +1009,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event Event whose callback will be used in case of success
 	 */
 	public void sewelisGetCompletions(final String match, final AbstractFormEvent event) {
+		ControlUtils.debugMessage("Controller sewelisGetCompletions match:" + match + " statement:" + this.getPlace().getStatement().getString());
 		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
 		getCompletionsRequestString += "&storeName=" + currentStore.getName(); 
 		getCompletionsRequestString += "&placeId=" + place.getId(); 
@@ -1034,8 +1035,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									try {
 										Increment inc = Parser.parseIncrement(currNode);
 //										ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
-										if(inc.getKind() != KIND.CLASS 
-												&& inc.getKind() != KIND.INVERSEPROPERTY 
+										if( inc.getKind() != KIND.INVERSEPROPERTY 
 												&& inc.getKind() != KIND.OPERATOR
 												&& inc.getKind() != KIND.PROPERTY
 												&& inc.getKind() != KIND.RELATION) {
@@ -1051,8 +1051,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
 								while(itInc.hasNext()){
 									Increment inc = itInc.next();
-									if(inc.getKind() != KIND.CLASS 
-									&& inc.getKind() != KIND.INVERSEPROPERTY 
+									if(inc.getKind() != KIND.INVERSEPROPERTY 
 									&& inc.getKind() != KIND.OPERATOR
 									&& inc.getKind() != KIND.PROPERTY
 									&& inc.getKind() != KIND.RELATION

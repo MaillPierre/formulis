@@ -60,8 +60,8 @@ public class DataUtils {
 				return DataUtils.extractPropertyFromIncrement(inc);
 			case ENTITY:
 				return DataUtils.extractEntityFromIncrement(inc);
-			case SOMETHING:
-				return DataUtils.extractSomethingFromIncrement(inc);
+			case LITERAL:
+				return DataUtils.extractLiteralFromIncrement(inc);
 			default:
 				return null;
 			}
@@ -71,9 +71,9 @@ public class DataUtils {
 		return null;
 	}
 
-	public static FormElement extractSomethingFromIncrement(Increment inc) throws FormElementConversionException {
+	public static FormElement extractLiteralFromIncrement(Increment inc) throws FormElementConversionException {
 		FormElement result = null;
-		if(inc.getKind() == KIND.SOMETHING) {
+		if(inc.getKind() == KIND.LITERAL) {
 			LinkedList<BasicElement> elements = getFirstDisplayableElements(inc.getDisplayElement());
 			try {
 				if(elements.size() == 1 && elements.getFirst() instanceof Typed) {
