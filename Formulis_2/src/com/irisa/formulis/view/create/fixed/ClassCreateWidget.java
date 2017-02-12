@@ -106,6 +106,7 @@ public class ClassCreateWidget extends AbstractDataWidget implements HasClassCre
 			FormClassLine newClassLine = new FormClassLine(parent.getData(), uriEvent);
 			getParentWidget().getData().addTypeLine(newClassLine);
 			getParentWidget().removeClassCreationWidget();
+			getParentWidget().reload();
 		}
 	}
 	

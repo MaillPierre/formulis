@@ -1037,8 +1037,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 //										ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
 										if( inc.getKind() != KIND.INVERSEPROPERTY 
 												&& inc.getKind() != KIND.OPERATOR
-												&& inc.getKind() != KIND.PROPERTY
-												&& inc.getKind() != KIND.RELATION) {
+//												&& inc.getKind() != KIND.PROPERTY
+//												&& inc.getKind() != KIND.RELATION
+												) {
 											result.addFirst(inc);
 //											ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 										}
@@ -1053,8 +1054,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									Increment inc = itInc.next();
 									if(inc.getKind() != KIND.INVERSEPROPERTY 
 									&& inc.getKind() != KIND.OPERATOR
-									&& inc.getKind() != KIND.PROPERTY
-									&& inc.getKind() != KIND.RELATION
+//									&& inc.getKind() != KIND.PROPERTY
+//									&& inc.getKind() != KIND.RELATION
 									&& ! result.contains(inc)) {
 										result.addLast(inc);
 //										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());

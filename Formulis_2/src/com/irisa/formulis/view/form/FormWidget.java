@@ -240,6 +240,7 @@ public class FormWidget
 	public void putRelationCreationWidget(){
 		newElementRow.clear();
 		newElementRow.add(relationCreationWid);
+		fireLineSelectionEvent(relationCreationWid.getSetCallback());
 	}
 	
 	public void removeRelationCreationWidget(){
