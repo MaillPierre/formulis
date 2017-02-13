@@ -1896,56 +1896,70 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource().getClass().getSimpleName() + " )");
 		this.place.clearCurrentCompletions();
-		// La source est forcément une ligne
-		AbstractFormLineWidget widSource = (AbstractFormLineWidget)event.getSource();
-		FormWidget widSourceParent = widSource.getParentWidget();
-		FormLine dataSource = widSource.getFormLine();
-		Form dataSourceParent = dataSource.getParent();
-		String queryLineLispql = lispqlStatementQuery(dataSource);
-
-		// Si c'est une relatio ou un form typé et qu'on a un callback pour renvoyer des données, c'est une demande de suggestions
-		if(dataSource instanceof FormRelationLine ) {
-			ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
-			if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSource, event.getCallback()));
-			} else {
-				if(event.getCallback() instanceof ActionCallback){
-					((ActionCallback) event.getCallback()).call();
-				}
-			}
-		}
-		else if(dataSource instanceof FormClassLine) { // Selection d'une classe
-			ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
-			// Si c'est une classe de litteral
-			if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
-			
-			// Demande de completion pour la ligne de type
-			} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
+		if(event .getSource() instanceof AbstractFormLineWidget) {
+			// La source est une ligne
+			AbstractFormLineWidget widSource = (AbstractFormLineWidget)event.getSource();
+			FormWidget widSourceParent = widSource.getParentWidget();
+			FormLine dataSource = widSource.getFormLine();
+			Form dataSourceParent = dataSource.getParent();
+			String queryLineLispql = lispqlStatementQuery(dataSource);
+	
+			// Si c'est une relatio ou un form typé et qu'on a un callback pour renvoyer des données, c'est une demande de suggestions
+			if(dataSource instanceof FormRelationLine ) {
+				ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
 				if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
-					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
-					queryLineLispql = lispqlStatementQuery(dataSourceParent);
-					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, event.getCallback()));
+					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSource, event.getCallback()));
 				} else {
 					if(event.getCallback() instanceof ActionCallback){
 						((ActionCallback) event.getCallback()).call();
 					}
 				}
-
-				// si le form n'a pas encore de type
-			} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
-				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
-				dataSourceParent.setMainTypeLine((FormClassLine) dataSource);
-				widSourceParent.reload();
-				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
-				
-				// Si la ligne avait déjà un type (retractation) et qu'on a pas fourni de callback
-			} else {
-				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
-				dataSourceParent.clear();
-				dataSourceParent.resetMainTypeLine();
-				String queryFormLispql = lispqlStatementQuery(dataSourceParent);
-				sewelisGetPlaceStatement(queryFormLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
 			}
+			else if(dataSource instanceof FormClassLine) { // Selection d'une classe
+				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
+				// Si c'est une classe de litteral
+				if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
+				
+				// Demande de completion pour la ligne de type
+				} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
+					if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+						ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
+						queryLineLispql = lispqlStatementQuery(dataSourceParent);
+						sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, event.getCallback()));
+					} else {
+						if(event.getCallback() instanceof ActionCallback){
+							((ActionCallback) event.getCallback()).call();
+						}
+					}
+	
+					// si le form n'a pas encore de type
+				} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
+					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
+					dataSourceParent.setMainTypeLine((FormClassLine) dataSource);
+					widSourceParent.reload();
+					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
+					
+					// Si la ligne avait déjà un type (retractation) et qu'on a pas fourni de callback
+				} else {
+					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
+					dataSourceParent.clear();
+					dataSourceParent.resetMainTypeLine();
+					String queryFormLispql = lispqlStatementQuery(dataSourceParent);
+					sewelisGetPlaceStatement(queryFormLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
+				}
+			}
+		} else {
+			AbstractFormElementWidget widSource = (AbstractFormElementWidget)event.getSource();
+			FormElement dataSource = widSource.getData();
+			String queryLispql = lispqlStatementQuery(dataSource);
+				ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS for " + queryLispql);
+				if(! queryLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+					sewelisGetPlaceStatement(queryLispql, new StatementChangedEvent(widSource, event.getCallback()));
+				} else {
+					if(event.getCallback() instanceof ActionCallback){
+						((ActionCallback) event.getCallback()).call();
+					}
+				}
 		}
 		incrementNumberOfActions();
 	}

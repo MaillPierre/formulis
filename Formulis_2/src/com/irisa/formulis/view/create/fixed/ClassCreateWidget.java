@@ -33,12 +33,12 @@ public class ClassCreateWidget extends AbstractDataWidget implements HasClassCre
 
 	private FormWidget parent;
 	private FluidRow element = new FluidRow();
-	private Column indentCol = new Column(1);
-	private Column predentCol = new Column(1);
 	private ClassSuggestionWidget nameBox;
 	private Column nameBoxCol;
 	private Button createButton = new Button("Create");
+	private Button cancelButton = new Button("Cancel");
 	private Column createButtonCol = new Column(2, createButton);
+	private Column cancelButtonCol = new Column(2, cancelButton);
 
 	private LinkedList<ClassCreationHandler> classCreationHandlers = new LinkedList<ClassCreationHandler>();
 	
@@ -54,6 +54,7 @@ public class ClassCreateWidget extends AbstractDataWidget implements HasClassCre
 		nameBox.getElement().setPropertyString("placeholder", "Class name");
 		nameBox.addSuggestionSelectionHandler(this);
 		nameBox.addCompletionAskedHandler(par);
+		nameBox.setSuggestionOnly(true);
 		createButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
@@ -63,11 +64,18 @@ public class ClassCreateWidget extends AbstractDataWidget implements HasClassCre
 				}
 			}
 		});
+		createButton.setBlock(true);
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				parent.removeClassCreationWidget();
+			}
+		});
+		cancelButton.setBlock(true);
 		
-		element.add(indentCol);
 		element.add(nameBoxCol);
 		element.add(createButtonCol);
-		element.add(predentCol);
+		element.add(cancelButtonCol);
 	}
 	
 	public FormWidget getParentWidget() {

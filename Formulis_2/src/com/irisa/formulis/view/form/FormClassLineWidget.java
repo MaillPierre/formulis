@@ -77,6 +77,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		labelUriBox.addValueChangeHandler(this);
 		labelUriBox.addSuggestionSelectionHandler(this);
 		labelUriBox.addCompletionAskedHandler(this);
+		labelUriBox.setSuggestionOnly(true);
 //		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
 //			@Override
 //			public void onKeyUp(KeyUpEvent event) {

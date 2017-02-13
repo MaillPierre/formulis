@@ -47,11 +47,14 @@ import com.irisa.formulis.view.form.AbstractFormLineWidget;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
+/**
+ * Abstract class for all suggestion fields, handles basic behaviour, the subclasses have to specify which kind of suggestions to send to the oracle
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractSuggestionWidget  extends AbstractFormulisWidget 
 implements ValueChangeHandler<String>, HasValueChangeHandlers<String>, 
 HasCompletionAskedHandler, 
-//HasLessCompletionsHandler, 
-//HasMoreCompletionsHandler, 
 SuggestionSelectionHandler, 
 HasSuggestionSelectionHandler, 
 HasElementCreationHandler,
@@ -61,8 +64,6 @@ KeyUpHandler,
 HasKeyUpHandlers {
 
 	protected LinkedList<CompletionAskedHandler> completionAskedHandlers = new LinkedList<CompletionAskedHandler>();
-//	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
-//	protected LinkedList<LessCompletionsHandler> lessCompletionsHandlers = new LinkedList<LessCompletionsHandler>();
 	protected LinkedList<SuggestionSelectionHandler> suggestionSelectionHandlers = new LinkedList<SuggestionSelectionHandler>();
 	protected LinkedList<ElementCreationHandler> elementCreationHandlers = new LinkedList<ElementCreationHandler>();
 	
@@ -182,7 +183,6 @@ HasKeyUpHandlers {
 		return new SuggestionCallback(this){
 			@Override
 			public void call() {
-				ControlUtils.debugMessage("SuggestionCallback setCallback call");
 				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
 					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 					waitingFor = false;
@@ -259,54 +259,6 @@ HasKeyUpHandlers {
 			hand.onCompletionAsked(event);
 		}
 	}
-
-//	@Override
-//	public void addLessCompletionsHandler(LessCompletionsHandler handler) {
-//		this.lessCompletionsHandlers.add(handler);
-//	}
-//
-//	public void fireLessCompletionsEvent() {
-////		ControlUtils.debugMessage("CustomSuggestionWidget fireLessCompletionsEvent");
-//		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, this.getSetCallback()));
-//	}
-//
-//	@Override
-//	public void fireLessCompletionsEvent(LessCompletionsEvent event) {
-//		Iterator<LessCompletionsHandler> itHand = this.lessCompletionsHandlers.iterator();
-//		while(itHand.hasNext()) {
-//			LessCompletionsHandler hand = itHand.next();
-//			hand.onLessCompletions(event);
-//		}
-//	}
-//
-//	@Override
-//	public void fireLessCompletionsEvent(SuggestionCallback cb) {
-//		this.fireLessCompletionsEvent(new LessCompletionsEvent(this, cb));
-//	}
-//
-//	@Override
-//	public void addMoreCompletionsHandler(MoreCompletionsHandler handler) {
-//		this.moreCompletionsHandlers.add(handler);
-//	}
-//
-//	@Override
-//	public void fireMoreCompletionsEvent(MoreCompletionsEvent event) {
-//		Iterator<MoreCompletionsHandler> itHand = this.moreCompletionsHandlers.iterator();
-//		while(itHand.hasNext()) {
-//			MoreCompletionsHandler hand = itHand.next();
-//			hand.onMoreCompletions(event);
-//		}
-//	}
-//
-//	@Override
-//	public void fireMoreCompletionsEvent(SuggestionCallback cb) {
-//		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, cb));
-//	}
-//
-//	public void fireMoreCompletionsEvent() {
-////		ControlUtils.debugMessage("CustomSuggestionWidget fireMoreCompletionsEvent");
-//		this.fireMoreCompletionsEvent(new MoreCompletionsEvent(this, this.getAddCallback()));
-//	}
 
 	@Override
 	public void addSuggestionSelectionHandler(SuggestionSelectionHandler handler) {

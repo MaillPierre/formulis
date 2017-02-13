@@ -31,15 +31,13 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 
 	private FormWidget parent;
 	private FluidRow element = new FluidRow();
-	private Column indentCol = new Column(1);
-	private Column predentCol = new Column(1);
 //	private TextBox nameBox = new TextBox();
 	private PropertySuggestionWidget nameBox;
 	private Column nameBoxCol;
 	private Button createButton = new Button("Create");
+	private Column createButtonCol = new Column(2, createButton);
 	private Button cancelButton = new Button("Cancel");
-	private HorizontalPanel buttonPanel = new HorizontalPanel();
-	private Column buttonCol = new Column(2, buttonPanel);
+	private Column cancelButtonCol = new Column(2, cancelButton);
 
 	private LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	
@@ -54,6 +52,7 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 		nameBox.getElement().setPropertyString("placeholder", "Property name");
 		nameBox.addSuggestionSelectionHandler(this);
 		nameBox.addCompletionAskedHandler(par);
+		nameBox.setSuggestionOnly(true);
 		createButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
@@ -70,12 +69,9 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 			}
 		});
 		
-		element.add(indentCol);
 		element.add(nameBoxCol);
-		buttonPanel.add(createButton);
-		buttonPanel.add(cancelButton);
-		element.add(buttonCol);
-		element.add(predentCol);
+		element.add(createButtonCol);
+		element.add(cancelButtonCol);
 	}
 	
 	public FormWidget getParentWidget() {
