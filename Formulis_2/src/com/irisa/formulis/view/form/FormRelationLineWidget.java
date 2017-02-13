@@ -187,7 +187,7 @@ public class FormRelationLineWidget
 	
 	@Override
 	public void setVariableElement(AbstractFormulisWidget nWid) {
-		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement " + nWid.getClass().getSimpleName());
+//		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement " + nWid.getClass().getSimpleName());
 		if(nWid != null) {
 			nWid.addClickWidgetEventHandler(this);
 			if(nWid instanceof AbstractFormElementWidget) {

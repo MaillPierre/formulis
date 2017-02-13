@@ -130,6 +130,8 @@ public class ControlUtils {
 		owlUnionOf("http://www.w3.org/2002/07/owl#unionOf"),
 		owlComplementOf("http://www.w3.org/2002/07/owl#complementOf"),
 		owlVersionInfo("http://www.w3.org/2002/07/owl#versionInfo"),
+		xsdInteger("http://www.w3.org/2001/XMLSchema#integer"),
+		xsdString("http://www.w3.org/2001/XMLSchema#string")
 		;
 	
 		private String uri;

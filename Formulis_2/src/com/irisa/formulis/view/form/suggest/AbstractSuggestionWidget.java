@@ -94,7 +94,9 @@ HasKeyUpHandlers {
 		element.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				if(! element.getValue().isEmpty()) {
+				if(event.getNativeKeyCode() == KeyCodes.KEY_DOWN) {
+					popover.focus();
+				} else if(! element.getValue().isEmpty()) {
 					ValueChangeEvent.fire(element, element.getValue());
 				}
 			}

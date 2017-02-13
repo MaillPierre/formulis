@@ -88,10 +88,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private MainNavigationBar navBar = new MainNavigationBar();
 
 	private static String uriBaseAdress = "http://www.irisa.fr/LIS/sewelis/";
-	
+
 	private static String serverAdress = "http://127.0.0.1:9999/";
-//	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
+	//	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
 	private static String logServerAdress = "http://servolis.irisa.fr:3941";
+	private static String logLogin = "expeDEXA";
+	private static String logPasswd = "expeDEXA";
+	private static String logUserKey = "0";
+	private static String logStoreKey = "77AFCEC";
 	private String userLogin = "anonymous";
 	private String userKey = "0";
 	private Store currentStore = null;
@@ -107,10 +111,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Date cookiesProfilesExpireDate = new Date(2500, 1, 1);
 	private HashSet<Profile> profiles = new HashSet<Profile>();
 	private HashMap<String, LinkedList<Profile>> storeProfileMap = new HashMap<String, LinkedList<Profile>>();
-	
+
 	private int numberOfActions = 0;
 	private Date startEditDate = new Date();
-	
+
 	private static Controller _instance = null;
 
 	/**
@@ -120,7 +124,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public static Controller instance() {
 		return _instance;
 	}
-	
+
 	public boolean isStoreSet() {
 		return this.currentStore != null;
 	}
@@ -158,7 +162,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		currentStore = storeMapByName.get(selectValue);
 		sewelisStoreXmlns();
 	}
-	
+
 	/**
 	 * Function for a hidden variable counting the number of user interactions with the forms
 	 */
@@ -166,138 +170,138 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		numberOfActions++;
 		ControlUtils.debugMessage("numberOfActions: " + getNumberOfActions());
 	}
-	
+
 	private int getNumberOfActions() {
 		return numberOfActions;
 	}
-	
+
 	public Answers getRootAnswers() {
 		return this.rootAnswers;
 	}
-	
+
 	public void setRootAnswers(Answers ans) {
 		this.rootAnswers = ans;
 	}
 
 	// Profiles FIXME REMETTRE GESTION DES PROFILS ( HERE BE DRAGONS )
-//
-//	public void addProfile(Profile pro) {
-//		ControlUtils.debugMessage("addProfile " + pro);
-//		profiles.add(pro);
-//		if(! storeProfileMap.containsKey(pro.getStoreName())) {
-//			storeProfileMap.put(pro.getStoreName(), new LinkedList<Profile>());
-//		}
-//		storeProfileMap.get(pro.getStoreName()).add(pro);
-//		addProfileToCookies(pro);
-//	}
-//
-//	public void addProfileToCookies(Profile pro) {
-//		try {
-//			LinkedList<Profile> cookiesProfiles = Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(this.cookiesProfilesIndex)).getDocumentElement());
-//			cookiesProfiles.add(pro);
-//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(cookiesProfiles).toString(), cookiesProfilesExpireDate);
-//		} catch (XMLParsingException | SerializingException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
-//		reloadNavbarProfileList();
-//	}
-//
-//	public void addProfiles(Collection<Profile> l) {
-//		Iterator<Profile> itPro = l.iterator();
-//		while(itPro.hasNext()) {
-//			Profile pro = itPro.next();
-//			addProfile(pro);
-//		}
-//	}
-//	
-//	public void removeProfile(Profile pro) {
-//		profiles.remove(pro);
-//		storeProfileMap.get(pro.getStoreName()).remove(pro);
-//	}
-//
-//	private Profile findProfile(Collection<Profile> list, String name) {
-//		Iterator<Profile> itPro = list.iterator();
-//		while(itPro.hasNext()) {
-//			Profile pro = itPro.next();
-//			if(pro.getName() == name) {
-//				return pro;
-//			}
-//		}
-//		return null;
-//	}
-//
-//	public Profile getProfile(String name) {
-//		return findProfile(this.profiles, name);
-//	}
-//
-//	public LinkedList<Profile> getProfilesByStore(String store) {
-//		return this.storeProfileMap.get(store);
-//	}
-//
-//	public Profile getProfileForAStore(String name, String store) {
-//		return findProfile(getProfilesByStore(store), name);
-//	}
-//
-//	public void initializeProfilesFromCookie() {
-//		if(Cookies.getCookie(cookiesProfilesIndex) == null) {
-//			try {
-//				Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
-//			} catch (SerializingException e) {
-//				ControlUtils.exceptionMessage(e);
-//			}
-//		} 
-//		try {
-//			this.profiles.addAll(Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)).getDocumentElement()));
-//		} catch (XMLParsingException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
-//		this.reloadNavbarProfileList();
-//	}
-//	
-//	/**
-//	 * @return Le contenu parsé du cookie de profile
-//	 */
-//	public Document getProfileDocument() {
-//		return XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex));
-//	}
-//	
-//	public void setProfileDocument(String doc) {
-//		Cookies.setCookie(cookiesProfilesIndex, doc, cookiesProfilesExpireDate);
-//	}
-//
-//	public LinkedList<Profile> getCookiesProfileList() {
-//		try {
-////			Utils.debugMessage("getCookiesProfileList cookie: " + Cookies.getCookie(cookiesProfilesIndex));
-//			Document profilesXMLDoc = XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)); 
-//			Node profilesXMLNode = profilesXMLDoc.getDocumentElement();
-//			return Parser.parseProfiles(profilesXMLNode);
-//		} catch (XMLParsingException | DOMParseException e) {
-//			ControlUtils.exceptionMessage(e);
-//			return null;
-//		}
-//	}
-//
-//	public void clearProfiles() {
-//		this.profiles.clear();
-//		this.storeProfileMap.clear();
-//		try {
-//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
-//		} catch (SerializingException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
-//	}
-//
-//	public void reloadNavbarProfileList() {
-////		navBar.adminPanel.profileList.clear();
-////		Iterator<Profile> itPro = this.profiles.iterator();
-////		while(itPro.hasNext()) {
-////			Profile pro = itPro.next();
-////			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
-////		}
-////		
-////		navBar.adminPanel.profileEditReload.click(); // SALE
-//	}
-	
+	//
+	//	public void addProfile(Profile pro) {
+	//		ControlUtils.debugMessage("addProfile " + pro);
+	//		profiles.add(pro);
+	//		if(! storeProfileMap.containsKey(pro.getStoreName())) {
+	//			storeProfileMap.put(pro.getStoreName(), new LinkedList<Profile>());
+	//		}
+	//		storeProfileMap.get(pro.getStoreName()).add(pro);
+	//		addProfileToCookies(pro);
+	//	}
+	//
+	//	public void addProfileToCookies(Profile pro) {
+	//		try {
+	//			LinkedList<Profile> cookiesProfiles = Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(this.cookiesProfilesIndex)).getDocumentElement());
+	//			cookiesProfiles.add(pro);
+	//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(cookiesProfiles).toString(), cookiesProfilesExpireDate);
+	//		} catch (XMLParsingException | SerializingException e) {
+	//			ControlUtils.exceptionMessage(e);
+	//		}
+	//		reloadNavbarProfileList();
+	//	}
+	//
+	//	public void addProfiles(Collection<Profile> l) {
+	//		Iterator<Profile> itPro = l.iterator();
+	//		while(itPro.hasNext()) {
+	//			Profile pro = itPro.next();
+	//			addProfile(pro);
+	//		}
+	//	}
+	//	
+	//	public void removeProfile(Profile pro) {
+	//		profiles.remove(pro);
+	//		storeProfileMap.get(pro.getStoreName()).remove(pro);
+	//	}
+	//
+	//	private Profile findProfile(Collection<Profile> list, String name) {
+	//		Iterator<Profile> itPro = list.iterator();
+	//		while(itPro.hasNext()) {
+	//			Profile pro = itPro.next();
+	//			if(pro.getName() == name) {
+	//				return pro;
+	//			}
+	//		}
+	//		return null;
+	//	}
+	//
+	//	public Profile getProfile(String name) {
+	//		return findProfile(this.profiles, name);
+	//	}
+	//
+	//	public LinkedList<Profile> getProfilesByStore(String store) {
+	//		return this.storeProfileMap.get(store);
+	//	}
+	//
+	//	public Profile getProfileForAStore(String name, String store) {
+	//		return findProfile(getProfilesByStore(store), name);
+	//	}
+	//
+	//	public void initializeProfilesFromCookie() {
+	//		if(Cookies.getCookie(cookiesProfilesIndex) == null) {
+	//			try {
+	//				Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
+	//			} catch (SerializingException e) {
+	//				ControlUtils.exceptionMessage(e);
+	//			}
+	//		} 
+	//		try {
+	//			this.profiles.addAll(Parser.parseProfiles(XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)).getDocumentElement()));
+	//		} catch (XMLParsingException e) {
+	//			ControlUtils.exceptionMessage(e);
+	//		}
+	//		this.reloadNavbarProfileList();
+	//	}
+	//	
+	//	/**
+	//	 * @return Le contenu parsé du cookie de profile
+	//	 */
+	//	public Document getProfileDocument() {
+	//		return XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex));
+	//	}
+	//	
+	//	public void setProfileDocument(String doc) {
+	//		Cookies.setCookie(cookiesProfilesIndex, doc, cookiesProfilesExpireDate);
+	//	}
+	//
+	//	public LinkedList<Profile> getCookiesProfileList() {
+	//		try {
+	////			Utils.debugMessage("getCookiesProfileList cookie: " + Cookies.getCookie(cookiesProfilesIndex));
+	//			Document profilesXMLDoc = XMLParser.parse(Cookies.getCookie(cookiesProfilesIndex)); 
+	//			Node profilesXMLNode = profilesXMLDoc.getDocumentElement();
+	//			return Parser.parseProfiles(profilesXMLNode);
+	//		} catch (XMLParsingException | DOMParseException e) {
+	//			ControlUtils.exceptionMessage(e);
+	//			return null;
+	//		}
+	//	}
+	//
+	//	public void clearProfiles() {
+	//		this.profiles.clear();
+	//		this.storeProfileMap.clear();
+	//		try {
+	//			Cookies.setCookie(cookiesProfilesIndex, XMLSerializer.profilesToXml(new LinkedList<Profile>()).toString(), cookiesProfilesExpireDate);
+	//		} catch (SerializingException e) {
+	//			ControlUtils.exceptionMessage(e);
+	//		}
+	//	}
+	//
+	//	public void reloadNavbarProfileList() {
+	////		navBar.adminPanel.profileList.clear();
+	////		Iterator<Profile> itPro = this.profiles.iterator();
+	////		while(itPro.hasNext()) {
+	////			Profile pro = itPro.next();
+	////			navBar.adminPanel.profileList.addItem(pro.getName() + " : " + pro.getStoreName(), pro.getName());
+	////		}
+	////		
+	////		navBar.adminPanel.profileEditReload.click(); // SALE
+	//	}
+
 	/**
 	 * Refresh the  displayed namespaces associated to a store according to the values stocked in the Store object
 	 */
@@ -375,11 +379,72 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		request.send();
 	}
 
+//	/**
+//	 * Connect the app to an existing SEWELIS account on the server
+//	 * @param t Login Token containing login and password
+//	 */
+//	public void sewelisLogin(final LoginToken t) {
+//		ControlUtils.debugMessage("sewelisLogin login:" + t.getLogin() + " psswd:" + t.getPassword() + " salt:" + Controller.serverAdress);
+//		String loginRequestString = serverAdress + "/login";
+//		loginRequestString += "?userKey=" + userKey;
+////		loginRequestString += "&userLogin=" + t.getLogin();
+////		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), Controller.serverAdress);
+//		loginRequestString += "&userLogin=" + "admin";
+//		loginRequestString += "&passwd=" + Crypto.getCryptedString("admin", Controller.serverAdress);
+//		navBar.setServerStatusMessage("Waiting...");
+//
+//		AbstractSewelisRequest request = new AbstractSewelisRequest(loginRequestString) {
+//			@Override
+//			public void onServerResponseReceived(Request request, Response response) {
+//				if (200 == response.getStatusCode()) {
+//					Document statusDoc = XMLParser.parse(response.getText());
+//					Element docElement = statusDoc.getDocumentElement();
+//					String status = docElement.getAttribute("status");
+//					if(!status.equals("ok")) {
+//						ControlUtils.debugMessage(docElement.getNodeValue());
+//						navBar.setServerStatusHovertext(docElement.getNodeValue());
+//					} else {
+//						userLogin = t.getLogin();
+//						userKey = docElement.getAttribute("userKey");
+//						navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
+//						navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
+//						Cookies.setCookie(cookiesUserLogin, userLogin);
+//						Cookies.setCookie(cookiesUserkey, userKey);
+//						sewelisVisibleStores();
+//					}
+//				} else {
+//					// FIXME GESTION DES MESSAGE D'ERREUR
+//					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+//				}					
+//			}
+//		};
+//		request.send();
+//	}
+
 	/**
-	 * Connect to an existing SEWELIS account on the server
+	 * Connect the app to an existing SEWELIS account on the server
 	 * @param t Login Token containing login and password
 	 */
 	public void sewelisLogin(final LoginToken t) {
+		sewelisLogin(t, new AbstractStringCallback() {
+			@Override
+			public void call(String userkeyString) {
+				userLogin = t.getLogin();
+				userKey = userkeyString;
+				navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
+				navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
+				Cookies.setCookie(cookiesUserLogin, userLogin);
+				Cookies.setCookie(cookiesUserkey, userKey);
+				sewelisVisibleStores();
+			}
+		});
+	}
+
+	/**
+	 * Connect to an existing SEWELIS account on the server and give the userkey to the callback
+	 * @param t Login Token containing login and password
+	 */
+	private void sewelisLogin(final LoginToken t, final AbstractStringCallback callback) {
 		String loginRequestString = serverAdress + "/login";
 		loginRequestString += "?userKey=" + userKey;
 		loginRequestString += "&userLogin=" + t.getLogin();
@@ -397,13 +462,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage(docElement.getNodeValue());
 						navBar.setServerStatusHovertext(docElement.getNodeValue());
 					} else {
-						userLogin = t.getLogin();
-						userKey = docElement.getAttribute("userKey");
-						navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
-						navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
-						Cookies.setCookie(cookiesUserLogin, userLogin);
-						Cookies.setCookie(cookiesUserkey, userKey);
-						sewelisVisibleStores();
+						callback.call(docElement.getAttribute("userKey"));
 					}
 				} else {
 					// FIXME GESTION DES MESSAGE D'ERREUR
@@ -442,7 +501,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-			
+
 		};
 		request.send();
 	}
@@ -453,9 +512,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisResultsOfStatement(String statString, FormEvent event ) {
 		sewelisResultsOfStatement(statString, event.getCallback());
 	}
-	
+
 	public void sewelisResultsOfStatement(String statString, final FormEventCallback callback ) {
-		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
+//		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
 		String resultsOfStatementRequestString = serverAdress + "/resultsOfStatement?userKey=" + userKey ;
 		resultsOfStatementRequestString += "&storeName=" + currentStore.getName(); 
 		resultsOfStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
@@ -474,7 +533,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(callback instanceof ObjectCallback) {
 								try {
 									Answers ans = Parser.parseAnswersResults(docElement.getFirstChild());
-									ControlUtils.debugMessage("sewelisResultsOfStatemennt Answer=" + ans);
+//									ControlUtils.debugMessage("sewelisResultsOfStatemennt Answer=" + ans);
 									((ObjectCallback) callback).call(ans);
 								} catch (XMLParsingException e) {
 									ControlUtils.exceptionMessage(e);
@@ -552,82 +611,82 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-	
 
-//	// STORES ACCESSORS
-//	public void exportRDF(String extension) {
-//		String filename = currentStore.getName() + "." + extension;
-//		String exportRDFString = serverAdress + "/exportRDF?";
-//		exportRDFString += "userKey=" + userKey;
-//		exportRDFString += "&storeName=" + currentStore.getName();
-//		exportRDFString += "&extension=" + extension;
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(exportRDFString));
-//		try {
-//			builder.sendRequest(null, new RequestCallback() {
-//				@Override
-//				public void onResponseReceived(Request request, Response response) {
-//					if (200 == response.getStatusCode()) {
-//						Window.alert(response.getText());
-//					}
-//				}
-//
-//				@Override
-//				public void onError(Request request, Throwable exception) {
-//
-//				}	
-//			});
-//		} catch (RequestException e) {
-//			Utils.exceptionMessage(e);
-//		}
-//	}
 
-		/**
-		 * Refresh the namespace list associated to the current store from the server
-		 */
-		public void sewelisStoreXmlns() {
-			if(this.currentStore != null) {
-				String storeXmlnsRequestString = serverAdress + "/storeXmlns?";
-				storeXmlnsRequestString += "userKey=" + userKey;
-				storeXmlnsRequestString += "&storeName=" + currentStore.getName();
-				navBar.setServerStatusMessage("Retrieving namespaces...");
+	//	// STORES ACCESSORS
+	//	public void exportRDF(String extension) {
+	//		String filename = currentStore.getName() + "." + extension;
+	//		String exportRDFString = serverAdress + "/exportRDF?";
+	//		exportRDFString += "userKey=" + userKey;
+	//		exportRDFString += "&storeName=" + currentStore.getName();
+	//		exportRDFString += "&extension=" + extension;
+	//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(exportRDFString));
+	//		try {
+	//			builder.sendRequest(null, new RequestCallback() {
+	//				@Override
+	//				public void onResponseReceived(Request request, Response response) {
+	//					if (200 == response.getStatusCode()) {
+	//						Window.alert(response.getText());
+	//					}
+	//				}
+	//
+	//				@Override
+	//				public void onError(Request request, Throwable exception) {
+	//
+	//				}	
+	//			});
+	//		} catch (RequestException e) {
+	//			Utils.exceptionMessage(e);
+	//		}
+	//	}
 
-				AbstractSewelisRequest request = new AbstractSewelisRequest(storeXmlnsRequestString) {
-					@Override
-					public void onServerResponseReceived(Request request, Response response) {
-						if (200 == response.getStatusCode()) {
-							Document storeListDoc = XMLParser.parse(response.getText());
-							Element docElement = storeListDoc.getDocumentElement();
-							String status = docElement.getAttribute("status");
-							navBar.setServerStatusMessage(status);
-							if(status != "ok") {
-								navBar.setServerStatusMessage(docElement.getAttribute("status"));
-								if(docElement.getFirstChild().getNodeName() == "message") {
-									ControlUtils.debugMessage( docElement.getFirstChild().toString());
-									navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
-								}
-							} else {
-								if(docElement.getNodeName().equals("storeXmlnsResponse")) {
-									NodeList childs = docElement.getChildNodes();
-									for(int i = 0; i < childs.getLength(); i++) {
-										Node child = childs.item(i);
-										if(child.getNodeName().equals("namespaceDefinition")) {
-											String ns = child.getAttributes().getNamedItem("namespace").getNodeValue();
-											String prefix = child.getAttributes().getNamedItem("prefix").getNodeValue();
-											currentStore.addNamespace(prefix, ns);
-										}
-									}
-									refreshNamespaceList();
-								}
+	/**
+	 * Refresh the namespace list associated to the current store from the server
+	 */
+	public void sewelisStoreXmlns() {
+		if(this.currentStore != null) {
+			String storeXmlnsRequestString = serverAdress + "/storeXmlns?";
+			storeXmlnsRequestString += "userKey=" + userKey;
+			storeXmlnsRequestString += "&storeName=" + currentStore.getName();
+			navBar.setServerStatusMessage("Retrieving namespaces...");
+
+			AbstractSewelisRequest request = new AbstractSewelisRequest(storeXmlnsRequestString) {
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						Document storeListDoc = XMLParser.parse(response.getText());
+						Element docElement = storeListDoc.getDocumentElement();
+						String status = docElement.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(status != "ok") {
+							navBar.setServerStatusMessage(docElement.getAttribute("status"));
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								ControlUtils.debugMessage( docElement.getFirstChild().toString());
+								navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 							}
-
 						} else {
-							ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+							if(docElement.getNodeName().equals("storeXmlnsResponse")) {
+								NodeList childs = docElement.getChildNodes();
+								for(int i = 0; i < childs.getLength(); i++) {
+									Node child = childs.item(i);
+									if(child.getNodeName().equals("namespaceDefinition")) {
+										String ns = child.getAttributes().getNamedItem("namespace").getNodeValue();
+										String prefix = child.getAttributes().getNamedItem("prefix").getNodeValue();
+										currentStore.addNamespace(prefix, ns);
+									}
+								}
+								refreshNamespaceList();
+							}
 						}
+
+					} else {
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
-				};
-				request.send();
-			}
+				}
+			};
+			request.send();
 		}
+	}
 	//
 	//	/**
 	//	 * Utilité inconnue (Genre d'entité ? Class, property, etc ... )
@@ -664,20 +723,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	//
 	//	}
 
-//	public void importRdf() {
-//
-//	}
-//
-//	public void importUri() {
-//
-//	}
+	//	public void importRdf() {
+	//
+	//	}
+	//
+	//	public void importUri() {
+	//
+	//	}
 
 	// NAVIGATION
-		/**
-		 * Place the current Place object to the root place of the current Store
-		 */
+	/**
+	 * Place the current Place object to the root place of the current Store
+	 */
 	public void sewelisGetPlaceRoot() {
-//		ControlUtils.debugMessage("getPlaceRoot");
+		//		ControlUtils.debugMessage("getPlaceRoot");
 		if(currentStore != null) {
 			String placeHomeRequestString = serverAdress + "/getPlaceRoot?";
 			placeHomeRequestString += "userKey=" + userKey;
@@ -715,18 +774,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
 				}
-				
+
 			};
 			request.send("getPlaceRoot() ERROR ");
 		}
-//		ControlUtils.debugMessage("FIN getPlaceRoot");
+		//		ControlUtils.debugMessage("FIN getPlaceRoot");
 	}
 
 	/**
 	 * Place the current palce to the home place ( or root in undefined) of the current store
 	 */
 	public void sewelisGetPlaceHome() {
-		ControlUtils.debugMessage("getPlaceHome");
+//		ControlUtils.debugMessage("getPlaceHome");
 		if(currentStore != null) {
 			String placeHomeRequestString = serverAdress + "/getPlaceHome?";
 			placeHomeRequestString += "userKey=" + userKey;
@@ -746,7 +805,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								Node placeNode = homePlaceElem.getFirstChild();
 								if(placeNode.getNodeName() == "place") {
 									loadPlace(placeNode);
-//									getRootForm();
+									//									getRootForm();
 									setCurrentForm( newForm());
 									loadFormContent();
 								} else {
@@ -786,14 +845,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event transmitted to changeFocus
 	 */
 	public void sewelisGetPlaceStatement(final String statString, final AbstractFormEvent event) {
-		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
+//		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 			navBar.setServerStatusMessage("Waiting...");
-			
+
 
 			AbstractSewelisRequest request = new AbstractSewelisRequest(placeStatementRequestString){
 				@Override
@@ -837,9 +896,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				}
 			};
 			request.send("sewelisGetPlaceStatement EXCEPTION");
-			
+
 		}
-		ControlUtils.debugMessage("FIN getPlaceStatement " );
+//		ControlUtils.debugMessage("FIN getPlaceStatement " );
 	}
 
 	/**
@@ -848,7 +907,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whit the callback to be called in success
 	 */
 	public void sewelisApplyTransformation(final Place place, final String transformationName, final AbstractFormEvent event) {
-		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
+//		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
 		if(currentStore != null) {
 			String applyTransformationRequestString = serverAdress + "/applyTransformation?";
 			applyTransformationRequestString += "userKey=" + userKey;
@@ -858,7 +917,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			navBar.setServerStatusMessage("Waiting...");
 			try {
 				AbstractSewelisRequest request = new AbstractSewelisRequest(applyTransformationRequestString) {
-					
+
 					@Override
 					public void onServerResponseReceived(Request request, Response response) {
 						//						displayDebugMessage("onResponseReceived");
@@ -903,7 +962,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.exceptionMessage(e);
 			}
 		}
-		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
+//		ControlUtils.debugMessage("FIN sewelisApplyTransformation " );
 	}
 
 	/**
@@ -912,7 +971,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whit the callback to be called in success
 	 */
 	public void sewelisGetPlaceUri(final URI uri, final AbstractFormEvent event) {
-		ControlUtils.debugMessage("sewelisGetPlaceUri( " + uri.getUri() + " ) " );
+//		ControlUtils.debugMessage("sewelisGetPlaceUri( " + uri.getUri() + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceUri?";
 			placeStatementRequestString += "userKey=" + userKey;
@@ -959,7 +1018,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			};
 			request.send("sewelisGetPlaceUri EXCEPTION");
 		}
-		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
+//		ControlUtils.debugMessage("FIN sewelisGetPlaceUri " );
 	}
 
 
@@ -967,10 +1026,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Run the given statement, eg. used to create entities
 	 * @param statString statement LispQL
 	 */
-	private void sewelisRunStatement(String statString) {
-		ControlUtils.debugMessage("runStatement (" + statString + ") ");
-		String runStatementRequestString = serverAdress + "/runStatement?userKey=" + userKey ;
-		runStatementRequestString += "&storeName=" + currentStore.getName(); 
+	public void sewelisRunStatement(String statString) {
+//		ControlUtils.debugMessage("runStatement (" + statString + ") ");
+		sewelisRunStatement(statString, userKey, currentStore.getName());
+	}
+
+
+	/**
+	 * Run the given statement, eg. used to create entities
+	 * @param statString statement LispQL
+	 */
+	private void sewelisRunStatement(String statString, String userKeyString, String storeName) {
+//		ControlUtils.debugMessage("runStatement (" + statString + ") ");
+		String runStatementRequestString = serverAdress + "/runStatement?userKey=" + userKeyString ;
+		runStatementRequestString += "&storeName=" + storeName; 
 		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
 
@@ -984,8 +1053,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					String status = docElement.getAttribute("status");
 					navBar.setServerStatusMessage(status);
 					if(status == "ok") {
-//						getRootForm();
-//						sewelisGetPlaceHome();
 					} else {
 						navBar.setServerStatusMessage(docElement.getAttribute("status"));
 						if(docElement.getFirstChild().getNodeName() == "message") {
@@ -998,7 +1065,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-			
+
 		};
 		request.send();
 	}
@@ -1009,13 +1076,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event Event whose callback will be used in case of success
 	 */
 	public void sewelisGetCompletions(final String match, final AbstractFormEvent event) {
-		ControlUtils.debugMessage("Controller sewelisGetCompletions match:" + match + " statement:" + this.getPlace().getStatement().getString());
+//		ControlUtils.debugMessage("Controller sewelisGetCompletions match:" + match + " statement:" + this.getPlace().getStatement().getString());
 		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
 		getCompletionsRequestString += "&storeName=" + currentStore.getName(); 
 		getCompletionsRequestString += "&placeId=" + place.getId(); 
 		getCompletionsRequestString += "&matchingKey=" + match;
 		navBar.setServerStatusMessage("Waiting...");
-		
+
 		AbstractSewelisRequest request = new AbstractSewelisRequest(getCompletionsRequestString) {
 
 			@Override
@@ -1034,14 +1101,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								do {
 									try {
 										Increment inc = Parser.parseIncrement(currNode);
-//										ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
+										//										ControlUtils.debugMessage("Controller getCompletions " + inc.getDisplayElement());
 										if( inc.getKind() != KIND.INVERSEPROPERTY 
 												&& inc.getKind() != KIND.OPERATOR
-//												&& inc.getKind() != KIND.PROPERTY
-//												&& inc.getKind() != KIND.RELATION
+												//												&& inc.getKind() != KIND.PROPERTY
+												//												&& inc.getKind() != KIND.RELATION
 												) {
 											result.addFirst(inc);
-//											ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
+											//											ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 										}
 									} catch (XMLParsingException e) {
 										ControlUtils.exceptionMessage(e);
@@ -1053,12 +1120,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 								while(itInc.hasNext()){
 									Increment inc = itInc.next();
 									if(inc.getKind() != KIND.INVERSEPROPERTY 
-									&& inc.getKind() != KIND.OPERATOR
-//									&& inc.getKind() != KIND.PROPERTY
-//									&& inc.getKind() != KIND.RELATION
-									&& ! result.contains(inc)) {
+											&& inc.getKind() != KIND.OPERATOR
+											//									&& inc.getKind() != KIND.PROPERTY
+											//									&& inc.getKind() != KIND.RELATION
+											&& ! result.contains(inc)) {
 										result.addLast(inc);
-//										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
+										//										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 									}
 								}
 								if(!result.isEmpty()) {
@@ -1075,7 +1142,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-			
+
 		};
 		request.send();
 	}
@@ -1121,7 +1188,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-			
+
 		};
 		request.send();
 	}
@@ -1153,7 +1220,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						Node placeNode = docElement.getFirstChild();
 						if(placeNode.getNodeName().equals("place")) {
 							loadPlace(placeNode);
-							
+
 							if(event != null) {
 								if(event.getCallback() instanceof ActionCallback){
 									((ActionCallback) event.getCallback()).call();
@@ -1175,7 +1242,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		};
 		request.send();
 	}
-	
+
 	public void sewelisShowLess() {
 		sewelisShowLess(null);
 	}
@@ -1221,7 +1288,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 				}
 			}
-			
+
 		};
 		request.send();
 	}
@@ -1270,21 +1337,21 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		};
 		request.send();
 	}
-	
+
 	/**
 	 * Corresponding function to uriDescription SEWELIS API function, return a place with a statement containing all statement known starting from an uri contained in event.getSource.getData
 	 * @param event event with a URIWidget at its source
 	 */
 	public void sewelisUriDescription(final DescribeUriEvent event) {
-		
+
 		sewelisGetPlaceUri(event.getUri(), new AbstractFormEvent( event.getSource(), new ObjectCallback() {
-				@Override
-				public void call(Object object) {
-					if(object instanceof Place) {
-						sewelisApplyTransformation((Place)object, "Describe", event);
-					}
+			@Override
+			public void call(Object object) {
+				if(object instanceof Place) {
+					sewelisApplyTransformation((Place)object, "Describe", event);
 				}
-			}) {
+			}
+		}) {
 		});
 	}
 	/**
@@ -1301,7 +1368,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		navBar.setServerStatusMessage("Waiting...");
 		AbstractSewelisRequest request = new AbstractSewelisRequest(defineNameRequestString) {
-			
+
 			@Override
 			public void onServerResponseReceived(Request request, Response response) {
 				if (200 == response.getStatusCode()) {
@@ -1324,7 +1391,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		};
 		request.send();
-		
+
 	}
 
 
@@ -1334,36 +1401,38 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param placeNode a XML Place node
 	 */
 	private void loadPlace(Node placeNode) {
-//		ControlUtils.debugMessage("loadPlace " + placeNode.toString());
+		//		ControlUtils.debugMessage("loadPlace " + placeNode.toString());
 		try {
 			place = Parser.parsePlace(placeNode);
-//			refreshAnswers();
-//			ControlUtils.debugMessage("Place " + place.getSuggestions().getEntitySuggestions().size() + " answers " + place.getAnswers().getContentRows().size() + " entity suggestions " + place.getSuggestions().getRelationSuggestions().size() + " relations suggestions");
+			//			refreshAnswers();
+			//			ControlUtils.debugMessage("Place " + place.getSuggestions().getEntitySuggestions().size() + " answers " + place.getAnswers().getContentRows().size() + " entity suggestions " + place.getSuggestions().getRelationSuggestions().size() + " relations suggestions");
 		} catch (XMLParsingException e) {
 			ControlUtils.exceptionMessage(e);
 		}
-//		ControlUtils.debugMessage("FIN loadPlace");
+		//		ControlUtils.debugMessage("FIN loadPlace");
 	}
-	
+
 	/**
 	 * Call for run to create the data contained in the transmitted form, go back to placeRoot
 	 * Supposed to be used to also send log to an external serveur
 	 * @param f FormWidget containing data to be created
 	 */
-//	@SuppressWarnings("deprecation")
+	//	@SuppressWarnings("deprecation")
 	private void finish(FormWidget f) {
 		ControlUtils.debugMessage("Controller finish");
-		sewelisRunStatement(/*"get " +*/ f.getData().toLispql(true) + "");
+		String finalStatement = f.getData().toLispql(true);
+		sewelisRunStatement(/*"get " +*/ finalStatement + "");
 		if(f.getData() == this.rootForm()) {
 			// Retour au formulaire de départ
-			sewelisGetPlaceRoot();
-//			this.toRootForm();
-			
+//			sewelisGetPlaceRoot();
+			this.toRootForm();
+
 			// Logging des actions
 			ControlUtils.debugMessage("Nombre d'actions: " + getNumberOfActions());
-//			Date nowDate = new Date();
-//			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
-//			this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+			//			Date nowDate = new Date();
+			//			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
+			//			this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
+			logLogStatement(finalStatement, "", "", this.numberOfActions);
 			numberOfActions = 0;
 		}
 		ControlUtils.debugMessage("Controller finish END");
@@ -1371,39 +1440,39 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 	// NAVIGATION 
-//	public void sewelisDoRun() {
-//		String insertIncrementRequestString = serverAdress + "/doRun?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + place.getId();
-//		navBar.setServerStatusMessage("Waiting...");
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//		try {
-//			builder.sendRequest(null, new RequestCallback() {			
-//				@Override
-//				public void onError(Request request, Throwable exception) {
-//					ControlUtils.exceptionMessage(exception);
-//				}
-//
-//				@Override
-//				public void onResponseReceived(Request request, Response response) {
-//					if (200 == response.getStatusCode()) {
-//						Document statusDoc = XMLParser.parse(response.getText());
-//						Element docElement = statusDoc.getDocumentElement();
-//						String status = docElement.getAttribute("status");
-//						navBar.setServerStatusMessage(status);
-//						if(status == "ok") {
-//							loadPlace(docElement.getFirstChild());
-//						}
-//					} else {
-//						// TODO GESTION DES MESSAGE D'ERREUR
-//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//					}
-//				}
-//			});
-//		} catch (RequestException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
-//	}
+	//	public void sewelisDoRun() {
+	//		String insertIncrementRequestString = serverAdress + "/doRun?userKey=" + userKey ;
+	//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
+	//		insertIncrementRequestString += "&placeId=" + place.getId();
+	//		navBar.setServerStatusMessage("Waiting...");
+	//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
+	//		try {
+	//			builder.sendRequest(null, new RequestCallback() {			
+	//				@Override
+	//				public void onError(Request request, Throwable exception) {
+	//					ControlUtils.exceptionMessage(exception);
+	//				}
+	//
+	//				@Override
+	//				public void onResponseReceived(Request request, Response response) {
+	//					if (200 == response.getStatusCode()) {
+	//						Document statusDoc = XMLParser.parse(response.getText());
+	//						Element docElement = statusDoc.getDocumentElement();
+	//						String status = docElement.getAttribute("status");
+	//						navBar.setServerStatusMessage(status);
+	//						if(status == "ok") {
+	//							loadPlace(docElement.getFirstChild());
+	//						}
+	//					} else {
+	//						// TODO GESTION DES MESSAGE D'ERREUR
+	//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+	//					}
+	//				}
+	//			});
+	//		} catch (RequestException e) {
+	//			ControlUtils.exceptionMessage(e);
+	//		}
+	//	}
 
 
 	// TRANSFORMATION
@@ -1427,10 +1496,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		builder.setTimeoutMillis(ControlUtils.queryTimeout);
 		try {
 			AbstractSewelisRequest request = new AbstractSewelisRequest(changeFocusRequestString) {
-				
+
 				@Override
 				public void onServerResponseReceived(Request request, Response response) {
-					ControlUtils.debugMessage("Controller sewelisChangeFocus");
+//					ControlUtils.debugMessage("Controller sewelisChangeFocus");
 					if (200 == response.getStatusCode()) {
 						Document statusDoc = XMLParser.parse(response.getText());
 						Element docElement = statusDoc.getDocumentElement();
@@ -1441,11 +1510,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							if(placeNode.getNodeName().equals("place")) {
 								loadPlace(placeNode);
 								if(event != null) {
-									ControlUtils.debugMessage("changeFocus followUp: " + event.getClass().getSimpleName());
 									if(event instanceof StatementChangedEvent) {
 										onStatementChanged((StatementChangedEvent) event);
 									} else if(event.getCallback() != null && event.getCallback() instanceof ActionCallback){
-											((ActionCallback) event.getCallback()).call();
+										((ActionCallback) event.getCallback()).call();
 									}
 								}
 							}
@@ -1462,7 +1530,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
 
-					ControlUtils.debugMessage("Controller sewelisChangeFocus END");
+//					ControlUtils.debugMessage("Controller sewelisChangeFocus END");
 				};
 			};
 			request.send();
@@ -1472,69 +1540,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 	}
 
-//	public Place sewelisChangeFocusAlone(Place here, String focusId) {
-//		//		mainPage.addDebugMessage("changeFocus " + f.toString());
-//		Place result = null;
-//		String insertIncrementRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
-//		insertIncrementRequestString += "&storeName=" + currentStore.getName(); 
-//		insertIncrementRequestString += "&placeId=" + here.getId(); 
-//		insertIncrementRequestString += "&focusId=" + focusId;
-//		navBar.setServerStatusMessage("Waiting...");
-//		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(insertIncrementRequestString));
-//		try {
-//			PlaceRequestCallback placeCallback = new PlaceRequestCallback() {
-//				
-//				private Place resultPlace = null;
-//				
-//				@Override
-//				public void onError(Request request, Throwable exception) {
-//					ControlUtils.exceptionMessage(exception);
-//				}
-//
-//				@Override
-//				public void onResponseReceived(Request request, Response response) {
-//					if (200 == response.getStatusCode()) {
-//						Document statusDoc = XMLParser.parse(response.getText());
-//						Element docElement = statusDoc.getDocumentElement();
-//						String status = docElement.getAttribute("status");
-//						navBar.setServerStatusMessage(status);
-//						if(status == "ok") {
-//							Node placeNode = docElement.getFirstChild();
-//							if(placeNode.getNodeName().equals("place")) {
-//								try {
-//									resultPlace = Parser.parsePlace(placeNode);
-//								} catch (XMLParsingException e) {
-//									ControlUtils.exceptionMessage(e);
-//								}
-//							}
-//						}else {
-//							ControlUtils.debugMessage("sewelisChangeFocusAlone ERROR " + status);
-//							if(docElement.getFirstChild().getNodeName() == "message") {
-//								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
-//								ControlUtils.debugMessage( message);
-//								navBar.setServerStatusHovertext(message);
-//							}
-//						}
-//					} else {
-//						// TODO GESTION DES MESSAGE D'ERREUR
-//						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-//					}
-//				}
-//
-//				@Override
-//				public Place getPlace() {
-//					return resultPlace;
-//				}
-//			};
-//			builder.sendRequest(null, placeCallback );
-//			result = placeCallback.getPlace();
-//		} catch (RequestException e) {
-//			ControlUtils.exceptionMessage(e);
-//		}
-//		return result;
-//	}
-
-
 	// VIEW REFRESH
 
 	/**
@@ -1542,16 +1547,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	private void refreshAnswers() {
 		mainPage.ansWidget.setAnswers(place.getAnswers());
-//		sewelisResultsOfStatement(this.lispqlStatementQuery(form), new ObjectCallback() {
-//			
-//			@Override
-//			public void call(Object object) {
-//				if(object != null && object instanceof Answers) {
-//					setRootAnswers((Answers) object);
-//					mainPage.ansWidget.setAnswers((Answers) object);
-//				}
-//			}
-//		});
+		//		sewelisResultsOfStatement(this.lispqlStatementQuery(form), new ObjectCallback() {
+		//			
+		//			@Override
+		//			public void call(Object object) {
+		//				if(object != null && object instanceof Answers) {
+		//					setRootAnswers((Answers) object);
+		//					mainPage.ansWidget.setAnswers((Answers) object);
+		//				}
+		//			}
+		//		});
 	}
 
 	/**
@@ -1586,7 +1591,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onModuleLoad() {
 		// Init de singleton
 		_instance = this;
-		
+
 		// Récupération de l'adresse du serveur
 		try {
 			Dictionary appSettings = Dictionary.getDictionary("formulisSettings");
@@ -1599,17 +1604,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.debugMessage("Controller onModuleLoad couldn't load server adress from main page");
 			ControlUtils.exceptionMessage(e);
 		}
-		
+
 		Parser.setControl(this);
-//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
+		//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
 		form = new Form(null);
 		mainPage = new MainPage(this);
 
 		RootPanel.get().add(navBar);
 		RootPanel.get().add(mainPage);
 		RootPanel.get().add(new FooterWidget());
-//		RootPanel.get().setStyleName("root");
-		
+		//		RootPanel.get().setStyleName("root");
+
 		if((Cookies.getCookie(cookiesUserLogin) != null && Cookies.getCookie(cookiesUserLogin) != "") 
 				&& (Cookies.getCookie(cookiesUserkey) != null && Cookies.getCookie(cookiesUserkey) != "")) {
 			userKey = Cookies.getCookie(cookiesUserkey);
@@ -1634,20 +1639,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				} 
 			}
 		});
-		
 
-//		// handlers attribution
-//		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
-//		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
+
+		//		// handlers attribution
+		//		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
+		//		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
 		mainPage.getSettingsWidget().getNamespaceDefineButton().addClickHandler(this);
-		
-		
+
+
 		navBar.storeListBox.addChangeHandler(new ChangeHandler(){
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -1655,13 +1660,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					int selectIndex= navBar.storeListBox.getSelectedIndex();
 					String selectValue = navBar.storeListBox.getValue(selectIndex);
 					setCurrentStore(selectValue);
-//					sewelisGetPlaceHome();
+					//					sewelisGetPlaceHome();
 					sewelisGetPlaceRoot();
 				}
 			}
 		});
 
-//		navBar.adminPanel.limitBox.setValue(CustomSuggestionWidget.getLimit());
+		//		navBar.adminPanel.limitBox.setValue(CustomSuggestionWidget.getLimit());
 		// LOGIN
 
 		this.navBar.loginWid.notLoggedLoginButton.addClickHandler(this);
@@ -1695,7 +1700,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e1);
 		}
 		sewelisVisibleStores();
-		
+
 		// Ping toutes les 30 secondes
 		Timer pingTimer = new Timer() {
 			@Override
@@ -1703,15 +1708,16 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				try {
 					if(navBar.getServerStatusMessage() != "error") {
 						sewelisPing();
+						sewelisVisibleStores();
 					}
-				} catch (RequestException e) {
+				} catch (Exception e) {
 					ControlUtils.exceptionMessage(e);
 				}
 			}
 		};
 		pingTimer.scheduleRepeating(30000);
 
-		
+
 		String winState = Window.Location.getParameter("state");
 		if(winState != null) {
 			String winProfileString = Crypto.deobfuscate(winState);
@@ -1724,22 +1730,22 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 
 	}
-	
+
 	// PROFILES
 
 	/**
 	 * Interroge la base, crée un profile de base pour la classe, hors rdfs/owl, qui a le plus d'élements
 	 */
 	public Profile formToProfile() {
-//		ControlUtils.debugMessage("Controller formToProfile " + this.mainPage.formWidget.getData());
+		//		ControlUtils.debugMessage("Controller formToProfile " + this.mainPage.formWidget.getData());
 		if(currentStore != null) {
 			Profile pro = new Profile(this.currentStore.getName(), this.currentStore.getName());
 			pro.setForm(this.mainPage.formWidget.getData().toProfileForm());
 
-//			ControlUtils.debugMessage("Controller formToProfile FIN " + pro);
+			//			ControlUtils.debugMessage("Controller formToProfile FIN " + pro);
 			return pro;
 		}
-//		ControlUtils.debugMessage("Controller formToProfile FIN null");
+		//		ControlUtils.debugMessage("Controller formToProfile FIN null");
 		return null;
 	}
 
@@ -1748,11 +1754,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public Form rootForm() {
 		return this.form;
 	}
-	
+
 	public Form finishedForm() {
 		return this.extractFinishedForm(form, null);
 	}
-	
+
 	private LinkedList<? extends FormLine> extractFinishedLines(Form f) {
 		LinkedList<FormLine> result = new LinkedList<FormLine>();
 		if(! f.isAnonymous()) {
@@ -1761,7 +1767,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Iterator<FormRelationLine> itRelL = f.relationLinesIterator();
 		while(itRelL.hasNext()) {
 			FormLine line = itRelL.next();
-			
+
 			if(line.isFinishable()) {
 				result.add(line);
 			} else if(line.getVariableElement() != null && line instanceof FormRelationLine && line.getVariableElement() instanceof Form) {
@@ -1770,10 +1776,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				result.add(nLine);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Extrait les élément remplis dans le formulaire courant (f)
 	 * @param f Formulaire courant
@@ -1782,7 +1788,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	private Form extractFinishedForm(Form f, FormComponent parent) {
 		Form result = new Form(parent);
-		
+
 		if(! f.isEmpty()) {
 			if(f.isFinishable()) {
 				result = f;
@@ -1791,12 +1797,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				result.addAllLines(this.extractFinishedLines(f));
 			}
 		}
-		
+
 		return result;
 	}
-	
-	
-	
+
+
+
 	// EVENTS
 
 	/**
@@ -1805,34 +1811,34 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onClick(ClickEvent event) {
-//		if(event.getSource() == mainPage.getSettingsWidget().profileModeButton) {
-//			this.mainPage.formWidget.toggleProfileMode();
-//
-//		} else if(event.getSource() == mainPage.getSettingsWidget().profileCreateButton) {
-//			if(this.mainPage.formWidget.isInProfileMode()) {
-//				Profile pro = formToProfile();
-//				pro.setName(mainPage.getSettingsWidget().profileNameBox.getValue());
-//				addProfile(pro);
-//				reloadNavbarProfileList();
-//			}
-//
-//		} else if(event.getSource() == mainPage.getSettingsWidget().profileClearButton) {
-//			this.clearProfiles();
-//			reloadNavbarProfileList();
-//
-//		} else if(event.getSource() == mainPage.getSettingsWidget().profileGoButton) {
-//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
-//			setProfile(findProfile(profiles, select));
-//
-//		} else if(event.getSource() == mainPage.getSettingsWidget().profileDeleteButton) {
-//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
-//			Profile pro = findProfile(profiles, select);
-//			if(pro != null) {
-//				removeProfile(pro);
-//			}
-//			
-//			reloadNavbarProfileList();
-//		} else 
+		//		if(event.getSource() == mainPage.getSettingsWidget().profileModeButton) {
+		//			this.mainPage.formWidget.toggleProfileMode();
+		//
+		//		} else if(event.getSource() == mainPage.getSettingsWidget().profileCreateButton) {
+		//			if(this.mainPage.formWidget.isInProfileMode()) {
+		//				Profile pro = formToProfile();
+		//				pro.setName(mainPage.getSettingsWidget().profileNameBox.getValue());
+		//				addProfile(pro);
+		//				reloadNavbarProfileList();
+		//			}
+		//
+		//		} else if(event.getSource() == mainPage.getSettingsWidget().profileClearButton) {
+		//			this.clearProfiles();
+		//			reloadNavbarProfileList();
+		//
+		//		} else if(event.getSource() == mainPage.getSettingsWidget().profileGoButton) {
+		//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+		//			setProfile(findProfile(profiles, select));
+		//
+		//		} else if(event.getSource() == mainPage.getSettingsWidget().profileDeleteButton) {
+		//			String select = mainPage.getSettingsWidget().profileList.getSelectedValue();
+		//			Profile pro = findProfile(profiles, select);
+		//			if(pro != null) {
+		//				removeProfile(pro);
+		//			}
+		//			
+		//			reloadNavbarProfileList();
+		//		} else 
 		if(event.getSource() == mainPage.getSettingsWidget().getNamespaceDefineButton()) {
 			if(mainPage.getSettingsWidget().getNamespacePrefixBox().getValue() != "" && mainPage.getSettingsWidget().getNamespaceUriBox().getValue() != "") {
 				this.sewelisDefineNamespace(mainPage.getSettingsWidget().getNamespacePrefixBox().getValue(), mainPage.getSettingsWidget().getNamespaceUriBox().getValue());
@@ -1840,37 +1846,37 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		} else 
 			if(event.getSource() == navBar.loginWid.notLoggedLoginButton) {
-			String login = this.navBar.loginWid.notLoggedLoginTextbox.getText();
-			String password = this.navBar.loginWid.notLoggedPasswdTextBox.getText();
-			this.sewelisLogin(new LoginToken( login, password));
+				String login = this.navBar.loginWid.notLoggedLoginTextbox.getText();
+				String password = this.navBar.loginWid.notLoggedPasswdTextBox.getText();
+				this.sewelisLogin(new LoginToken( login, password));
 
-		} else if(event.getSource() == this.navBar.loginWid.logoutButton) {
-			sewelisLogout();
-			navBar.loginWid.setLogState(LOGIN_STATE.NOT_LOGGED);
+			} else if(event.getSource() == this.navBar.loginWid.logoutButton) {
+				sewelisLogout();
+				navBar.loginWid.setLogState(LOGIN_STATE.NOT_LOGGED);
 
-			userLogin = "anonymous";
-			userKey = "0";
-			sewelisVisibleStores();
-			
-		} else if(event.getSource() == this.navBar.loginWid.notLoggedNewuserButton) {
-			navBar.loginWid.setLogState(LOGIN_STATE.NEW_USER);
-			
-		} else if(event.getSource() == this.navBar.loginWid.newUserButton) {
-			String login = this.navBar.loginWid.newUserTextbox.getText();
-			String password = this.navBar.loginWid.newUserpasswdTextBox.getText();
-			String email = this.navBar.loginWid.newUserEmailTextbox.getText();
-			sewelisRegister(new NewUserToken( login, password, email));
-			
-		} 
-//			else if(event.getSource() == this.navBar.adminPanel.profileEditSave) {
-//			this.setProfileDocument(navBar.adminPanel.profileEditArea.getText());
-//			
-//		} else if(event.getSource() == this.navBar.adminPanel.profileEditClear) {
-//			navBar.adminPanel.profileEditArea.setText("");
-//			
-//		} else if(event.getSource() == this.navBar.adminPanel.profileEditReload) {
-//			navBar.adminPanel.profileEditArea.setText(getProfileDocument().toString());
-//		}
+				userLogin = "anonymous";
+				userKey = "0";
+				sewelisVisibleStores();
+
+			} else if(event.getSource() == this.navBar.loginWid.notLoggedNewuserButton) {
+				navBar.loginWid.setLogState(LOGIN_STATE.NEW_USER);
+
+			} else if(event.getSource() == this.navBar.loginWid.newUserButton) {
+				String login = this.navBar.loginWid.newUserTextbox.getText();
+				String password = this.navBar.loginWid.newUserpasswdTextBox.getText();
+				String email = this.navBar.loginWid.newUserEmailTextbox.getText();
+				sewelisRegister(new NewUserToken( login, password, email));
+
+			} 
+		//			else if(event.getSource() == this.navBar.adminPanel.profileEditSave) {
+		//			this.setProfileDocument(navBar.adminPanel.profileEditArea.getText());
+		//			
+		//		} else if(event.getSource() == this.navBar.adminPanel.profileEditClear) {
+		//			navBar.adminPanel.profileEditArea.setText("");
+		//			
+		//		} else if(event.getSource() == this.navBar.adminPanel.profileEditReload) {
+		//			navBar.adminPanel.profileEditArea.setText(getProfileDocument().toString());
+		//		}
 
 	}
 
@@ -1894,7 +1900,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		// SELECTION DE LIGNE
 		// la selection d'une ligne entraine un changement de statement
 
-		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource().getClass().getSimpleName() + " )");
+//		ControlUtils.debugMessage("Controller onLineSelection ( " + event.getSource().getClass().getSimpleName() + " )");
 		this.place.clearCurrentCompletions();
 		if(event .getSource() instanceof AbstractFormLineWidget) {
 			// La source est une ligne
@@ -1903,10 +1909,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			FormLine dataSource = widSource.getFormLine();
 			Form dataSourceParent = dataSource.getParent();
 			String queryLineLispql = lispqlStatementQuery(dataSource);
-	
+
 			// Si c'est une relatio ou un form typé et qu'on a un callback pour renvoyer des données, c'est une demande de suggestions
 			if(dataSource instanceof FormRelationLine ) {
-				ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
+//				ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS");
 				if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
 					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSource, event.getCallback()));
 				} else {
@@ -1916,14 +1922,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				}
 			}
 			else if(dataSource instanceof FormClassLine) { // Selection d'une classe
-				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
+//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
 				// Si c'est une classe de litteral
 				if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
-				
-				// Demande de completion pour la ligne de type
+
+					// Demande de completion pour la ligne de type
 				} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
 					if(! queryLineLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
-						ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
+//						ControlUtils.debugMessage("Controller onLineSelection BY A CLASS new statement");
 						queryLineLispql = lispqlStatementQuery(dataSourceParent);
 						sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, event.getCallback()));
 					} else {
@@ -1931,17 +1937,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							((ActionCallback) event.getCallback()).call();
 						}
 					}
-	
+
 					// si le form n'a pas encore de type
 				} else if(dataSourceParent.isAnonymous() || dataSourceParent.isTypeList()) {
-					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
+//					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS SETTING TYPE LINE " + dataSource);
 					dataSourceParent.setMainTypeLine((FormClassLine) dataSource);
 					widSourceParent.reload();
 					sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(widSourceParent, widSourceParent.getLoadCallback()));
-					
+
 					// Si la ligne avait déjà un type (retractation) et qu'on a pas fourni de callback
 				} else {
-					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
+//					ControlUtils.debugMessage("Controller onLineSelection BY A CLASS RESETING TYPE LINE");
 					dataSourceParent.clear();
 					dataSourceParent.resetMainTypeLine();
 					String queryFormLispql = lispqlStatementQuery(dataSourceParent);
@@ -1952,14 +1958,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			AbstractFormElementWidget widSource = (AbstractFormElementWidget)event.getSource();
 			FormElement dataSource = widSource.getData();
 			String queryLispql = lispqlStatementQuery(dataSource);
-				ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS for " + queryLispql);
-				if(! queryLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
-					sewelisGetPlaceStatement(queryLispql, new StatementChangedEvent(widSource, event.getCallback()));
-				} else {
-					if(event.getCallback() instanceof ActionCallback){
-						((ActionCallback) event.getCallback()).call();
-					}
+//			ControlUtils.debugMessage("Controller onLineSelection ASKING COMPLETIONS for " + queryLispql);
+			if(! queryLispql.equals(lastRequestPlace)) { // Si on a pas changé de ligne, pas besoin de recharger les suggestions
+				sewelisGetPlaceStatement(queryLispql, new StatementChangedEvent(widSource, event.getCallback()));
+			} else {
+				if(event.getCallback() instanceof ActionCallback){
+					((ActionCallback) event.getCallback()).call();
 				}
+			}
 		}
 		incrementNumberOfActions();
 	}
@@ -1985,37 +1991,37 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onStatementChanged(StatementChangedEvent event) {
-		ControlUtils.debugMessage("Controller onStatementChange");
+//		ControlUtils.debugMessage("Controller onStatementChange");
 		try{
-		// CHANGEMENT DE STATEMENT
-		// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
-		if(event.getSource() instanceof FormWidget || event.getSource() instanceof FormClassLineWidget) {
-			ControlUtils.debugMessage("Controller onStatementChange BY A FORM OR A CLASS");
-			if(event.getCallback() instanceof ActionCallback){
-				((ActionCallback) event.getCallback()).call();
+			// CHANGEMENT DE STATEMENT
+			// Le contenu du statement a été changé est pret a être chargé dans le formulaire source
+			if(event.getSource() instanceof FormWidget || event.getSource() instanceof FormClassLineWidget) {
+//				ControlUtils.debugMessage("Controller onStatementChange BY A FORM OR A CLASS");
+				if(event.getCallback() instanceof ActionCallback){
+					((ActionCallback) event.getCallback()).call();
+				}
+			} else if(event.getSource() instanceof FormRelationLineWidget) {
+				FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
+				if(widSource.getData().isFinishable()) {
+//					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
+					sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
+				} else if(event.getCallback() != null && event.getCallback() instanceof SuggestionCallback) {
+//					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE");
+					SuggestionCallback callback = (SuggestionCallback) event.getCallback();
+					onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
+				}
+				//		} else if(event.getSource() instanceof FormClassLineWidget) {
+				////			ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A CLASS");
+				//			event.getCallback().call(this);
 			}
-		} else if(event.getSource() instanceof FormRelationLineWidget) {
-			FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
-			if(widSource.getData().isFinishable()) {
-				ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
-				sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
-			} else if(event.getCallback() != null && event.getCallback() instanceof SuggestionCallback) {
-						ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE");
-						SuggestionCallback callback = (SuggestionCallback) event.getCallback();
-						onCompletionAsked(new CompletionAskedEvent(event.getSource(), callback));
-			}
-//		} else if(event.getSource() instanceof FormClassLineWidget) {
-////			ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A CLASS");
-//			event.getCallback().call(this);
-		}
-		refreshAnswers();
-		
-//		incrementNumberOfActions();
+			refreshAnswers();
+
+			//		incrementNumberOfActions();
 		}
 		catch(Exception e) {
 			ControlUtils.exceptionMessage(e);
 		}
-		ControlUtils.debugMessage("Controller onStatementChange END");
+//		ControlUtils.debugMessage("Controller onStatementChange END");
 	}
 
 	/**
@@ -2026,7 +2032,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onElementCreation(ElementCreationEvent event) {
 		// CREATION D'UN NOUVEL ELEMENT
-//		ControlUtils.debugMessage("Controller onElementCreation");
+		//		ControlUtils.debugMessage("Controller onElementCreation");
 		AbstractFormLineWidget widSource = event.getSource();
 		if(widSource instanceof FormRelationLineWidget) {
 			FormLine dataSource = widSource.getFormLine();
@@ -2034,21 +2040,21 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			FormWidget newFormWid = new FormWidget(newDataForm, widSource);
 			//	boolean newFormFilled = loadFormContent(newFormWid);
 			boolean newFormFilled = this.isFormContentLoadable(newFormWid);
-//			ControlUtils.debugMessage("Controller onElementCreation " + newFormFilled + " " + newDataForm .isEmpty());
+			//			ControlUtils.debugMessage("Controller onElementCreation " + newFormFilled + " " + newDataForm .isEmpty());
 			if(newFormFilled ) {	
 				widSource.setLineState(LINE_STATE.GUIDED_CREATION);
 				dataSource.setVariableElement(newDataForm);
 				widSource.setVariableElement(newFormWid);
 				newFormWid.addClickWidgetEventHandler(widSource);
 				newDataForm.setTempValue(event.getValue());
-	//			ViewUtils.connectFormEventChain(newFormWid, widSource);
-	
+				//			ViewUtils.connectFormEventChain(newFormWid, widSource);
+
 				String queryLineLispql = lispqlStatementQuery(dataSource);
 				sewelisGetPlaceStatement(queryLineLispql, new StatementChangedEvent(newFormWid, newFormWid.getLoadCallback()));
 			} else {
 				widSource.setLineState(LINE_STATE.CREATION, new CreationTypeOracle(this.getPlaceLiteralLines(widSource.getParentWidget()), event.getValue()));
 			}
-	
+
 			incrementNumberOfActions();
 		}
 	}
@@ -2082,7 +2088,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
-//		ControlUtils.debugMessage("onMoreCompletions");
+		//		ControlUtils.debugMessage("onMoreCompletions");
 		if(this.getPlace().hasMore()) {
 			sewelisShowMost(event);
 		} else {
@@ -2097,25 +2103,25 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	@Override
 	public void onLessCompletions(LessCompletionsEvent event) {
-//		ControlUtils.debugMessage("onLessCompletions");
+		//		ControlUtils.debugMessage("onLessCompletions");
 		if(this.getPlace().hasLess()) {
-//			ControlUtils.debugMessage("onLessCompletions showLeast");
+			//			ControlUtils.debugMessage("onLessCompletions showLeast");
 			sewelisShowLeast(event);
 		} else {
 			if(event.getSource() instanceof AbstractFormulisWidget) {
 				String queryString = lispqlStatementQuery(((AbstractFormulisWidget) event.getSource()).getParentWidget().getData());
-	//			ControlUtils.debugMessage("onLessCompletions " + queryString);
+				//			ControlUtils.debugMessage("onLessCompletions " + queryString);
 				sewelisGetPlaceStatement(queryString, event);
 			}
 		}
 	}
-//
-//	@Override
-//	public void onValueChange(ValueChangeEvent<Integer> event) {
-////		if(event.getSource() == this.navBar.adminPanel.limitBox) {
-////			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
-////		}
-//	}
+	//
+	//	@Override
+	//	public void onValueChange(ValueChangeEvent<Integer> event) {
+	////		if(event.getSource() == this.navBar.adminPanel.limitBox) {
+	////			CustomSuggestionWidget.setLimit(this.navBar.adminPanel.limitBox.getValue());
+	////		}
+	//	}
 
 	/**
 	 * Create a new line, add it to the data form source of event, call FormWidget.reload
@@ -2125,17 +2131,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(event.getSource() instanceof RelationCreateWidget) {
 			RelationCreateWidget widSource = (RelationCreateWidget) event.getSource();
 			FormWidget parentWidSource = widSource.getParentWidget();
-			
+
 			String uri = newElementUri(widSource.getTextValue());
 			String label = widSource.getTextValue();
-			
+
 			URI uriObj = new URI(uri, URI.KIND.PROPERTY, label);
-			
+
 			FormRelationLine newLine = new FormRelationLine(parentWidSource.getData(), uriObj);
 			newLine.setAsNew(true);
 			parentWidSource.getData().addLine(newLine);
 			parentWidSource.reload();
- 		}
+		}
 
 		incrementNumberOfActions();
 	}
@@ -2149,17 +2155,17 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		if(event.getSource() instanceof ClassCreateWidget) {
 			ClassCreateWidget widSource = (ClassCreateWidget) event.getSource();
 			FormWidget parentWidSource = widSource.getParentWidget();
-			
+
 			String uri = newElementUri(widSource.getTextValue());
 			String label = widSource.getTextValue();
-			
+
 			URI uriObj = new URI(uri, URI.KIND.CLASS, label);
-			
+
 			FormClassLine newLine = new FormClassLine(parentWidSource.getData(), uriObj);
 			newLine.setAsNew(true);
 			parentWidSource.getData().addTypeLine(newLine);
 			parentWidSource.reload();
- 		}
+		}
 
 		incrementNumberOfActions();
 	}
@@ -2169,12 +2175,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onFinishForm(FinishFormEvent event) {
-//		ControlUtils.debugMessage("Controller onFinishForm");
+		//		ControlUtils.debugMessage("Controller onFinishForm");
 		if(event.getCallback() instanceof ActionCallback){
 			((ActionCallback) event.getCallback()).call();
 		}
 		finish( ( (FormWidget)event.getSource()));
-//		ControlUtils.debugMessage("Controller onFinishForm END");
+		//		ControlUtils.debugMessage("Controller onFinishForm END");
 	}
 
 	/**
@@ -2226,13 +2232,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		} catch (SerializingException | InvalidHistoryState e) {
 			// TODO Auto-generated catch block
 			ControlUtils.exceptionMessage(e);
-//			e.printStackTrace();
+			//			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	// GESTION FORMULAIRE
 
 	/**
@@ -2242,7 +2248,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		setCurrentForm( newForm());
 		sewelisGetPlaceStatement("get [ ]", new StatementChangedEvent(mainPage.formWidget, mainPage.formWidget.getLoadCallback()));
 	}
-	
+
 	/**
 	 * Set the main form data and call FormWidget.reload
 	 * @param f
@@ -2253,7 +2259,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		mainPage.formWidget.setData(this.form);
 		mainPage.formWidget.reload();
 	}
-	
+
 	/**
 	 * load the content of the main form from Place data
 	 */
@@ -2267,44 +2273,44 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param widSource
 	 */
 	public void loadFormContent(FormWidget widSource) {
-//		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
+		//		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
 
 		if( widSource.getData() != null) {
 			if(this.isFormContentLoadable(widSource)) {
-	
+
 				LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 				LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 				Collections.sort(relationLines, new FormLineComparator());
 				Collections.sort(classLines, new FormLineComparator());
-	
+
 				// Si il n'y a qu'un seul type proposé, alors il faut qu'il soit selectionné et placé dans le statement 
 				// pour que les relations proposées soient les bonnes
-	//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
+				//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
 				if(! (widSource.getData().getTypeLines().size() == classLines.size() 
 						&& widSource.getData().getTypeLines().containsAll(classLines) ) ) {
-					
-					
-	//				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
+
+
+					//				ControlUtils.debugMessage("Controller loadFormContent current:" + widSource.getData().getTypeLines() + " new:"+ classLines);
 					widSource.getData().clearContent();
 
 					widSource.getData().setHasMore(this.place.hasMore());
-					
+
 					widSource.getData().addAllTypeLines(classLines);
-					
+
 					// Si il n'y a qu'un type proposé, on change le statement vers ce type
 					if(widSource.getData().getTypeLines().size() == 1) {
-	//						ControlUtils.debugMessage("Controller loadFormContent typé" );
-							widSource.getData().setMainTypeLine(widSource.getData().getTypeLines().getFirst());
-							String queryString = lispqlStatementQuery(widSource.getData());
-							relationLines.clear();
-							this.sewelisGetPlaceStatement(queryString, new StatementChangedEvent(widSource, widSource.getLoadCallback()));
+						//						ControlUtils.debugMessage("Controller loadFormContent typé" );
+						widSource.getData().setMainTypeLine(widSource.getData().getTypeLines().getFirst());
+						String queryString = lispqlStatementQuery(widSource.getData());
+						relationLines.clear();
+						this.sewelisGetPlaceStatement(queryString, new StatementChangedEvent(widSource, widSource.getLoadCallback()));
 					} else if (widSource.getData().isTypeList()){ // C'est une liste de type
 						widSource.fireHistoryEvent();
 					}
 				} 
-					
+
 				if(widSource.getData().isTyped() || widSource.getData().isAnonymous()) {
-	//				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
+					//				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
 					int nbLines = relationLines.size();
 					Iterator<FormRelationLine> itRelLines = relationLines.iterator();
 					while(itRelLines.hasNext()) {
@@ -2330,12 +2336,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param widSource
 	 */
 	public void appendFormContent(FormWidget widSource) {
-//		ControlUtils.debugMessage("appendFormContent " + widSource);
+		//		ControlUtils.debugMessage("appendFormContent " + widSource);
 
 		if(this.isFormContentLoadable(widSource)) {
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
-//			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
+			//			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
 			if(widSource.getData().getTypeLines().isEmpty()) {
 				widSource.getData().appendAllLines(classLines);
 			} else {
@@ -2354,20 +2360,20 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return true if the mentioned necessary component are present
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
-//		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
+		//		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
 		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
-//		return (widSource.getData().isAnonymous()
-//				&& ! classLines.isEmpty()
-//				&& (classLines.size() == 1 
-//				&& classLines.getFirst() instanceof FormClassLine)
-//				|| (! classLines.isEmpty())) 
-//				|| ! relationLines.isEmpty();
-//		return (widSource.getData().isAnonymous()
-//				|| widSource.getData().isTyped()
-//				|| widSource.getData().isTypeList() )
-//				&& ! widSource.getData().isEmpty();
+		//		return (widSource.getData().isAnonymous()
+		//				&& ! classLines.isEmpty()
+		//				&& (classLines.size() == 1 
+		//				&& classLines.getFirst() instanceof FormClassLine)
+		//				|| (! classLines.isEmpty())) 
+		//				|| ! relationLines.isEmpty();
+		//		return (widSource.getData().isAnonymous()
+		//				|| widSource.getData().isTyped()
+		//				|| widSource.getData().isTypeList() )
+		//				&& ! widSource.getData().isEmpty();
 		return ! classLines.isEmpty() || ! relationLines.isEmpty();
 	}
 
@@ -2445,7 +2451,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Iterator<Increment> itIncre = place.getSuggestions().entityIterator();
 		while(itIncre.hasNext()) {
 			Increment incre = itIncre.next();
-//			ControlUtils.debugMessage(incre.toString());
+			//			ControlUtils.debugMessage(incre.toString());
 			if(incre.getKind() == KIND.SOMETHING) {
 				LinkedList<BasicElement> newElemList = DataUtils.getFirstDisplayableElements(incre.getDisplayElement());
 				if(newElemList.size() == 1) {
@@ -2494,77 +2500,53 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public String lispqlStatementQuery(FormElement eleme, boolean root) {
-//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
+		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
 		String result = "";
 		if(eleme instanceof FormLine) {
-//			ControlUtils.debugMessage("lispqlStatementQuery FormLine");
+			//			ControlUtils.debugMessage("lispqlStatementQuery FormLine");
 			FormLine line = (FormLine) eleme;
 			if(eleme instanceof FormRelationLine) {
-//				ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine");
+				//				ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine");
 				if(root) {
-//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine Root");
+					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine Root");
 					FormRelationLine relLine = (FormRelationLine) eleme;
 					result = "get [ " + relLine.toRootLispql() + " ]";
 				} else {
-//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine not Root");
+					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine not Root");
 					try{
-					result = "get [ " + line.toLispql(true, false) + " ]";
+						result = "get [ " + line.toLispql(true, false) + " ]";
 					}catch(Exception e) {
-						ControlUtils.debugMessage("lispqlStatemetQuery EXCEPTION " + eleme );
+						ControlUtils.debugMessage("lispqlStatementQuery EXCEPTION " + eleme );
 						throw e;
 					}
 				}
 			} else if(eleme instanceof FormClassLine) {
-//				ControlUtils.debugMessage("lispqlStatementQuery FormClassLine");
+				//				ControlUtils.debugMessage("lispqlStatementQuery FormClassLine");
 				result = "get [ " + line.toLispql() + " ]";
 			}
 		} else {
-//			ControlUtils.debugMessage("lispqlStatementQuery not FormLine");
+			//			ControlUtils.debugMessage("lispqlStatementQuery not FormLine");
 			result = "get " + eleme.toLispql() + "";
 		}
-//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
+		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
 		return result;
 	}
-	
-	/**
-	 * EXPERIMENTAL
-	 * @param user
-	 * @param store
-	 * @param uri
-	 * @param start
-	 * @param end
-	 * @param nbActions
-	 */
-	public void sendExperimentLog(String user, String store, String uri, String start, String end, int nbActions) {
-//		http://servolis.irisa.fr:3941/message?user=testUser2&store=testStore2&uri=testUri&start=11:50&end=11:52
-		String logRequestString = logServerAdress + "/message?";
-			logRequestString += "&user=" + user; 
-			logRequestString += "&store=" + currentStore.getLabel(); 
-			logRequestString += "&uri=" + URL.encodeQueryString(uri);
-			logRequestString += "&start=" + start;
-			logRequestString += "&end=" + end;
-			logRequestString += "&nbActions=" + nbActions;
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(logRequestString));
-		try {
-			RequestCallback placeCallback = new RequestCallback() {
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					if(response.getStatusCode() != 0) {
-						ControlUtils.debugMessage("EXPERIMENT LOGGING FAILED" + response.getText());
-					} else {
-						
-					}
-				}
-				@Override
-				public void onError(Request request, Throwable exception) {
-					ControlUtils.debugMessage("EXPERIMENT LOGGING FAILED ");
-					ControlUtils.exceptionMessage(exception);
-				}
-			};
-			builder.sendRequest(null, placeCallback );
-		} catch (RequestException e) {
-			ControlUtils.exceptionMessage(e);
-		}
+
+	public void logLogin() {
+		sewelisLogin(new LoginToken(logLogin, logPasswd), new AbstractStringCallback() {
+			@Override
+			public void call(String userKeyString) {
+				logUserKey = userKeyString;
+			}
+		});
 	}
+	
+	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
+		String logUriBase = uriBaseAdress + logStoreKey + "/#";
+		String logStatement =" a <" + logUriBase + "logEntry> ; <" + logUriBase + "by> \""+ this.userLogin + "\"@en ; <" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger + " ; <" + logUriBase+ "creating> [ " + statement + " ]";
+		sewelisRunStatement(logStatement, logUserKey, logStoreKey);
+	}
+	
+	
 
 }

@@ -35,25 +35,6 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 
 	protected AbstractFormulisWidget fixedElement = null;
 
-//	element
-//		contentCol 9
-//			contentRow
-//			elementCol 12
-//				elementRow
-//					fixedElement
-//					labelUriBox
-//		buttonsCol 3
-//			buttonsContainer
-//				buttonsRow
-//					resetElementButton
-//					repeatLineButton
-//					removeLineButton
-//				profileRow
-//					profileCheckbox
-//					profileIndexPlus
-//					profileIndexMinus
-//					profileIndexBox
-
 	public FormClassLineWidget(FormClassLine l, FormWidget par, String startValue) {
 		super(l, par);
 

@@ -214,8 +214,6 @@ public class FormWidget
 		newClassButton.setEnabled(false);
 		forceCreationButton.setEnabled(false);
 		
-//		this.finishButton.setVisible(! getData().isEmpty());
-//		this.finishButton.setEnabled(false);
 		this.setFinishButtonsState(FINISH_BUTTON_STATE.FINISHED);
 		this.moreButton.setVisible(false);
 		this.reloadButton.setVisible(false);
@@ -269,7 +267,7 @@ public class FormWidget
 	}
 	
 	public void reload() {
-		ControlUtils.debugMessage("FormWidget reload ");
+//		ControlUtils.debugMessage("FormWidget reload ");
 		if(getData() != null ) {
 			if(! getData().isEmpty() ) {
 				if(getData().isFinished()) {
@@ -290,12 +288,11 @@ public class FormWidget
 			newRelationButton.setEnabled(newRelationButtonCanBeEnabled());
 		}
 		this.finishButton.setVisible(getData() != null && ! getData().isEmpty());
-//		this.finishButton.setEnabled(getData() != null && ! getData().isFinished());
 		this.setFinishButtonsState(computeFinishButtonState());
 		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore() && ! getData().isFinished()); // TODO uncomment to reactivate More Form
-//			this.moreButton.setVisible(false); // TODO comment to desactivate More Form
+//		this.moreButton.setVisible(false); // TODO comment to desactivate More Form
 		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty() && ! getData().isFinished());	
-		ControlUtils.debugMessage("FormWidget reload END newClassButtonCanBeEnabled:" + newClassButtonCanBeEnabled() + " newRelationButtonCanBeEnabled:" + newRelationButtonCanBeEnabled());
+//		ControlUtils.debugMessage("FormWidget reload END newClassButtonCanBeEnabled:" + newClassButtonCanBeEnabled() + " newRelationButtonCanBeEnabled:" + newRelationButtonCanBeEnabled());
 	}
 	
 	protected boolean newClassButtonCanBeEnabled() {
@@ -307,7 +304,6 @@ public class FormWidget
 	}
 	
 	protected boolean newRelationButtonCanBeEnabled() {
-		ControlUtils.debugMessage("FormWidget newRelationButtonCanBeEnabled storeSet:"+ Controller.instance().isStoreSet()   +" empty:" + this.getData().isEmpty() + " anonymous:" + this.getData().isAnonymous() + " typeList:" + this.getData().isTyped());
 		return Controller.instance().isStoreSet()  
 				&& (this.getData().isEmpty() 
 						|| this.getData().isAnonymous() 
