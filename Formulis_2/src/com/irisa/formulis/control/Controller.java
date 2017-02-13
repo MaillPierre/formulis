@@ -95,7 +95,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private static String logLogin = "expeDEXA";
 	private static String logPasswd = "expeDEXA";
 	private static String logUserKey = "0";
-	private static String logStoreKey = "77AFCEC";
+	private static String logStoreKey = "storeba9a9d";
 	private String userLogin = "anonymous";
 	private String userKey = "0";
 	private Store currentStore = null;
@@ -461,7 +461,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					if(!status.equals("ok")) {
 						ControlUtils.debugMessage(docElement.getNodeValue());
 						navBar.setServerStatusHovertext(docElement.getNodeValue());
-					} else {
+					} else if (docElement.getAttribute("userKey") != null){
+						ControlUtils.debugMessage("Connected as " + t.getLogin());
 						callback.call(docElement.getAttribute("userKey"));
 					}
 				} else {
@@ -1728,6 +1729,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.exceptionMessage(e1);
 			}
 		}
+		
+		logLogin();
 
 	}
 
@@ -2543,7 +2546,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
 		String logUriBase = uriBaseAdress + logStoreKey + "/#";
-		String logStatement =" a <" + logUriBase + "logEntry> ; <" + logUriBase + "by> \""+ this.userLogin + "\"@en ; <" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger + " ; <" + logUriBase+ "creating> [ " + statement + " ]";
+		String logStatement = "[ <" + ControlUtils.FORBIDDEN_URIS.rdfType.getUri() + "> <" + logUriBase + "logEntry> ; ";
+		logStatement +="<" + logUriBase + "by> \""+ this.userLogin + "\"@en ; ";
+		logStatement +="<" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger.getUri() + "> ; ";
+		logStatement +="<" + logUriBase+ "creating> [ " + statement + " ] ]";
+		ControlUtils.debugMessage("Logging: " + logStatement);
 		sewelisRunStatement(logStatement, logUserKey, logStoreKey);
 	}
 	
