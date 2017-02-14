@@ -15,10 +15,13 @@
 13/12/2016
 - On peut configurer le serveur SEWELIS interrogé simplement en éditant une valeur d'un petit dictionnaire JS dans index.html
 
-20/02/2017
+05/02/2017
 (Changements omis)
-- Possibilité de forcer la création d'un élément de zéro sans guidage ("Force creation")
+- Possibilité de forcer la création d'un élément de zéro sans guidage ("no guiding")
 - Suggestions d'entités existantes lors de l'écriture du label d'un form (chargement de la description existante pas encore implémenté)
+
+14/02/2017
+- Pour expérience: Envoie des logs à un store géré par utilisateur expeDEXA indiquant store, utilisateur, nombre d'actions et données entrées
 
 TODO:
 - Suppression des étapes intermédiaires (une seul type) de l'historique (+++)

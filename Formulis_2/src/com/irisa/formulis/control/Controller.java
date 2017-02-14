@@ -90,12 +90,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private static String uriBaseAdress = "http://www.irisa.fr/LIS/sewelis/";
 
 	private static String serverAdress = "http://127.0.0.1:9999/";
-	//	private static String serverAdress = "http://servolis.irisa.fr:3939/"; // TODO Rendre adresse serveur configurable
-	private static String logServerAdress = "http://servolis.irisa.fr:3941";
+//	private static String logServerAdress = "http://servolis.irisa.fr:3941";
 	private static String logLogin = "expeDEXA";
 	private static String logPasswd = "expeDEXA";
 	private static String logUserKey = "0";
-	private static String logStoreKey = "storeba9a9d";
+	private static String logStoreName = "";
 	private String userLogin = "anonymous";
 	private String userKey = "0";
 	private Store currentStore = null;
@@ -1598,9 +1597,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			Dictionary appSettings = Dictionary.getDictionary("formulisSettings");
 			String serverAdressString = appSettings.get("serverAdress");
 			String uriBaseString = appSettings.get("uriBaseAdress");
+			String logStoreNameString = appSettings.get("logStoreName");
 			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
 			serverAdress = serverAdressString;
 			uriBaseAdress = uriBaseString;
+			logStoreName = logStoreNameString;
 		} catch(MissingResourceException e) {
 			ControlUtils.debugMessage("Controller onModuleLoad couldn't load server adress from main page");
 			ControlUtils.exceptionMessage(e);
@@ -2545,13 +2546,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 	
 	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
-		String logUriBase = uriBaseAdress + logStoreKey + "/#";
+		String logUriBase = uriBaseAdress + logStoreName + "/#";
 		String logStatement = "[ <" + ControlUtils.FORBIDDEN_URIS.rdfType.getUri() + "> <" + logUriBase + "logEntry> ; ";
 		logStatement +="<" + logUriBase + "by> \""+ this.userLogin + "\"@en ; ";
+		logStatement +="<" + logUriBase + "store> \""+ this.currentStore.getName() + "\"@en ; ";
 		logStatement +="<" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger.getUri() + "> ; ";
 		logStatement +="<" + logUriBase+ "creating> [ " + statement + " ] ]";
 		ControlUtils.debugMessage("Logging: " + logStatement);
-		sewelisRunStatement(logStatement, logUserKey, logStoreKey);
+		sewelisRunStatement(logStatement, logUserKey, logStoreName);
 	}
 	
 	
