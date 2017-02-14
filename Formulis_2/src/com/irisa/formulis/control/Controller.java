@@ -2483,9 +2483,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public static String newElementUri(String label) {
 		String result = uriBaseAdress + instance().currentStore.getName() + "/#";
-		String sanitizedLabel = label.replace(" ", "_").replace("<","_").replace(">","_").replace("#","_").replace("%","_").replace("\"","_").replace(",","_").replace(")","_").replace("{","_").replace("}","_").replace("|","_").replace("\\","_").replace("^","_").replace("'","_").replace(";","_").replace("/","_").replace("?","_").replace(":","_").replace("@","_").replace("&","_").replace("=","_").replace("+","_").replace("$","_").replace(",", "_");
+		String sanitizedLabel = sanitizedLabel(label);
 		result += sanitizedLabel;
 		return result;
+	}
+	
+	public static String sanitizedLabel(String label) {
+		return label.replace(" ", "_").replace("<","_").replace(">","_").replace("#","_").replace("%","_").replace("\"","_").replace(",","_").replace(")","_").replace("{","_").replace("}","_").replace("|","_").replace("\\","_").replace("^","_").replace("'","_").replace(";","_").replace("/","_").replace("?","_").replace(":","_").replace("@","_").replace("&","_").replace("=","_").replace("+","_").replace("$","_").replace(",", "_");
 	}
 
 	/**

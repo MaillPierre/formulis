@@ -7,6 +7,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileLine;
+import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.form.FormLine;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
@@ -76,20 +77,24 @@ public abstract class AbstractFormLineWidget extends AbstractFormElementWidget
 		
 		initWidget(element);
 		
-		resetElementButton.setTitle("Reset");
+		resetElementButton.setTitle("Reset this line content");
 		resetElementButton.addClickHandler(this);
 		resetElementButton.setBlock(true);
-		repeatLineButton.setTitle("Repeat");
+		if(this.getData().getFixedElement() instanceof URI) {
+			repeatLineButton.setTitle("Add another " + ((URI) this.getData().getFixedElement()).getLabel());
+		} else {
+			repeatLineButton.setTitle("Repeat");
+		}
 		repeatLineButton.addClickHandler(this);
 		repeatLineButton.setBlock(true);
-		removeLineButton.setTitle("Delete");
+		removeLineButton.setTitle("Delete this line");
 		removeLineButton.addClickHandler(this);
 		removeLineButton.setBlock(true);
 				
 		buttonsContainer.add(buttonsRow);
 		buttonsRow.setWidth("100%"); // TEST
-		buttonsRow.add(resetElementButton);
 		buttonsRow.add(repeatLineButton);
+		buttonsRow.add(resetElementButton);
 		buttonsRow.add(removeLineButton);
 		
 		resetElementButton.setSize(ButtonSize.SMALL);

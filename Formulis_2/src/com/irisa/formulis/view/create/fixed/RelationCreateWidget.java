@@ -58,7 +58,7 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 			public void onClick(ClickEvent event) {
 				if(!getTextValue().isEmpty()) {
 					fireRelationCreationEvent();
-					parent.putElementCreationButtons();
+					parent.removeRelationCreationWidget();
 				}
 			}
 		});
@@ -103,7 +103,7 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 
 	@Override
 	public void onSuggestionSelection(SuggestionSelectionEvent event) {
-		ControlUtils.debugMessage("RelationCreateWidget onSuggestionSelection " + event.getSuggestion().getElement());
+//		ControlUtils.debugMessage("RelationCreateWidget onSuggestionSelection " + event.getSuggestion().getElement());
 		Suggestion sugg = event.getSuggestion();
 		if(sugg.getElement() instanceof URI ) {
 			URI uriEvent = (URI) sugg.getElement();
