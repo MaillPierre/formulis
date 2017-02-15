@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Column;
+import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,11 +34,14 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 	private FluidRow element = new FluidRow();
 //	private TextBox nameBox = new TextBox();
 	private PropertySuggestionWidget nameBox;
-	private Column nameBoxCol;
+	private FluidRow nameBoxRow = new FluidRow(); // used to give the same appearance to this as the relation lines
+	private Column nameBoxCol = new Column(8, nameBoxRow);
+	private Column nameBoxSubCol = new Column(11);
+	private HorizontalPanel buttonPanel = new HorizontalPanel();
+	private FluidContainer buttonContainer = new FluidContainer();
 	private Button createButton = new Button("Create");
-	private Column createButtonCol = new Column(2, createButton);
 	private Button cancelButton = new Button("Cancel");
-	private Column cancelButtonCol = new Column(2, cancelButton);
+	private Column buttonCol = new Column(4, buttonContainer);
 
 	private LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	
@@ -46,7 +50,8 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 		initWidget(element);
 		
 		nameBox = new PropertySuggestionWidget(null, parent);
-		nameBoxCol = new Column(8, nameBox);
+		nameBoxRow.add(nameBoxSubCol);
+		nameBoxSubCol.add(nameBox);
 		
 		nameBox.addStyleName("input-block-level");
 		nameBox.getElement().setPropertyString("placeholder", "Property name");
@@ -69,13 +74,34 @@ public class RelationCreateWidget extends Composite implements HasRelationCreati
 			}
 		});
 		
+		nameBoxCol.addStyleName("no-gutter");
+		buttonContainer.add(buttonPanel);
+		createButton.setBlock(true);
+		cancelButton.setBlock(true);
+		buttonPanel.add(createButton);
+		buttonPanel.add(cancelButton);
+		buttonPanel.setWidth("100%");
+		buttonCol.addStyleName("no-gutter");
+		
 		element.add(nameBoxCol);
-		element.add(createButtonCol);
-		element.add(cancelButtonCol);
+		element.add(buttonCol);
+		
+		reload();
 	}
 	
 	public FormWidget getParentWidget() {
 		return parent;
+	}
+	
+	/**
+	 * Just set the offset right
+	 */
+	public void reload() {
+		if(! getParentWidget().getData().isAnonymous()) {
+			nameBoxSubCol.setOffset(1);
+		} else {
+			nameBoxSubCol.setOffset(0);
+		}
 	}
 
 	@Override

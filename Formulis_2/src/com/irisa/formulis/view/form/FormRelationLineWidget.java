@@ -48,7 +48,7 @@ public class FormRelationLineWidget
 	implements SuggestionSelectionHandler, HasAllDragAndDropHandlers  {
 
 	protected Column fixedElementCol = new Column(3); 
-	protected Column variableElementCol = new Column(9);
+	protected Column variableElementCol = new Column(8);
 	protected HorizontalPanel elementRow = new HorizontalPanel();
 	protected Column elementCol = new Column(11, elementRow);
 	
@@ -63,8 +63,6 @@ public class FormRelationLineWidget
 		super(l, par);
 		
 		getElement().setDraggable(Element.DRAGGABLE_TRUE);
-		
-		variableElementCol.setSize(8); 
 
 		try {
 			this.fixedElement = FormulisWidgetFactory.getWidget(l.getFixedElement(), this, this);

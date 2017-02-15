@@ -57,13 +57,15 @@ public class FormWidget
 	implements DragEndHandler, DragStartHandler {
 
 	private FluidRow element = new FluidRow();
-	private Column linesCol = new Column(11);
+	private Column linesCol = new Column(12);
 	private LinkedList<AbstractFormLineWidget> linesWidgets = new LinkedList<AbstractFormLineWidget>();
 
 	private Column controlCol = new Column(1);
 	private CheckBox profileCheckbox = new CheckBox();
 	
 	private FluidRow newElementRow = new FluidRow();
+	private FluidRow lineRow = new FluidRow();
+	private Column lineAndCreateCol = new Column(11, lineRow, newElementRow);
 	private Button newRelationButton = new Button("New line");
 	private Button newClassButton = new Button("New class");
 	private Button forceCreationButton = new Button("No guiding");
@@ -74,14 +76,13 @@ public class FormWidget
 	private ClassCreateWidget classCreationWid = new ClassCreateWidget(this);
 	
 	private FluidRow contentRow = new FluidRow();
-	private Column contentCol = new Column(11,contentRow, newElementRow);
+//	private Column contentCol = new Column(11,contentRow, newElementRow);
+	private Column contentCol = new Column(11,contentRow);
 	
 	private Column finishCol = new Column(1);
 	private Button finishButton = new Button("", IconType.PENCIL);
 	private Button moreButton = new Button("", IconType.PLUS_SIGN);
 	private Button reloadButton = new Button("", IconType.REFRESH);
-	
-	private boolean storeSet = false;
 	
 	public enum FINISH_BUTTON_STATE {
 		FINISHABLE, // Peut être fini
@@ -102,8 +103,10 @@ public class FormWidget
 		element.add(finishCol);
 		element.add(controlCol);
 		element.addStyleName("weblis-form-frame");
-		contentRow.add(linesCol);
+//		contentRow.add(linesCol);
+		contentRow.add(lineAndCreateCol);
 		contentRow.add(finishCol);
+		lineRow.add(linesCol);
 		finishCol.add(finishButton);
 		finishCol.add(moreButton);
 		finishCol.add(reloadButton);
@@ -292,7 +295,8 @@ public class FormWidget
 		this.moreButton.setVisible(getData() != null && ! getData().isEmpty() && getData().hasMore() && ! getData().isFinished()); // TODO uncomment to reactivate More Form
 //		this.moreButton.setVisible(false); // TODO comment to desactivate More Form
 		this.reloadButton.setVisible(getData() != null && ! getData().isEmpty() && ! getData().isFinished());	
-//		ControlUtils.debugMessage("FormWidget reload END newClassButtonCanBeEnabled:" + newClassButtonCanBeEnabled() + " newRelationButtonCanBeEnabled:" + newRelationButtonCanBeEnabled());
+		
+		this.relationCreationWid.reload();
 	}
 	
 	protected boolean newClassButtonCanBeEnabled() {
