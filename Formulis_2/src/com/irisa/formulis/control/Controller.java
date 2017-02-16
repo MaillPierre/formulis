@@ -845,7 +845,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event transmitted to changeFocus
 	 */
 	public void sewelisGetPlaceStatement(final String statString, final AbstractFormEvent event) {
-//		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
+		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
@@ -886,6 +886,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 							}
 						} else {
 							String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+							if(message.contains("SyntaxError")) {
+								message += " in " + statString;
+							}
 							ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
 							navBar.setServerStatusHovertext(message);
 						}
@@ -1129,6 +1132,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									}
 								}
 								if(!result.isEmpty()) {
+									ControlUtils.debugMessage("Controller sewelisGetCompletions " + result);
 									place.setCurrentCompletions(result);  
 									if(event.getCallback() instanceof ActionCallback){
 										((ActionCallback) event.getCallback()).call();

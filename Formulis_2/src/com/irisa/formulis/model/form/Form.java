@@ -251,7 +251,7 @@ public class Form extends FormComponent {
 		while(itRelLines.hasNext()) {
 			FormLine line = itRelLines.next();
 			try {
-			if(! line.equals(selectedLine) &&  line.isFinishable()) {
+			if((! line.equals(selectedLine) &&  line.isFinishable()) && !(line instanceof FormClassLine && ((FormClassLine) line).isAnonymous())){
 				String lineString =  line.toLispql(isFinalRequest);
 //				ControlUtils.debugMessage("Form toLispql line added:" + lineString);
 				otherlines.add(lineString);
@@ -294,9 +294,10 @@ public class Form extends FormComponent {
 		} else if(this.isAnonymous() ) {
 			result += " [ a thing ";
 			// Si il y a quelque chose à venir après
-			if(! otherlines.isEmpty() || getParent() != null && getParent() instanceof FormLine) {
-				result += " ; ";
-			}
+//			if((! otherlines.isEmpty() || getParent() != null && getParent() instanceof FormLine)) {
+//				ControlUtils.debugMessage("Form toLispql otherlines: " + otherlines);
+//				result += " ; ";
+//			}
 		} else {
 			result += " [ ";
 		}
@@ -321,7 +322,7 @@ public class Form extends FormComponent {
 			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
 				Form parentForm = parentLine.getParent();
 				String parentFormString = parentForm.toLispql(parentLine);
-				if((! otherlines.isEmpty()) || ! this.isAnonymous()) {
+				if((! otherlines.isEmpty())/* || ! this.isAnonymous()*/) {
 					result += " ; ";
 				}
 				result += parentFormString;
