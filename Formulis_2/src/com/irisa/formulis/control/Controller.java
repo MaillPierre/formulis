@@ -903,6 +903,144 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		}
 //		ControlUtils.debugMessage("FIN getPlaceStatement " );
 	}
+	
+	/**
+	 * Return through the callback the "concepts and relations" suggestions for the given statement
+	 * @param statement
+	 * @param callback
+	 */
+	public void sewelisGetStatementRelationSuggestions(String statement, ObjectCallback callback) {
+		sewelisGetStatement(statement, new ObjectCallback(){
+			@Override
+			public void call(Object object) {
+				if(object instanceof Place) {
+					
+				}
+			}
+		});
+	}
+
+	/**
+	 * Return the given statement place through the callback 
+	 * @param statString statement LispQL
+	 * @param event transmitted to changeFocus
+	 */
+	public void sewelisGetStatement(final String statString, final ObjectCallback callback) {
+		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
+		if(currentStore != null) {
+			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
+			placeStatementRequestString += "userKey=" + userKey;
+			placeStatementRequestString += "&storeName=" + currentStore.getName();
+			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
+			navBar.setServerStatusMessage("Waiting...");
+
+
+			AbstractSewelisRequest request = new AbstractSewelisRequest(placeStatementRequestString){
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+					//						displayDebugMessage("onResponseReceived");
+					if (200 == response.getStatusCode()) {
+						Document homePlaceDoc = XMLParser.parse(response.getText());
+						Element homePlaceElem = homePlaceDoc.getDocumentElement();
+						String status = homePlaceElem.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(homePlaceElem.getNodeName() == "getPlaceStatementResponse" && status == "ok") {
+							Node placeNode = homePlaceElem.getFirstChild();
+							if(placeNode.getNodeName() == "place") {
+
+								// TODO Rustine pour gérer le focus renvoyé par getPlaceStatement = a étudier
+								// Le focused est placé à la racine du statement, ce qui ne permet pas d'avoir de suggestions pour l'objet qui nous interesse
+								// La rustine déplace le focused au premier focus de la formule (2 numéro après, premier élément da la première Pair)
+								// SALE
+								try {
+									String focusedId = place.getStatement().getFocusedDisplay();
+									String targetFocusId = String.valueOf(Integer.valueOf(focusedId) - 1);
+									sewelisChangeStatementFocus(targetFocusId, callback);
+								} catch(Exception e) {
+									ControlUtils.exceptionMessage( e);
+								}
+							} else {
+								// FIXME GESTION DES MESSAGES D'ERREUR
+								ControlUtils.debugMessage("EXPECTED <place> node = " + placeNode);
+							}
+						} else {
+							String message =  homePlaceElem.getFirstChild().getFirstChild().getNodeValue();
+							if(message.contains("SyntaxError")) {
+								message += " in " + statString;
+							}
+							ControlUtils.debugMessage(homePlaceElem.getAttribute("status") + ": " + message);
+							navBar.setServerStatusHovertext(message);
+						}
+					} else {
+						// FIXME GESTION DES MESSAGES D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+					}
+				}
+			};
+			request.send("sewelisGetPlaceStatement EXCEPTION");
+
+		}
+//		ControlUtils.debugMessage("FIN getPlaceStatement " );
+	}
+
+	/**
+	 * In SEWELIS Places, elements in statement can be set as focus, identified by numbers
+	 * With this function, the statement stay the same, but the place change
+	 * @param focusId number of the element in the statement
+	 * @param event event whose callback will be called in case of success
+	 */
+	public void sewelisChangeStatementFocus(String focusId, final ObjectCallback callback) {
+		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
+		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
+		changeFocusRequestString += "&placeId=" + place.getId(); 
+		changeFocusRequestString += "&focusId=" + focusId;
+		navBar.setServerStatusMessage("Waiting...");
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(changeFocusRequestString));
+		builder.setTimeoutMillis(ControlUtils.queryTimeout);
+		try {
+			AbstractSewelisRequest request = new AbstractSewelisRequest(changeFocusRequestString) {
+
+				@Override
+				public void onServerResponseReceived(Request request, Response response) {
+//					ControlUtils.debugMessage("Controller sewelisChangeFocus");
+					if (200 == response.getStatusCode()) {
+						Document statusDoc = XMLParser.parse(response.getText());
+						Element docElement = statusDoc.getDocumentElement();
+						String status = docElement.getAttribute("status");
+						navBar.setServerStatusMessage(status);
+						if(status == "ok") {
+							Node placeNode = docElement.getFirstChild();
+							if(placeNode.getNodeName().equals("place")) {
+								Place place;
+								try {
+									place = Parser.parsePlace(placeNode);
+									callback.call(place);
+								} catch (XMLParsingException e) {
+									ControlUtils.exceptionMessage(e);
+								}
+							}
+						} else {
+							ControlUtils.debugMessage("sewelisChangeFocus ERROR " + status);
+							if(docElement.getFirstChild().getNodeName() == "message") {
+								String message = docElement.getFirstChild().getFirstChild().getNodeValue();
+								ControlUtils.debugMessage( message);
+								navBar.setServerStatusHovertext(message);
+							}
+						}
+					} else {
+						// TODO GESTION DES MESSAGE D'ERREUR
+						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+					}
+
+//					ControlUtils.debugMessage("Controller sewelisChangeFocus END");
+				};
+			};
+			request.send();
+		} catch (Exception e) {
+			ControlUtils.debugMessage("SewelisChangeFocus EXCEPTION ");
+			ControlUtils.exceptionMessage(e);
+		}
+	}
 
 	/**
 	 * Set the current place to the place corresponding to the Uri passed in parameter 
@@ -1119,20 +1257,31 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 									currNode = currNode.getNextSibling();
 								}
 								while(currNode != null);
-								Iterator<Increment> itInc = place.getSuggestions().getEntitySuggestions().iterator();
-								while(itInc.hasNext()){
-									Increment inc = itInc.next();
-									if(inc.getKind() != KIND.INVERSEPROPERTY 
-											&& inc.getKind() != KIND.OPERATOR
+								Iterator<Increment> itEntityInc = place.getSuggestions().getEntitySuggestions().iterator();
+								while(itEntityInc.hasNext()){
+									Increment entityInc = itEntityInc.next();
+									if(entityInc.getKind() != KIND.INVERSEPROPERTY 
+											&& entityInc.getKind() != KIND.OPERATOR
 											//									&& inc.getKind() != KIND.PROPERTY
 											//									&& inc.getKind() != KIND.RELATION
-											&& ! result.contains(inc)) {
-										result.addLast(inc);
+											&& ! result.contains(entityInc)) {
+										result.addLast(entityInc);
+										//										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
+									}
+								}
+								Iterator<Increment> itRelationInc = place.getSuggestions().getRelationSuggestions().iterator();
+								while(itRelationInc.hasNext()){
+									Increment relationInc = itRelationInc.next();
+									if(relationInc.getKind() != KIND.INVERSEPROPERTY 
+											&& relationInc.getKind() != KIND.OPERATOR
+											//									&& inc.getKind() != KIND.PROPERTY
+											//									&& inc.getKind() != KIND.RELATION
+											&& ! result.contains(relationInc)) {
+										result.addLast(relationInc);
 										//										ControlUtils.debugMessage("Controller getCompletions AJOUT " + inc.getDisplayElement());
 									}
 								}
 								if(!result.isEmpty()) {
-									ControlUtils.debugMessage("Controller sewelisGetCompletions " + result);
 									place.setCurrentCompletions(result);  
 									if(event.getCallback() instanceof ActionCallback){
 										((ActionCallback) event.getCallback()).call();

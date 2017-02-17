@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
@@ -26,7 +27,7 @@ public class ClassSuggestionWidget extends AbstractSuggestionWidget {
 
 	@Override
 	public void addSuggestionToOracle(Increment inc) {
-		if(inc.getKind() == KIND.CLASS) {
+		if(inc.getKind() == KIND.CLASS && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) inc.getDisplayElement()).getUri()) ) {
 			this.oracle.add(new Suggestion(inc));
 		}
 	}
@@ -38,7 +39,7 @@ public class ClassSuggestionWidget extends AbstractSuggestionWidget {
 		while(itInc.hasNext()) {
 			Increment inc = itInc.next();
 			ControlUtils.debugMessage("ClassSuggestionWidget setOracleSuggestions inc:"+ inc);
-			if(inc.getKind() == KIND.CLASS) {
+			if(inc.getKind() == KIND.CLASS  && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) inc.getDisplayElement()).getUri()) ) {
 				suggs.add(new Suggestion(inc));
 			}
 		}
