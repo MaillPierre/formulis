@@ -1,16 +1,10 @@
 @CHARSET "UTF-8";
 
-/* .root { */
-/* 	justify-content:center; */
-/* } */
-
 .mainPage {
 	padding-top: 40px;
 }
 
 .weblis-navbar-text {
-/*     display: inline-block !important; */
-/*     vertical-align: middle; */
     text-align: center;
     list-style-type: none;
     margin-right: 3px;
@@ -42,7 +36,6 @@
 }
 
 .weblis-line-frame {
-/* 	padding: 1% 1%; */
     border-style: solid;
 	border-radius: 6px;
     border-color: #e6e6e6;
@@ -61,13 +54,7 @@
 
 .header {
     display: inline;
-/*     text-align: left; */
-/*     vertical-align: bottom; */
-/*     padding: 5px; */
 	font-weight: bold;
-/* 	border: 1px solid #ddd; */
-/* 	border-bottom-width: 2px; */
-/* 	border-top: 0; */
 }
 
 .indent {
@@ -120,7 +107,6 @@
 }
 
 .pairline {
-/* 	display: inline; */
 	width: 100%;
 }
 
@@ -213,25 +199,6 @@
     padding-right:0;
     padding-left:0;
 }
-
-/* .controls { */
-/* 	background-color: #CCFFFF; */
-/* 	border-radius: 10px; */
-/* 	align-content: stretch; */
-/* } */
-
-/* .insertButtonPanel { */
-/* 	border-radius: 10px; */
-/* 	align-content: stretch; */
-/* } */
-
-/* .gwt-PushButton { */
-/* 	border-radius: 3px; */
-/* } */
-
-/* .row-fluid [class*="span"] { */
-/*     vertical-align: middle; */
-/* } */
 
 .gwt-PushButton-up {
 	color: #ffffff;
@@ -482,4 +449,8 @@ td.datePickerYear {
 }
 
 .dateBoxPopup {
+}
+
+.pull-bottom {
+	vertical-align: bottom;
 }
