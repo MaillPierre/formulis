@@ -75,7 +75,6 @@ import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionC
  * This class is the end of the FormEvent event chain (Pattern Chain of responsibility).
  * Main method is onModuleLoad.
  * The application display and interact with several elements: one store, one Form (root of the displayed Form), a Place (containing suggestions and answers) 
- * , and an answer containing the answers satisfying the current statement (IN PROGRESS)
  * @author pmaillot
  *
  */
@@ -100,7 +99,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private Store currentStore = null;
 	private Place place = null;
 	private Form form = null;
-	private Answers rootAnswers = null; 
 	private String lastRequestPlace = "";
 
 	private String cookiesProfilesIndex = "FormulisProfile";
@@ -172,14 +170,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	private int getNumberOfActions() {
 		return numberOfActions;
-	}
-
-	public Answers getRootAnswers() {
-		return this.rootAnswers;
-	}
-
-	public void setRootAnswers(Answers ans) {
-		this.rootAnswers = ans;
 	}
 
 	// Profiles FIXME REMETTRE GESTION DES PROFILS ( HERE BE DRAGONS )
@@ -513,6 +503,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisResultsOfStatement(statString, event.getCallback());
 	}
 
+	/**
+	 * SEWELIS function to retrieve answers given in a different format (without display setting, among other things)
+	 * @param statString statement
+	 * @param callback ObjectCallback retrieving the Answers object
+	 */
 	public void sewelisResultsOfStatement(String statString, final FormEventCallback callback ) {
 //		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
 		String resultsOfStatementRequestString = serverAdress + "/resultsOfStatement?userKey=" + userKey ;
@@ -1908,10 +1903,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	// FORMULAIRE
 
+	/**
+	 * 
+	 * @return access to the root form at the root of the displayed form
+	 */
 	public Form rootForm() {
 		return this.form;
 	}
 
+	/**
+	 * Call extractFinishedLines on the root form
+	 * @return form with all finished elements
+	 */
 	public Form finishedForm() {
 		return this.extractFinishedForm(form, null);
 	}
@@ -2241,7 +2244,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * 
+	 * If the place can be relaxed, call directly showMost, other with, return to the statement's place
 	 */
 	@Override
 	public void onMoreCompletions(MoreCompletionsEvent event) {
@@ -2258,6 +2261,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
+
+	/**
+	 * If the place can be specialized, call directly showMost, other with, return to the statement's place
+	 */
 	@Override
 	public void onLessCompletions(LessCompletionsEvent event) {
 		//		ControlUtils.debugMessage("onLessCompletions");
@@ -2693,6 +2700,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 
+	/**
+	 * call sewelisLogin ans update logUserKey with the current userKey
+	 */
 	public void logLogin() {
 		sewelisLogin(new LoginToken(logLogin, logPasswd), new AbstractStringCallback() {
 			@Override
@@ -2701,7 +2711,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		});
 	}
-	
+
+
+	/**
+	 * call sewelisRunStatement to send the statement to the log server
+	 */
 	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
 		String logUriBase = uriBaseAdress + logStoreName + "/#";
 		String logStatement = "[ <" + ControlUtils.FORBIDDEN_URIS.rdfType.getUri() + "> <" + logUriBase + "logEntry> ; ";

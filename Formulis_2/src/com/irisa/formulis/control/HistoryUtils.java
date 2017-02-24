@@ -7,6 +7,12 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.irisa.formulis.model.exception.InvalidHistoryState;
 
+/**
+ * Class responsible of handling history
+ * Should change its behavior according to the possibility to use local storage
+ * @author pmaillot
+ *
+ */
 public class HistoryUtils {
 	
 	private static Storage bank = Storage.getLocalStorageIfSupported();

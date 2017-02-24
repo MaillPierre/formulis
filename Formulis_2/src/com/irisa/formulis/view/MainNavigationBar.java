@@ -21,6 +21,11 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.Store;
 
+/**
+ * View object for all server interaction elements outside of the form (login, store selection,...)
+ * @author pmaillot
+ *
+ */
 public class MainNavigationBar extends Composite{
 
 	// Indicators & User menus

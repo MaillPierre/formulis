@@ -1,17 +1,8 @@
 package com.irisa.formulis.view.create.fixed;
 
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.irisa.formulis.control.Controller;
-import com.irisa.formulis.model.basic.URI;
-import com.irisa.formulis.model.basic.URI.KIND;
 import com.irisa.formulis.model.form.Form;
-import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
 public class FormCreateWidget extends AbstractCreateWidget {

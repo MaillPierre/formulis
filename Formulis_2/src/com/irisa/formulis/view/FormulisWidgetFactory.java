@@ -15,6 +15,11 @@ import com.irisa.formulis.view.form.FormClassLineWidget;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.irisa.formulis.view.form.FormWidget;
 
+/**
+ * View Utility class to transform data objects into view widgets
+ * @author pmaillot
+ *
+ */
 public class FormulisWidgetFactory {
 	
 	public static AbstractFormulisWidget getWidget(BasicElement e, AbstractFormulisWidget par) throws FormElementConversionException {

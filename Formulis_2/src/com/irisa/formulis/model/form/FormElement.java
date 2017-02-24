@@ -1,5 +1,10 @@
 package com.irisa.formulis.model.form;
 
+/**
+ * Base data class for all form element
+ * @author pmaillot
+ *
+ */
 public interface FormElement {
 
 	public String toLispql();

@@ -43,6 +43,11 @@ import com.irisa.formulis.view.event.interfaces.RemoveLineHandler;
 import com.irisa.formulis.view.event.interfaces.StatementChangedHandler;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
+/**
+ * Base View class forming the spine of the event transmission chain
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 		implements FormEventChainHandler, HasFormEventChainHandlers {
 

@@ -1,16 +1,17 @@
 package com.irisa.formulis.view;
 
 import com.github.gwtbootstrap.client.ui.Footer;
-import com.github.gwtbootstrap.client.ui.Image;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.InlineHTML;
 
+/**
+ * View class vor all the information element à the bottom of the page
+ * @author pmaillot
+ *
+ */
 public class FooterWidget extends Composite {
 
 	private Footer element = new Footer();

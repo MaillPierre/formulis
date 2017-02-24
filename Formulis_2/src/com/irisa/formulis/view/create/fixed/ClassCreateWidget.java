@@ -6,14 +6,10 @@ import java.util.LinkedList;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Composite;
 import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.basic.URI;
-import com.irisa.formulis.model.exception.UnexpectedAction;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.AbstractDataWidget;
@@ -29,7 +25,8 @@ import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionC
 import com.irisa.formulis.view.form.suggest.ClassSuggestionWidget;
 import com.irisa.formulis.view.form.suggest.Suggestion;
 
-public class ClassCreateWidget extends AbstractDataWidget implements HasClassCreationHandler, SuggestionSelectionHandler, CompletionAskedHandler {
+public class ClassCreateWidget extends AbstractDataWidget 
+	implements HasClassCreationHandler, SuggestionSelectionHandler, CompletionAskedHandler {
 
 	private FormWidget parent;
 	private FluidRow element = new FluidRow();

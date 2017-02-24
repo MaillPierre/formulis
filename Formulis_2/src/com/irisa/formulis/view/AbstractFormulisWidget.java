@@ -8,6 +8,11 @@ import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
 
+/**
+ * View class for all Form component part of the form tree
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractFormulisWidget extends AbstractDataWidget implements ClickHandler {
 
 	protected AbstractFormulisWidget parentWid;

@@ -7,6 +7,12 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 
+/**
+ * Utility class to encapsulate all queries sent to a HTTP endpoint.
+ * Centralize exception management during asynchronous management and server interaction (timeout...) settings
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractSewelisRequest {
 
 	private String sentQuery;

@@ -1,6 +1,5 @@
 package com.irisa.formulis.model.form;
 
-import com.google.gwt.safehtml.shared.UriUtils;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileClassLine;
@@ -9,6 +8,11 @@ import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.basic.URI.KIND;
 
+/**
+ * Data object representing a class line, contains a class URI and a label or is anonymous
+ * @author pmaillot
+ *
+ */
 public class FormClassLine extends FormLine {
 	
 	private String elementUri = "";

@@ -18,6 +18,11 @@ import com.irisa.formulis.view.custom.SimpleFormWidget;
 import com.irisa.formulis.view.event.interfaces.FormEventChainHandler;
 import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 
+/**
+ * View utility class 
+ * @author pmaillot
+ *
+ */
 public class ViewUtils {
 
 	public static String getHTMLSpaceString() {

@@ -4,6 +4,11 @@ import com.google.gwt.user.client.ui.Composite;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.form.FormElement;
 
+/**
+ * Base widget for any component with a data counterpart
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractDataWidget extends Composite {
 	
 	protected FormElement data;

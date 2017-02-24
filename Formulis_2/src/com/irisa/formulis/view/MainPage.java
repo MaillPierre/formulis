@@ -8,6 +8,11 @@ import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Footer;
 
+/**
+ * Root widget off all root widgets
+ * @author pmaillot
+ *
+ */
 public class MainPage extends Composite {
 	
 	private FluidRow element = new FluidRow();

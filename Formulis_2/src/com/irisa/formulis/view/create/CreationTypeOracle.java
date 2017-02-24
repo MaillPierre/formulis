@@ -12,6 +12,11 @@ import com.irisa.formulis.model.basic.BasicLeafElement;
 import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.basic.Typed;
 
+/**
+ * View utility class which try to dtermine the kind od creation widget needed according to the types suggested
+ * @author pmaillot
+ *
+ */
 public class CreationTypeOracle {
 	
 	private LinkedList<BasicLeafElement> types;

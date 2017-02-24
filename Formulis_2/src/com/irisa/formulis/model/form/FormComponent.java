@@ -1,8 +1,12 @@
 package com.irisa.formulis.model.form;
 
 import com.irisa.formulis.control.profile.ProfileElement;
-import com.irisa.formulis.model.Place;
 
+/**
+ * base data class for all form main, components (forms and lines)
+ * @author pmaillot
+ *
+ */
 public abstract class FormComponent implements FormElement {
 
 	protected FormComponent parent;

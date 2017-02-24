@@ -5,6 +5,11 @@ import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileRelationLine;
 import com.irisa.formulis.model.basic.URI;
 
+/**
+ * Data element reprensenting a relation line, fixed element is a relation URI, variable element can be any FormElement
+ * @author pmaillot
+ *
+ */
 public class FormRelationLine extends FormLine {
 
 	public FormRelationLine(FormComponent par, FormElement fixed, FormElement variable) {

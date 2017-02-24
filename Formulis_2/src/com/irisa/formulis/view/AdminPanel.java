@@ -12,6 +12,11 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.irisa.formulis.control.ControlUtils;
 
+/**
+ * Settings panel
+ * @author pmaillot
+ *
+ */
 public class AdminPanel extends Composite  {
 	
 	private DisclosurePanel element = new DisclosurePanel();

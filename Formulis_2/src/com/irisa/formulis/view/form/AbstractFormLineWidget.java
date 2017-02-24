@@ -23,6 +23,11 @@ import com.github.gwtbootstrap.client.ui.IntegerBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 
+/**
+ * Base view widget to unify the display of lines (class and relations)
+ * @author pmaillot
+ *
+ */
 public abstract class AbstractFormLineWidget extends AbstractFormElementWidget 
 	implements ClickWidgetHandler {
 	

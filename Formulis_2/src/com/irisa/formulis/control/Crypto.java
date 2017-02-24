@@ -3,7 +3,7 @@ package com.irisa.formulis.control;
 public class Crypto {
 
 	/**
-	 * 
+	 * Call to encryption functions in sjcl.js
 	 * @param passwd sel utilisé dans le cryptage
 	 * @param serverAdress 
 	 * @return

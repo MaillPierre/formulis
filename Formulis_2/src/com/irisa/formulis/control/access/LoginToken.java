@@ -1,5 +1,10 @@
 package com.irisa.formulis.control.access;
 
+/**
+ * Container object for login/password data
+ * @author pmaillot
+ *
+ */
 public class LoginToken {
 	
 	final private String login;

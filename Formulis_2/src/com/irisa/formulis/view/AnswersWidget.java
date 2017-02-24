@@ -1,6 +1,5 @@
 package com.irisa.formulis.view;
 
-import java.rmi.UnexpectedException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -21,6 +20,11 @@ import com.irisa.formulis.model.exception.UnexpectedAction;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.view.custom.SimpleFormWidget;
 
+/**
+ * View Widget to display answers in a table (more or less copied on SEWELIS web interface)
+ * @author pmaillot
+ *
+ */
 public class AnswersWidget extends Composite {
 
 	private Answers answers;

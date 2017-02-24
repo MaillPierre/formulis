@@ -9,9 +9,10 @@ import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 
 /**
- * Classe de données pour représenter une édition en cours.
- * Un form peut être traduit vers une requête lispql pour interroger le serveur, en demandant la relation courante (en cours d'édition)
- * Etat de Form: Anonyme: aucun type, liste de type: plus d'un type, Typé: un seul type
+ * Base data object for a Form
+ * Has relation lines, types lines and a main type line
+ * can be translated to a lispql query to send a statement string to a SEWELIS server
+ * Can be a type list, typed (with one main type) or anonymous
  * @author pmaillot
  *
  */

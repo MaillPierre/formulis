@@ -1,5 +1,11 @@
 package com.irisa.formulis.model.form;
 
+/**
+ * Base data class for all lines
+ * All lines contain a fixed element (class ou relation URI) and a variable element (encapsulated label for classes or object for relation line)
+ * @author pmaillot
+ *
+ */
 public abstract class FormLine extends FormComponent {
 	
 	protected FormElement fixedElement;

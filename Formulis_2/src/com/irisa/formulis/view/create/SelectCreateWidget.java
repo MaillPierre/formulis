@@ -10,7 +10,6 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.user.client.ui.Grid;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.create.fixed.FormCreateWidget;
 import com.irisa.formulis.view.create.variable.DateCreateWidget;
@@ -20,12 +19,15 @@ import com.irisa.formulis.view.create.variable.NumericCreateWidget;
 import com.irisa.formulis.view.create.variable.TextCreateWidget;
 import com.irisa.formulis.view.create.variable.TimeCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
-import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.ClickWidgetHandler;
-import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.FormRelationLineWidget;
 import com.github.gwtbootstrap.client.ui.ListBox;
 
+/**
+ * Encapsulation widget for all line-based creation widgets, give access to the list of type 
+ * and return to the line automatically the data contained inside the selected creation widget
+ * @author pmaillot
+ *
+ */
 public class SelectCreateWidget extends AbstractFormulisWidget implements ChangeHandler {
 	
 	private Grid element = new Grid(3, 1);

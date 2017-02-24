@@ -2,6 +2,11 @@ package com.irisa.formulis.model.form;
 
 import java.util.Comparator;
 
+/**
+ * Sort from lines by type, fixed element and variables element
+ * @author pmaillot
+ *
+ */
 public class FormLineComparator implements Comparator<FormLine> {
 
 	@Override
