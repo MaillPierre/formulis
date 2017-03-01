@@ -3,6 +3,7 @@ package com.irisa.formulis.model.form;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileRelationLine;
+import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.basic.URI;
 
 /**
@@ -66,6 +67,11 @@ public class FormRelationLine extends FormLine {
 			} else {
 				result += " [] ";
 			}
+		}
+		// Ajout du type et du labl de la propriété si nouvellement créée
+		if(this.isNew()) {
+			result += " ; " + fixedElement.toLispql() + " a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>"; 
+			result += " ; " + fixedElement.toLispql() + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(((URI)fixedElement).getLabel()).toLispql())  ;
 		}
 		} catch(Exception e){
 			ControlUtils.debugMessage("FormRelationLine toLispql EXCEPTION fixed:" + this.fixedElement + " variable:"+this.variableElement + " parent:" + this.getParent());

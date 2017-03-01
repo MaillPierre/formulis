@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.basic.URI;
+import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
@@ -27,7 +29,7 @@ public class PropertySuggestionWidget extends AbstractSuggestionWidget {
 	@Override
 	public void addSuggestionToOracle(Increment inc) {
 		ControlUtils.debugMessage("PropertySuggestionWidget addSuggestionToOracle " + inc);
-		if((inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.RELATION) && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) inc.getDisplayElement()).getUri())) {
+		if(checkIncrement(inc)) {
 			this.oracle.add(new Suggestion(inc));
 		}
 	}
@@ -39,11 +41,24 @@ public class PropertySuggestionWidget extends AbstractSuggestionWidget {
 		Iterator<Increment> itInc = c.iterator();
 		while(itInc.hasNext()) {
 			Increment inc = itInc.next();
-			if((inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.RELATION)  && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) inc.getDisplayElement()).getUri()) ) {
+			if(checkIncrement(inc)) {
 				suggs.add(new Suggestion(inc));
 			}
 		}
 		this.oracle.setSuggestions(suggs);
+	}
+	
+	private boolean checkIncrement(Increment inc) {
+		boolean result = inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.RELATION;
+		FormElement formElem = null;
+		try {
+			formElem = DataUtils.extractPropertyFromIncrement(inc);
+		} catch (FormElementConversionException e) {
+			ControlUtils.exceptionMessage(e);
+		}
+		result = result && formElem != null && formElem instanceof URI && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) formElem).getUri());
+		
+		return result;
 	}
 
 }

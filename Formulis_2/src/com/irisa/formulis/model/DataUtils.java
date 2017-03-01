@@ -94,7 +94,7 @@ public class DataUtils {
 
 	public static FormElement extractPropertyFromIncrement(Increment inc) throws FormElementConversionException {
 		FormElement result = null;
-		if(inc.getKind() == KIND.PROPERTY) {
+		if(inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.RELATION) {
 			LinkedList<BasicElement> elements = getFirstDisplayableElements(inc.getDisplayElement());
 			try {
 				if(elements.size() == 1 && elements.getFirst() instanceof Pair) {

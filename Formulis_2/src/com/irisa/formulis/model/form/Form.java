@@ -274,6 +274,15 @@ public class Form extends FormComponent {
 		}
 //		ControlUtils.debugMessage("Form toLispql [lisql des lignes extrait] " + result);
 		
+		// Ecriture de la requête dans result
+		
+		// La ligne est séléectionnée pendant le remplissage et le parent est non vide et donne du contexte à la requête
+		boolean linkToParent = getParent() != null 
+				&& getParent() instanceof FormLine 
+				&& ! isFinalRequest && selectedLine != null 
+				&& ((FormLine) getParent()).getParent() != null  
+				&& ((FormLine) getParent()).getParent() instanceof Form;
+		
 		// Ligne selectionée
 		if(selectedLine != null && relationLines.contains(selectedLine)) {
 			result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
@@ -295,10 +304,10 @@ public class Form extends FormComponent {
 		} else if(this.isAnonymous() ) {
 			result += " [ a thing ";
 			// Si il y a quelque chose à venir après
-//			if((! otherlines.isEmpty() || getParent() != null && getParent() instanceof FormLine)) {
+			if(! otherlines.isEmpty() || linkToParent) {
 //				ControlUtils.debugMessage("Form toLispql otherlines: " + otherlines);
-//				result += " ; ";
-//			}
+				result += " ; ";
+			}
 		} else {
 			result += " [ ";
 		}
@@ -318,16 +327,14 @@ public class Form extends FormComponent {
 //		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
-		if(getParent() != null && getParent() instanceof FormLine && ! isFinalRequest && selectedLine != null) {
-			FormLine parentLine = (FormLine) getParent();
-			if(parentLine.getParent() != null  && parentLine.getParent() instanceof Form) {
-				Form parentForm = parentLine.getParent();
-				String parentFormString = parentForm.toLispql(parentLine);
-				if((! otherlines.isEmpty())/* || ! this.isAnonymous()*/) {
-					result += " ; ";
-				}
-				result += parentFormString;
+		if(linkToParent) {
+			FormLine parentLine = ((FormLine) getParent());
+			Form parentForm = parentLine.getParent();
+			String parentFormString = parentForm.toLispql(parentLine);
+			if((! otherlines.isEmpty())/* || ! this.isAnonymous()*/) {
+				result += " ; ";
 			}
+			result += parentFormString;
 		}
 //		ControlUtils.debugMessage("Form toLispql [lien vers parent] " + result);
 		
