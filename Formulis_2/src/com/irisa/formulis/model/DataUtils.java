@@ -118,7 +118,7 @@ public class DataUtils {
 				ControlUtils.exceptionMessage(e);
 			}
 		} else {
-			throw new FormElementConversionException("extractClassUriFromIncrement expect increment of kind CLASS");
+			throw new FormElementConversionException("extractClassUriFromIncrement expect increment of kind PROPERTY or RELATION, got " + inc.getKind());
 		}
 		return result;
 	}
@@ -153,7 +153,7 @@ public class DataUtils {
 				throw new FormElementConversionException("extractClassUriFromIncrement expect last element to be URI, got " + elements.toString());
 			}
 		} else {
-			throw new FormElementConversionException("extractClassUriFromIncrement expect increment of kind CLASS");
+			throw new FormElementConversionException("extractClassUriFromIncrement expect increment of kind CLASS, got " + inc.getKind());
 		}
 		return result;
 	}

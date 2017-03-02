@@ -186,7 +186,7 @@ HasKeyUpHandlers {
 			@Override
 			public void call() {
 				if(Controller.instance().getPlace().getCurrentCompletions() != null) {
-					ControlUtils.debugMessage("AbstractSuggestionCallback getSetCallback " + Controller.instance().getPlace().getCurrentCompletions());
+//					ControlUtils.debugMessage("AbstractSuggestionCallback getSetCallback " + Controller.instance().getPlace().getCurrentCompletions());
 					source.setOracleSuggestions(Controller.instance().getPlace().getCurrentCompletions());
 					waitingFor = false;
 				}

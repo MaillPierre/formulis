@@ -840,7 +840,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event transmitted to changeFocus
 	 */
 	public void sewelisGetPlaceStatement(final String statString, final AbstractFormEvent event) {
-		ControlUtils.debugMessage("getPlaceStatement( " + statString + " ) " );
+		ControlUtils.debugMessage("sewelisGetPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
@@ -905,6 +905,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event transmitted to changeFocus
 	 */
 	public void sewelisGetPlaceStatementStandalone(final String statString, final ObjectCallback callback) {
+		ControlUtils.debugMessage("sewelisGetPlaceStatementStandalone( " + statString + " ) " );
 		if(currentStore != null) {
 			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
@@ -1155,8 +1156,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Run the given statement, eg. used to create entities
 	 * @param statString statement LispQL
 	 */
-	private void sewelisRunStatement(String statString, String userKeyString, String storeName) {
-		//		ControlUtils.debugMessage("runStatement (" + statString + ") ");
+	private void sewelisRunStatement(final String statString, String userKeyString, String storeName) {
+		ControlUtils.debugMessage("sewelisRunStatement store:"+ storeName +" (" + statString + ") ");
 		String runStatementRequestString = serverAdress + "/runStatement?userKey=" + userKeyString ;
 		runStatementRequestString += "&storeName=" + storeName; 
 		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
@@ -1175,13 +1176,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					} else {
 						navBar.setServerStatusMessage(docElement.getAttribute("status"));
 						if(docElement.getFirstChild().getNodeName() == "message") {
-							ControlUtils.debugMessage( docElement.getFirstChild().toString());
+							ControlUtils.debugMessage( docElement.getFirstChild().toString() + " statement: " + statString);
 							navBar.setServerStatusHovertext(docElement.getFirstChild().toString());
 						}
 					}
 				} else {
 					// TODO GESTION DES MESSAGE D'ERREUR
-					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
+					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText() + " statement: " + statString);
 				}
 			}
 
@@ -2300,6 +2301,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String label = widSource.getTextValue();
 
 			URI uriObj = new URI(uri, URI.KIND.PROPERTY, label);
+//			sewelisRunStatement(Controller.lispqlRelationCreationQuery(uriObj));
 
 			FormRelationLine newLine = new FormRelationLine(parentWidSource.getData(), uriObj);
 			newLine.setAsNew(true);
@@ -2697,6 +2699,13 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			result = "get " + eleme.toLispql() + "";
 		}
 		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
+		return result;
+	}
+	
+	public static String lispqlRelationCreationQuery(URI uri) {
+		String result = "";
+		result += uri.toLispql() + " a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ; "; 
+		result += uri.toLispql() + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(uri.getLabel()).toLispql()) + " . " ;
 		return result;
 	}
 

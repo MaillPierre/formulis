@@ -251,15 +251,16 @@ public class Form extends FormComponent {
 		Iterator<FormRelationLine> itRelLines = this.relationLinesIterator();
 		while(itRelLines.hasNext()) {
 			FormLine line = itRelLines.next();
-			try {
-			if((! line.equals(selectedLine) &&  line.isFinishable()) && !(line instanceof FormClassLine && ((FormClassLine) line).isAnonymous())){
+			if((! line.equals(selectedLine) 
+					&&  line.isFinishable()) 
+					&& !(line instanceof FormClassLine 
+							&& ((FormClassLine) line).isAnonymous())
+					&& !( ! isFinalRequest
+							&& line instanceof FormRelationLine 
+							&& ((FormRelationLine) line).isNew())){
 				String lineString =  line.toLispql(isFinalRequest);
 //				ControlUtils.debugMessage("Form toLispql line added:" + lineString);
 				otherlines.add(lineString);
-			}
-			} catch(Exception e) {
-				ControlUtils.debugMessage("Form toLispql EXCEPTION line:" + line + " selectedLine: " + selectedLine + " isFinished:" + line.isFinishable());
-				throw e;
 			}
 		}
 		if( this.isTypeList()) {
@@ -302,10 +303,9 @@ public class Form extends FormComponent {
 				result += " ; ";
 			}
 		} else if(this.isAnonymous() ) {
-			result += " [ a thing ";
+			result += "[ a thing ";
 			// Si il y a quelque chose à venir après
 			if(! otherlines.isEmpty() || linkToParent) {
-//				ControlUtils.debugMessage("Form toLispql otherlines: " + otherlines);
 				result += " ; ";
 			}
 		} else {

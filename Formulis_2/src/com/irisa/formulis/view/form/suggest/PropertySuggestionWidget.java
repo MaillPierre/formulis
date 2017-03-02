@@ -50,14 +50,15 @@ public class PropertySuggestionWidget extends AbstractSuggestionWidget {
 	
 	private boolean checkIncrement(Increment inc) {
 		boolean result = inc.getKind() == KIND.PROPERTY || inc.getKind() == KIND.RELATION;
-		FormElement formElem = null;
-		try {
-			formElem = DataUtils.extractPropertyFromIncrement(inc);
-		} catch (FormElementConversionException e) {
-			ControlUtils.exceptionMessage(e);
+		if(result) {
+			FormElement formElem = null;
+			try {
+				formElem = DataUtils.extractPropertyFromIncrement(inc);
+			} catch (FormElementConversionException e) {
+				ControlUtils.exceptionMessage(e);
+			}
+			result = result && formElem != null && formElem instanceof URI && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) formElem).getUri());
 		}
-		result = result && formElem != null && formElem instanceof URI && ! ControlUtils.FORBIDDEN_URIS.isForbidden(((URI) formElem).getUri());
-		
 		return result;
 	}
 

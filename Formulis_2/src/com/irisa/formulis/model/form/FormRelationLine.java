@@ -39,11 +39,7 @@ public class FormRelationLine extends FormLine {
 	 */
 	public String toRootLispql() {
 		String result = "";
-		try {
-			result = "is " + this.fixedElement.toLispql() + " of []";
-		} catch(Exception e) {
-			ControlUtils.debugMessage("FormRelationLine toRootLispql EXCEPTION");
-		}
+		result = "is " + this.fixedElement.toLispql() + " of []";
 		return result;
 	}
 	
@@ -56,27 +52,21 @@ public class FormRelationLine extends FormLine {
 	public String toLispql(boolean selected, boolean isFinalRequest) {
 //		ControlUtils.debugMessage("FormRelationLine toLispql( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) "+ this.fixedElement + " " + this.variableElement);
 		String result = "";
-		try{
 		
 		if(getParent() != null && this.getParent() instanceof Form && selected ) {
 			result = this.getParent().toLispql(this);
 		} else {
 			result += this.fixedElement.toLispql();
 			if(this.variableElement != null ) {
-				result += " " + this.variableElement.toLispql(isFinalRequest);
+				result += " " + this.variableElement.toLispql(isFinalRequest) + " ";
 			} else {
 				result += " [] ";
 			}
 		}
-		// Ajout du type et du labl de la propriété si nouvellement créée
-		if(this.isNew()) {
-			result += " ; " + fixedElement.toLispql() + " a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>"; 
-			result += " ; " + fixedElement.toLispql() + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(((URI)fixedElement).getLabel()).toLispql())  ;
-		}
-		} catch(Exception e){
-			ControlUtils.debugMessage("FormRelationLine toLispql EXCEPTION fixed:" + this.fixedElement + " variable:"+this.variableElement + " parent:" + this.getParent());
-			throw e;
-		}
+//		if(isNew() && isFinalRequest) {
+//			result += "; " + fixedElement.toLispql() + " a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ; "; 
+//			result += fixedElement.toLispql() + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(((URI) fixedElement).getLabel()).toLispql()) + " " ;
+//		}
 
 //		ControlUtils.debugMessage("FormRelationLine toLispql FIN ( selected=" + selected + " , isFinalRequest=" + isFinalRequest + " ) "+ this.fixedElement + " " + this.variableElement);
 		return result;

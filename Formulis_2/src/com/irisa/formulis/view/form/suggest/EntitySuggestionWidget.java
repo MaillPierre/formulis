@@ -35,7 +35,7 @@ public class EntitySuggestionWidget extends AbstractSuggestionWidget implements 
 		super.onKeyDown(event); 
 		if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 			if(element.getText() != "") {
-				
+				popover.hide();
 			}
 		}
 	}
