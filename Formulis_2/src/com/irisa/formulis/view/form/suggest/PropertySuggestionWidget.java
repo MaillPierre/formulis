@@ -28,7 +28,7 @@ public class PropertySuggestionWidget extends AbstractSuggestionWidget {
 
 	@Override
 	public void addSuggestionToOracle(Increment inc) {
-		ControlUtils.debugMessage("PropertySuggestionWidget addSuggestionToOracle " + inc);
+//		ControlUtils.debugMessage("PropertySuggestionWidget addSuggestionToOracle " + inc);
 		if(checkIncrement(inc)) {
 			this.oracle.add(new Suggestion(inc));
 		}
@@ -36,7 +36,7 @@ public class PropertySuggestionWidget extends AbstractSuggestionWidget {
 
 	@Override
 	public void setOracleSuggestions(Collection<Increment> c) {
-		ControlUtils.debugMessage("PropertySuggestionWidget setOracleSuggestions " + c );
+//		ControlUtils.debugMessage("PropertySuggestionWidget setOracleSuggestions " + c );
 		LinkedList<Suggestion> suggs = new LinkedList<Suggestion>();
 		Iterator<Increment> itInc = c.iterator();
 		while(itInc.hasNext()) {

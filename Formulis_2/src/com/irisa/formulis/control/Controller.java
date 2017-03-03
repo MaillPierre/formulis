@@ -2301,7 +2301,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String label = widSource.getTextValue();
 
 			URI uriObj = new URI(uri, URI.KIND.PROPERTY, label);
-//			sewelisRunStatement(Controller.lispqlRelationCreationQuery(uriObj));
+			sewelisRunStatement(Controller.lispqlRelationCreationQuery(uriObj));
 
 			FormRelationLine newLine = new FormRelationLine(parentWidSource.getData(), uriObj);
 			newLine.setAsNew(true);
@@ -2704,8 +2704,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	
 	public static String lispqlRelationCreationQuery(URI uri) {
 		String result = "";
-		result += uri.toLispql() + " a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ; "; 
-		result += uri.toLispql() + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(uri.getLabel()).toLispql()) + " . " ;
+		result += uri.toLispql() + " [ a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ; "; 
+		result += " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(uri.getLabel()).toLispql()) + " ] . " ;
 		return result;
 	}
 
