@@ -190,6 +190,7 @@ public class DataUtils {
 
 	public static Form pairToForm(Pair pair, FormLine parent) throws FormElementConversionException {
 		Form result = new Form(parent);
+		URI formSubject = null;
 		if(pair.getFirstLine().size() == 1 && (pair.getFirstLine().getFirst() instanceof Display)) {
 			LinkedList<BasicElement> firstLine = getFirstDisplayableElements(pair.getFirstLine().getFirst());
 			if(firstLine.getFirst() instanceof Keyword ) { // "the something" something = "thing" ou classe
@@ -201,16 +202,19 @@ public class DataUtils {
 					thingLine.setAnonymous(true);
 				}
 				result.addTypeLine(thingLine, false);
+			} else if (firstLine.getFirst() instanceof URI){
+//				ControlUtils.debugMessage("pairToForm if1 " + firstLine.getFirst());
+				formSubject = (URI) firstLine.getFirst();
 			}
-			
 		} else {
 			throw new FormElementConversionException("pairToForm expect firstline to contain only one element " + pair.getFirstLine());
 		}
-		//	Utils.displayDebugMessage("extractEntityFromIncrement firstPair.secondLine ( " + firstPair.getSecondLine().size() + " ) = " + firstPair.getSecondLine());
+		
 		if(pair.getSecondLine().size() == 1) {
 			LinkedList<BasicElement> secondLine = getFirstDisplayableElements(pair.getSecondLine().getFirst());
 			if(secondLine.getFirst() instanceof And) { // Liste de conjonction
 				And andLines = (And) secondLine.getFirst();
+				BasicElement previous = null; // previous element, used for ClassLine detection
 				Iterator<BasicElement> itAndlines = andLines.getContentIterator();
 				while(itAndlines.hasNext()) {
 					BasicElement andElem = itAndlines.next();
@@ -219,17 +223,39 @@ public class DataUtils {
 							Pair currentPair = (Pair) andElem;
 							FormLine newLine = pairToLine(currentPair, result);
 							result.addLine(newLine);
+						} else if(andElem instanceof URI 
+								&& (((URI) andElem).getKind() == URI.KIND.CLASS) 
+								&& previous != null 
+								&& previous instanceof Keyword
+								&& previous.equals(new Keyword("is a"))) {
+							FormClassLine classLine = null;
+							classLine = new FormClassLine(result, ((URI) andElem));
+							result.setMainTypeLine(classLine);
+						} else {
+//							ControlUtils.debugMessage("pairToForm if2.2 " + andElem + " " + (andElem instanceof URI && ((URI) andElem).getKind() == URI.KIND.CLASS ) );
 						}
+					} else {
+//						ControlUtils.debugMessage("pairToForm if2.1 " + andElem);
 					}
+					
+					previous = andElem;
 				}
 			} else if(secondLine.getFirst() instanceof Pair) { // Une seule ligne (NON VERIFIE)
 				Pair currentPair = (Pair) secondLine.getFirst();
 				FormLine newLine = pairToLine(currentPair, result);
 				result.addLine(newLine);
+			} else {
+//				ControlUtils.debugMessage("pairToForm if2 " + pair.getSecondLine());
 			}
 		} else {
 			throw new FormElementConversionException("pairToForm expect secondline to contain only one element " + pair.getSecondLine());
 		}
+		
+		if(result.getMainType() != null && formSubject != null) {
+			result.getMainType().setEntityUri(formSubject);
+			result.getMainType().setFinished(true);
+		}
+		
 		return result;
 	}
 

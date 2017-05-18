@@ -15,12 +15,15 @@ import com.irisa.formulis.model.basic.URI.KIND;
  */
 public class FormClassLine extends FormLine {
 	
-	private String elementUri = "";
+	private URI elementUri = null;
 	private String elementLabel = "";
 	private boolean anonymous = false;
 
 	public FormClassLine(FormComponent par, FormElement fixed, FormElement varElement) {
 		super(par, fixed, varElement);
+		if(varElement != null && varElement instanceof URI) {
+			this.setEntityUri(((URI)varElement));
+		}
 		if(fixed.equals(ControlUtils.thingKeyword)) {
 			anonymous = true;
 		}
@@ -68,14 +71,15 @@ public class FormClassLine extends FormLine {
 
 	public URI getEntityUri() {
 //		elementUri = Controller.newElementUri(elementLabel);
-		if(this.getEntityLabel().isEmpty()) {
-			return null;
+		if( this.elementUri == null && ! this.getEntityLabel().isEmpty()) {
+			setEntityUri(new URI(Controller.newElementUri(elementLabel), KIND.ENTITY, elementLabel));
 		}
-		return new URI(elementUri, KIND.ENTITY, elementLabel);
+		return this.elementUri;
 	}
 
-	public void setEntityUri(String elementUri) {
-		this.elementUri = elementUri;
+	public void setEntityUri(URI varElement) {
+		this.elementUri = varElement;
+		this.setVariableElement(varElement);
 	}
 
 	public String getEntityLabel() {
@@ -83,12 +87,10 @@ public class FormClassLine extends FormLine {
 	}
 
 	public void setEntityLabel(String label) {
-		this.elementLabel = label;
-		if(label == "") {
+		if(label.equals("")) {
 			setEntityUri(null);
-		} else {
-			setEntityUri(Controller.newElementUri(label));
 		}
+		this.elementLabel = label;
 	}
 	
 	@Override

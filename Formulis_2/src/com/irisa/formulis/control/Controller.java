@@ -1055,8 +1055,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 											((AbstractStringCallback)event.getCallback()).call(tmpPlace.getStatement().toString() );
 										}  else if(event.getCallback() instanceof ActionCallback){
 											((ActionCallback) event.getCallback()).call();
-										} else if(event.getCallback() instanceof AbstractFormCallback) {
-											((AbstractFormCallback)event.getCallback()).call(DataUtils.ressourceDescStatementToForm(tmpPlace.getStatement()));
+										} else if(event.getCallback() instanceof AbstractFormCallback && transformationName.equals("Describe")) {
+											Form resultForm = DataUtils.ressourceDescStatementToForm(tmpPlace.getStatement());
+											((AbstractFormCallback)event.getCallback()).call(resultForm);
 										}
 									} catch (XMLParsingException | FormElementConversionException | ClassCastException e) {
 										ControlUtils.exceptionMessage(e);
@@ -1474,7 +1475,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Corresponding function to uriDescription SEWELIS API function, return a place with a statement containing all statement known starting from an uri contained in event.getSource.getData
 	 * @param event event with a URIWidget at its source
 	 */
-	public void sewelisUriDescription(final DescribeUriEvent event) {
+	public void sewelisDescriptionUri(final DescribeUriEvent event) {
 
 		sewelisGetPlaceUri(event.getUri(), new AbstractFormEvent( event.getSource(), new ObjectCallback() {
 			@Override
@@ -2241,7 +2242,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onDescribeUri(final DescribeUriEvent event) {
-		sewelisUriDescription(event);
+		sewelisDescriptionUri(event);
 	}
 
 	/**
@@ -2420,7 +2421,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param f
 	 */
 	public void setCurrentForm(Form f) {
-		ControlUtils.debugMessage("setCurrentForm( " + f + " )");
+//		ControlUtils.debugMessage("setCurrentForm( " + f + " )");
 		this.form = f;
 		mainPage.formWidget.setData(this.form);
 		mainPage.formWidget.reload();
@@ -2639,7 +2640,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * Utility function to create new URIs as per SEWELIS standards
+	 * Utility function to create new URIs as per SEWELIS standards for the current store
 	 * @param label end part of the uri (most of the type, the label of the entity)
 	 * @return
 	 */
@@ -2710,7 +2711,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	/**
-	 * call sewelisLogin ans update logUserKey with the current userKey
+	 * call sewelisLogin and update logUserKey with the current userKey
 	 */
 	public void logLogin() {
 		sewelisLogin(new LoginToken(logLogin, logPasswd), new AbstractStringCallback() {

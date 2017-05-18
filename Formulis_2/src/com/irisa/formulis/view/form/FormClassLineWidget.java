@@ -12,6 +12,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileLine;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.FormElementConversionException;
@@ -42,6 +43,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	public FormClassLineWidget(FormClassLine l, FormWidget par, String startValue) {
 		super(l, par);
 
+		ControlUtils.debugMessage("FormClassLineWidget " + l + "  " + l.getVariableElement() + "  " + l.getEntityLabel());
 		if(! l.isAnonymous()) {
 			try {
 				this.fixedElement = FormulisWidgetFactory.getWidget((URI)l.getFixedElement(), this, this);
@@ -73,7 +75,13 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 			}
 		});
 		
-		if(! l.getEntityLabel().isEmpty()) {
+		if( l .getEntityUri() != null) {
+			try {
+				setVariableElement(FormulisWidgetFactory.getWidget(l.getEntityUri(), this.getParentWidget()));
+			} catch (FormElementConversionException e) {
+				ControlUtils.exceptionMessage(e);
+			}
+		} else if(! l.getEntityLabel().isEmpty()) {
 			labelUriBox.setText(l.getEntityLabel());
 			ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());
 		} else if(! l.getTempValue().isEmpty()) {
@@ -105,18 +113,16 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		elementRow.clear();
 		elementRow.add(fixedElement);
 		
-		if(this.getData().isFinished()) {
-			finish();
-		} else {
-			setLineState(LINE_STATE.SUGGESTIONS);
-		}
-		
 		if(this.getParentWidget().getData().isTypeList() ) {
 			hideLabelBox();
 		} 
 		if(this.getParentWidget().getData().isTyped() 
 				&& this.getParentWidget().getData().getMainType().equals(this.getData())) {
-			showLabelBox();
+			if(this.getData().isFinishable() && this.getData().isFinished()) {
+				setLineState(LINE_STATE.FINISHED);
+			} else {
+				setLineState(LINE_STATE.SUGGESTIONS);
+			}
 		} else {
 			hideLabelBox();
 		}
@@ -133,21 +139,23 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 	
 	public void hideLabelBox() {
-//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
+		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
 		labelUriBox.setVisible(false);
 		
 		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
-			labelWid = new URIWidget(this.getFormLine().getEntityUri(), null);
+			labelWid = new URIWidget(this.getFormLine().getEntityUri(), this);
+			ControlUtils.debugMessage("FormClassLineWidget hideLabelBox" + labelWid);
 			elementRow.remove(labelUriBox);
 			if(labelWid != null) {
 				elementRow.add(labelWid);
 				elementRow.setCellWidth(labelWid, "100%");
 			}
 		}
-//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
+		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
 	}
 	
 	public void showLabelBox() {
+		ControlUtils.debugMessage("FormClassLineWidget showLabelBox");
 		labelUriBox.setVisible(true);
 		if(this.getData() != null) {
 			if(labelWid != null) {
@@ -156,6 +164,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 			elementRow.add(labelUriBox);
 			elementRow.setCellWidth(labelUriBox, "100%");
 		}
+		ControlUtils.debugMessage("FormClassLineWidget showLabelBox END");
 	}
 
 	@Override
@@ -240,7 +249,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		return new AbstractFormCallback() {			
 			@Override
 			public void call(Form desc) {
-				ControlUtils.debugMessage("DescribeUriCallback call " + desc);
+				Controller.instance().setCurrentForm(desc);
 			}
 		};
 	}
