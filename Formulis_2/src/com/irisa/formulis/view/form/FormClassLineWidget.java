@@ -115,6 +115,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		
 		if(this.getParentWidget().getData().isTypeList() ) {
 			hideLabelBox();
+			this.resetElementButton.setEnabled(false);
 		} 
 		if(this.getParentWidget().getData().isTyped() 
 				&& this.getParentWidget().getData().getMainType().equals(this.getData())) {
@@ -249,7 +250,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		return new AbstractFormCallback() {			
 			@Override
 			public void call(Form desc) {
-				Controller.instance().setCurrentForm(desc);
+				getParentWidget().setData(desc);
 			}
 		};
 	}

@@ -134,9 +134,17 @@ public class ControlUtils {
 		owlIntersectionOf("http://www.w3.org/2002/07/owl#intersectionOf"),
 		owlUnionOf("http://www.w3.org/2002/07/owl#unionOf"),
 		owlComplementOf("http://www.w3.org/2002/07/owl#complementOf"),
+		owlAnnotationProperty("http://www.w3.org/2002/07/owl#AnnotationProperty"),
+		owlRestriction("http://www.w3.org/2002/07/owl#Restriction"),
 		owlVersionInfo("http://www.w3.org/2002/07/owl#versionInfo"),
 		xsdInteger("http://www.w3.org/2001/XMLSchema#integer"),
-		xsdString("http://www.w3.org/2001/XMLSchema#string")
+		xsdString("http://www.w3.org/2001/XMLSchema#string"),
+		xsdFloat("http://www.w3.org/2001/XMLSchema#float"),
+		xsdNonNegativeInteger("http://www.w3.org/2001/XMLSchema#nonNegativeInteger"),
+		xsdPositiveInteger("http://www.w3.org/2001/XMLSchema#positiveInteger"),
+		xsdUnsignedInt("http://www.w3.org/2001/XMLSchema#unsignedInt"),
+		xsdUnsignedShort("http://www.w3.org/2001/XMLSchema#unsignedShort"),
+		
 		;
 	
 		private String uri;
