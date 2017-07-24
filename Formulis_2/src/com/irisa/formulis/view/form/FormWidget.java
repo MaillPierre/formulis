@@ -90,6 +90,13 @@ public class FormWidget
 		EDIT; // Manque d'éléments pour être fini
 	}
 	
+	public enum LAST_ACTION {
+		LOAD,
+		EDIT,
+		INTERN_EDIT,
+		SUBMIT
+	}
+	
 	/**
 	 * Responsable de la gestion des evenement lorsqu'une ligne est en cours de déplacement (le début et la fin du déplacement son gérés par le form lui-même
 	 */
