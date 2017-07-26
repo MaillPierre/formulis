@@ -97,6 +97,8 @@ public class FormWidget
 		SUBMIT
 	}
 	
+	private LAST_ACTION actionMemory = LAST_ACTION.EDIT;
+	
 	/**
 	 * Responsable de la gestion des evenement lorsqu'une ligne est en cours de déplacement (le début et la fin du déplacement son gérés par le form lui-même
 	 */
@@ -178,6 +180,7 @@ public class FormWidget
 			@Override
 			public void call() {
 				Controller.instance().loadFormContent(this.getSource());
+				this.getSource().setLastAction(LAST_ACTION.LOAD);
 			}
 		};
 	}
@@ -200,6 +203,7 @@ public class FormWidget
 			@Override
 			public void call() {
 				this.getSource().getData().setFinished(true);
+				this.getSource().setLastAction(LAST_ACTION.SUBMIT);
 				this.getSource().reload();
 			}
 		};
@@ -398,6 +402,14 @@ public class FormWidget
 		return (Form) super.getData();
 	}
 	
+	public LAST_ACTION getLastAction() {
+		return actionMemory;
+	}
+
+	public void setLastAction(LAST_ACTION actionMemory) {
+		this.actionMemory = actionMemory;
+	}
+
 	@Override
 	public AbstractFormLineWidget getParentWidget() {
 		if(super.getParentWidget() != null) {

@@ -282,14 +282,14 @@ HasKeyUpHandlers {
 		}
 	}
 
-	/**
-	 * Retransmet l'event avec le getValue
-	 */
-	public void fireElementCreationEvent() {
-		if(getParentWidget() instanceof AbstractFormLineWidget) {
-			((AbstractFormLineWidget) this.getParentWidget()).fireElementCreationEvent(getValue());
-		}
-	}
+//	/**
+//	 * Retransmet l'event avec le getValue
+//	 */
+//	public void fireElementCreationEvent() {
+//		if(getParentWidget() instanceof AbstractFormLineWidget) {
+//			((AbstractFormLineWidget) this.getParentWidget()).fireElementCreationEvent(getValue());
+//		}
+//	}
 
 	@Override
 	public void fireElementCreationEvent(String value) {

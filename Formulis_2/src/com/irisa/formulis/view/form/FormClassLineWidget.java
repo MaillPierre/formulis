@@ -28,6 +28,7 @@ import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.FormWidget.LAST_ACTION;
 import com.irisa.formulis.view.form.suggest.EntitySuggestionWidget;
 
 public class FormClassLineWidget extends AbstractFormLineWidget implements ValueChangeHandler<String>, ClickHandler, CompletionAskedHandler, SuggestionSelectionHandler {
@@ -251,6 +252,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 			@Override
 			public void call(Form desc) {
 				getParentWidget().setData(desc);
+				getParentWidget().setLastAction(LAST_ACTION.LOAD);
 			}
 		};
 	}

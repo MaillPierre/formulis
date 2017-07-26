@@ -41,6 +41,7 @@ import com.irisa.formulis.view.create.SelectCreateWidget;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
+import com.irisa.formulis.view.form.FormWidget.LAST_ACTION;
 import com.irisa.formulis.view.form.suggest.VariableSuggestionWidget;
 
 public class FormRelationLineWidget 
@@ -213,6 +214,9 @@ public class FormRelationLineWidget
 			elementRow.add(fixedElement);
 		}
 //		ControlUtils.debugMessage("FormRelationLineWidget setVariableElement END");
+		if(nWid != this.getVariableElement()) {
+			this.getParentWidget().setLastAction(LAST_ACTION.EDIT);
+		}
 	}
 	
 	public void resetLine() {
