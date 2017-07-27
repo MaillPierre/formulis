@@ -364,6 +364,7 @@ public class FormWidget
 		
 		if(getData().isTyped() && ! getData().isAnonymous()) {
 			mainTypeLine = new FormClassLineWidget(getData().getMainType(), this);
+			mainTypeLine.setProfileMode(this.profileMode);
 			mainTypeLine.getData().setTempValue(this.getData().getTempValue());
 		}
 		

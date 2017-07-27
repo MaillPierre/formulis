@@ -183,6 +183,8 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		} else if(state == LINE_STATE.SUGGESTIONS) {
 			showLabelBox();
 			this.getData().setFinished(false);
+		} else if(state == LINE_STATE.FIXED) {
+			
 		}
 	}
 

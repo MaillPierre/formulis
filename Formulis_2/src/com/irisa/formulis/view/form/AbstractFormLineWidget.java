@@ -74,7 +74,8 @@ public abstract class AbstractFormLineWidget extends AbstractFormElementWidget
 		SUGGESTIONS,
 		GUIDED_CREATION,
 		CREATION,
-		FINISHED
+		FINISHED,
+		FIXED
 	}
 	
 	public AbstractFormLineWidget( FormLine l, FormWidget par) {
