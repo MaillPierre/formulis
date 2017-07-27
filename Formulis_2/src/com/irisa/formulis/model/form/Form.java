@@ -288,7 +288,7 @@ public class Form extends FormComponent {
 		if(selectedLine != null && relationLines.contains(selectedLine)) {
 			result += "is " + selectedLine.getFixedElement().toLispql() + " of ";
 		} 
-		ControlUtils.debugMessage("Form toLispql [ligne selectionnée] " + result);
+//		ControlUtils.debugMessage("Form toLispql [ligne selectionnée] " + result);
 
 		// Ligne de type
 		if(! this.isAnonymous() && ! this.isTypeList() && this.getMainType() != null) {
@@ -311,7 +311,7 @@ public class Form extends FormComponent {
 		} else {
 			result += " [ ";
 		}
-		ControlUtils.debugMessage("Form toLispql [ligne de type] " + this.getMainType() + " otherlines: " + otherlines.size());
+//		ControlUtils.debugMessage("Form toLispql [ligne de type] " + this.getMainType() + " otherlines: " + otherlines.size());
 		
 		// Ajout des autres lignes
 		if(! otherlines.isEmpty()) {
@@ -324,7 +324,7 @@ public class Form extends FormComponent {
 				}
 			}
 		}
-		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
+//		ControlUtils.debugMessage("Form toLispql [autres lignes] " + result);
 		
 		// Ajout de la liaison vers le parent
 		if(linkToParent) {

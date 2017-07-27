@@ -358,18 +358,23 @@ public class FormWidget
 	
 	protected LinkedList<AbstractFormLineWidget> formLinesToWidgetLines() {
 		LinkedList<AbstractFormLineWidget> result = new LinkedList<AbstractFormLineWidget>();
+		LinkedList<AbstractFormLineWidget> classLines = new LinkedList<AbstractFormLineWidget>();
+		LinkedList<AbstractFormLineWidget> relationLines = new LinkedList<AbstractFormLineWidget>();
+		AbstractFormLineWidget mainTypeLine = null;
+		
+		if(getData().isTyped() && ! getData().isAnonymous()) {
+			mainTypeLine = new FormClassLineWidget(getData().getMainType(), this);
+			mainTypeLine.getData().setTempValue(this.getData().getTempValue());
+		}
 		
 		Iterator<FormClassLine> itClassL = getData().typeLinesIterator();
 		while(itClassL.hasNext()) {
 			FormClassLine line = itClassL.next();
-			if(! line.isAnonymous()) {
+			if(! line.isAnonymous() && ! line.equals(getData().getMainType())) {
 				FormClassLineWidget nClassLine = new FormClassLineWidget(line, this);
 				nClassLine.setProfileMode(this.profileMode);
-				result.add(nClassLine);
+				classLines.add(nClassLine);
 			}
-		}
-		if(getData().isTyped() && ! getData().isAnonymous() && result.getFirst() instanceof FormClassLineWidget) {
-			((FormClassLineWidget) result.getFirst()).getData().setTempValue(this.getData().getTempValue());
 		}
 
 		Iterator<FormRelationLine> itRelL = getData().relationLinesIterator();
@@ -378,12 +383,12 @@ public class FormWidget
 			FormRelationLineWidget nRelLine = new FormRelationLineWidget(line, this);
 			if( ! getData().isFinished() || (getData().isFinished() && nRelLine.getData().isFinished())) {
 				nRelLine.setProfileMode(this.profileMode);
-				result.add(nRelLine);
+				relationLines.add(nRelLine);
 			}
 		}
 
 		final FormLineComparator comp = new FormLineComparator();
-		Collections.sort(result, new Comparator<AbstractFormLineWidget>(){
+		Comparator<AbstractFormLineWidget> viewLinesComp = new Comparator<AbstractFormLineWidget>() {
 			@Override
 			public int compare(AbstractFormLineWidget o1, AbstractFormLineWidget o2) {
 				if(o1 != null && o2 != null) {
@@ -392,7 +397,13 @@ public class FormWidget
 					return 0;
 				}
 			}
-		});
+		};
+		Collections.sort(classLines, viewLinesComp);
+		Collections.sort(relationLines, viewLinesComp);
+		
+		result.addAll(classLines);
+		result.add(mainTypeLine);
+		result.addAll(relationLines);
 		
 		return result;
 	}
