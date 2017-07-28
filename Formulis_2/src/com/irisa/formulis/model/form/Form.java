@@ -31,7 +31,22 @@ public class Form extends FormComponent {
 	
 	public Form(FormComponent par, FormClassLine typeL) {
 		super(par);
-		this.typeLines.add(typeL);
+		setMainTypeLine(typeL);
+	}
+	
+	public Form(Form other) {
+		super(other.parent);
+		Iterator<FormRelationLine> itRel = other.relationLinesIterator();
+		while(itRel.hasNext()) {
+			FormRelationLine nRel = new FormRelationLine(itRel.next());
+			addLine(nRel);
+		}
+		Iterator<FormClassLine> itTyp = other.getTypeLines().iterator();
+		while(itTyp.hasNext()) {
+			FormClassLine nTyp = new FormClassLine(itTyp.next());
+			addTypeLine(nTyp);
+		}
+		setMainTypeLine(new FormClassLine(other.getMainType()));
 	}
 	
 	/**

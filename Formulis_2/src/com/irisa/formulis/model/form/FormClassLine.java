@@ -35,6 +35,9 @@ public class FormClassLine extends FormLine {
 	
 	public FormClassLine(FormClassLine l) {
 		this(l.getParent(), l.getFixedElement(), l.getVariableElement());
+		this.elementUri = new URI(l.elementUri);
+		this.elementLabel = l.elementLabel;
+		this.anonymous = l.anonymous;
 	}
 	
 	public FormClassLine(FormComponent par) {

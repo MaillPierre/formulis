@@ -41,7 +41,11 @@ import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
 import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
+import com.irisa.formulis.view.event.DescribeUriEvent;
+import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishableLineEvent;
+import com.irisa.formulis.view.event.RelationCreationEvent;
+import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.callback.AbstractActionCallback;
 import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.callback.FormEventCallback;
@@ -340,6 +344,30 @@ public class FormWidget
 			reload();
 		}
 //		ControlUtils.debugMessage("FormWidget onFinishableLine " + event.getSource().getClass().getSimpleName() + " " + event.getState() + " END");
+	}
+	
+	@Override
+	public void onElementCreation(ElementCreationEvent event) {
+		super.onElementCreation(event);
+		this.setLastAction(LAST_ACTION.INTERN_EDIT);
+	}
+	
+	@Override
+	public void onRemoveLine(RemoveLineEvent event) {
+		super.onRemoveLine(event);
+		this.setLastAction(LAST_ACTION.INTERN_EDIT);
+	}
+	
+	@Override
+	public void onDescribeUri(DescribeUriEvent event) {
+		super.onDescribeUri(event);
+		this.setLastAction(LAST_ACTION.INTERN_EDIT);
+	}
+	
+	@Override
+	public void onRelationCreation(RelationCreationEvent event) {
+		super.onRelationCreation(event);
+		this.setLastAction(LAST_ACTION.INTERN_EDIT);
 	}
 	
 	public void setFinishButtonsState(FINISH_BUTTON_STATE state) {

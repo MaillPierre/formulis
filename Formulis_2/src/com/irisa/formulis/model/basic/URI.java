@@ -15,11 +15,19 @@ public class URI extends BasicLeafElement {
 	private String labelString;
 	
 	public URI(String uri, URI.KIND kindFlag, String label) {
+		super();
 		uriString = uri;
 		kind= kindFlag;
 		labelString = label;
 	}
 	
+	public URI(URI uri) {
+		super();
+		uriString = uri.uriString;
+		kind = uri.kind;
+		labelString = uri.labelString;
+	}
+
 	public String getUri() {
 		return uriString;
 	}

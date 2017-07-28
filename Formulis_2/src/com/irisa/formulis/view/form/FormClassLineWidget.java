@@ -24,6 +24,7 @@ import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
+import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
@@ -213,6 +214,9 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 //		ControlUtils.debugMessage("FormClassLineWidget onValueChange " + event.getValue() + " " + (event.getSource() == this.labelUriBox));
 		if(event.getSource() == this.labelUriBox) {
 			getFormLine().setEntityLabel(event.getValue());
+			if(event.getValue() != this.getFormLine().getEntityLabel()) {
+				getParentWidget().setLastAction(LAST_ACTION.EDIT);
+			}
 			this.fireFinishableLineEvent(this.getFormLine().isFinishable());
 		}
 	}
