@@ -1759,7 +1759,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		Parser.setControl(this);
 		//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
+		ControlUtils.debugMessage("HERE DRAGONS DWELL");
 		form = new Form(null);
+		ControlUtils.debugMessage("HERE DRAGONS DWELL");
 		mainPage = new MainPage(this);
 
 		RootPanel.get().add(navBar);
