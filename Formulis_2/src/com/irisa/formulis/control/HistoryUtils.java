@@ -48,7 +48,7 @@ public class HistoryUtils {
 	}
 	
 	public static String getPermalinkFromToken(String token) throws InvalidHistoryState {
-		return Controller.getServerAdress()+ "?state=" + Crypto.obfuscate(getProfileFromHistoryToken(token));
+		return FormulisSettings.getServerAdress()+ "?state=" + Crypto.obfuscate(getProfileFromHistoryToken(token));
 	}
 	
 	public static String getPermalink(String profile) throws InvalidHistoryState {

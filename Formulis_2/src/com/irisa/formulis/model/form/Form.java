@@ -34,20 +34,27 @@ public class Form extends FormComponent {
 		setMainTypeLine(typeL);
 	}
 	
-//	public Form copy(Form other) {
-//		this.setParent(other.parent);
-//		Iterator<FormRelationLine> itRel = other.relationLinesIterator();
-//		while(itRel.hasNext()) {
-//			FormRelationLine nRel = new FormRelationLine(itRel.next());
-//			addLine(nRel);
-//		}
-//		Iterator<FormClassLine> itTyp = other.getTypeLines().iterator();
-//		while(itTyp.hasNext()) {
-//			FormClassLine nTyp = new FormClassLine(itTyp.next());
-//			addTypeLine(nTyp);
-//		}
-//		setMainTypeLine(new FormClassLine(other.getMainType()));
-//	}
+	/**
+	 * Replace the form content by the given form
+	 * @param other
+	 */
+	public void replaceBy(Form other) {
+		clear();
+		this.setParent(other.parent);
+		Iterator<FormRelationLine> itRel = other.relationLinesIterator();
+		while(itRel.hasNext()) {
+			FormRelationLine nRel = new FormRelationLine(itRel.next());
+			addLine(nRel);
+		}
+		Iterator<FormClassLine> itTyp = other.getTypeLines().iterator();
+		while(itTyp.hasNext()) {
+			FormClassLine nTyp = new FormClassLine(itTyp.next());
+			addTypeLine(nTyp);
+		}
+		setMainTypeLine(new FormClassLine(other.getMainType()));
+		this.setHasLess(other.hasLess());
+		this.setHasMore(other.hasMore());
+	}
 	
 	/**
 	 * Ajoute une ligne de type et efface les autres lignes

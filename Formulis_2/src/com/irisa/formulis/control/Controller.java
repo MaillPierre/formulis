@@ -88,10 +88,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	private static String uriBaseAdress = "http://www.irisa.fr/LIS/sewelis/";
 
-	private static String serverAdress = "http://127.0.0.1:9999/";
 	//	private static String logServerAdress = "http://servolis.irisa.fr:3941";
-	private static String logLogin = "expeDEXA";
-	private static String logPasswd = "expeDEXA";
+//	private static String logLogin = "expeDEXA";
+//	private static String logPasswd = "expeDEXA";
 	private static String logUserKey = "0";
 	private static String logStoreName = "";
 	private String userLogin = "anonymous";
@@ -124,18 +123,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 	public boolean isStoreSet() {
 		return this.currentStore != null;
-	}
-
-	/**
-	 * 
-	 * @return the SEWELIS server adress, initialized by a dictionnary in index.html or set to http://127.0.0.1:9999/ by default
-	 */
-	public static String getServerAdress() {
-		return serverAdress;
-	}
-
-	public static void setServerAdress(String adress) {
-		serverAdress = adress;
 	}
 
 	/**
@@ -313,7 +300,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @throws RequestException
 	 */
 	public void sewelisPing() throws RequestException {
-		String pingRequestString = serverAdress + "/ping";
+		String pingRequestString = FormulisSettings.getServerAdress() + "/ping";
 		navBar.setServerStatusMessage("Waiting...");
 
 		AbstractSewelisRequest request = new AbstractSewelisRequest(pingRequestString) {
@@ -338,10 +325,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param nu a NewUserToken containing the necessary infos to create a new SEWELIS account
 	 */
 	public void sewelisRegister(final NewUserToken nu) {
-		String registerRequestString = serverAdress + "/register";
+		String registerRequestString = FormulisSettings.getServerAdress() + "/register";
 		registerRequestString += "?userKey=" + userKey;
 		registerRequestString += "&userLogin=" + nu.getUserName();
-		registerRequestString += "&passwd=" + Crypto.getCryptedString(nu.getPassword(), Controller.serverAdress);
+		registerRequestString += "&passwd=" + Crypto.getCryptedString(nu.getPassword(), FormulisSettings.getServerAdress());
 		registerRequestString += "&email=" + nu.getEmail();
 		navBar.setServerStatusMessage("Waiting...");
 
@@ -368,48 +355,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		request.send();
 	}
 
-	//	/**
-	//	 * Connect the app to an existing SEWELIS account on the server
-	//	 * @param t Login Token containing login and password
-	//	 */
-	//	public void sewelisLogin(final LoginToken t) {
-	//		ControlUtils.debugMessage("sewelisLogin login:" + t.getLogin() + " psswd:" + t.getPassword() + " salt:" + Controller.serverAdress);
-	//		String loginRequestString = serverAdress + "/login";
-	//		loginRequestString += "?userKey=" + userKey;
-	////		loginRequestString += "&userLogin=" + t.getLogin();
-	////		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), Controller.serverAdress);
-	//		loginRequestString += "&userLogin=" + "admin";
-	//		loginRequestString += "&passwd=" + Crypto.getCryptedString("admin", Controller.serverAdress);
-	//		navBar.setServerStatusMessage("Waiting...");
-	//
-	//		AbstractSewelisRequest request = new AbstractSewelisRequest(loginRequestString) {
-	//			@Override
-	//			public void onServerResponseReceived(Request request, Response response) {
-	//				if (200 == response.getStatusCode()) {
-	//					Document statusDoc = XMLParser.parse(response.getText());
-	//					Element docElement = statusDoc.getDocumentElement();
-	//					String status = docElement.getAttribute("status");
-	//					if(!status.equals("ok")) {
-	//						ControlUtils.debugMessage(docElement.getNodeValue());
-	//						navBar.setServerStatusHovertext(docElement.getNodeValue());
-	//					} else {
-	//						userLogin = t.getLogin();
-	//						userKey = docElement.getAttribute("userKey");
-	//						navBar.loginWid.loggedUsernameLabel.setText(t.getLogin());
-	//						navBar.loginWid.setLogState(LOGIN_STATE.LOGGED);
-	//						Cookies.setCookie(cookiesUserLogin, userLogin);
-	//						Cookies.setCookie(cookiesUserkey, userKey);
-	//						sewelisVisibleStores();
-	//					}
-	//				} else {
-	//					// FIXME GESTION DES MESSAGE D'ERREUR
-	//					ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
-	//				}					
-	//			}
-	//		};
-	//		request.send();
-	//	}
-
 	/**
 	 * Connect the app to an existing SEWELIS account on the server
 	 * @param t Login Token containing login and password
@@ -434,10 +379,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param t Login Token containing login and password
 	 */
 	private void sewelisLogin(final LoginToken t, final AbstractStringCallback callback) {
-		String loginRequestString = serverAdress + "/login";
+		String loginRequestString = FormulisSettings.getServerAdress() + "/login";
 		loginRequestString += "?userKey=" + userKey;
 		loginRequestString += "&userLogin=" + t.getLogin();
-		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), Controller.serverAdress);
+		loginRequestString += "&passwd=" + Crypto.getCryptedString(t.getPassword(), FormulisSettings.getServerAdress());
 		navBar.setServerStatusMessage("Waiting...");
 
 		AbstractSewelisRequest request = new AbstractSewelisRequest(loginRequestString) {
@@ -467,7 +412,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Logout from the current connexion to a SEWELIS account
 	 */
 	public void sewelisLogout() {
-		String logoutRequestString = serverAdress + "/logout";
+		String logoutRequestString = FormulisSettings.getServerAdress() + "/logout";
 		logoutRequestString += "?userKey=" + userKey;
 		navBar.setServerStatusMessage("Waiting...");
 
@@ -510,7 +455,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void sewelisResultsOfStatement(String statString, final FormEventCallback callback ) {
 		//		ControlUtils.debugMessage("resultsOfStatement (" + statString + ") ");
-		String resultsOfStatementRequestString = serverAdress + "/resultsOfStatement?userKey=" + userKey ;
+		String resultsOfStatementRequestString = FormulisSettings.getServerAdress() + "/resultsOfStatement?userKey=" + userKey ;
 		resultsOfStatementRequestString += "&storeName=" + currentStore.getName(); 
 		resultsOfStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
@@ -558,7 +503,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void sewelisVisibleStores() {
 		try {
-			String visibleStoresRequestString = serverAdress + "/visibleStores?";
+			String visibleStoresRequestString = FormulisSettings.getServerAdress() + "/visibleStores?";
 			visibleStoresRequestString += "userKey=" + userKey;
 			navBar.setServerStatusMessage("Retrieving stores...");
 
@@ -640,7 +585,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void sewelisStoreXmlns() {
 		if(this.currentStore != null) {
-			String storeXmlnsRequestString = serverAdress + "/storeXmlns?";
+			String storeXmlnsRequestString = FormulisSettings.getServerAdress() + "/storeXmlns?";
 			storeXmlnsRequestString += "userKey=" + userKey;
 			storeXmlnsRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Retrieving namespaces...");
@@ -733,7 +678,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisGetPlaceRoot() {
 		//		ControlUtils.debugMessage("getPlaceRoot");
 		if(currentStore != null) {
-			String placeHomeRequestString = serverAdress + "/getPlaceRoot?";
+			String placeHomeRequestString = FormulisSettings.getServerAdress() + "/getPlaceRoot?";
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
@@ -782,7 +727,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisGetPlaceHome() {
 		//		ControlUtils.debugMessage("getPlaceHome");
 		if(currentStore != null) {
-			String placeHomeRequestString = serverAdress + "/getPlaceHome?";
+			String placeHomeRequestString = FormulisSettings.getServerAdress() + "/getPlaceHome?";
 			placeHomeRequestString += "userKey=" + userKey;
 			placeHomeRequestString += "&storeName=" + currentStore.getName();
 			navBar.setServerStatusMessage("Waiting...");
@@ -842,7 +787,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisGetPlaceStatement(final String statString, final AbstractFormEvent event) {
 		ControlUtils.debugMessage("sewelisGetPlaceStatement( " + statString + " ) " );
 		if(currentStore != null) {
-			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
+			String placeStatementRequestString = FormulisSettings.getServerAdress() + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
@@ -907,7 +852,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisGetPlaceStatementStandalone(final String statString, final ObjectCallback callback) {
 		ControlUtils.debugMessage("sewelisGetPlaceStatementStandalone( " + statString + " ) " );
 		if(currentStore != null) {
-			String placeStatementRequestString = serverAdress + "/getPlaceStatement?";
+			String placeStatementRequestString = FormulisSettings.getServerAdress() + "/getPlaceStatement?";
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
@@ -969,7 +914,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event event whose callback will be called in case of success
 	 */
 	public void sewelisChangeStatementFocus(String focusId, final ObjectCallback callback) {
-		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
+		String changeFocusRequestString = FormulisSettings.getServerAdress() + "/changeFocus?userKey=" + userKey ;
 		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
 		changeFocusRequestString += "&placeId=" + place.getId(); 
 		changeFocusRequestString += "&focusId=" + focusId;
@@ -1029,7 +974,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisApplyTransformation(final Place place, final String transformationName, final AbstractFormEvent event) {
 		//		ControlUtils.debugMessage("sewelisApplyTransformation( " + place.getId() + ", " + transformationName + " ) " );
 		if(currentStore != null) {
-			String applyTransformationRequestString = serverAdress + "/applyTransformation?";
+			String applyTransformationRequestString = FormulisSettings.getServerAdress() + "/applyTransformation?";
 			applyTransformationRequestString += "userKey=" + userKey;
 			applyTransformationRequestString += "&storeName=" + currentStore.getName();
 			applyTransformationRequestString += "&placeId=" + place.getId();
@@ -1094,7 +1039,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void sewelisGetPlaceUri(final URI uri, final AbstractFormEvent event) {
 		//		ControlUtils.debugMessage("sewelisGetPlaceUri( " + uri.getUri() + " ) " );
 		if(currentStore != null) {
-			String placeStatementRequestString = serverAdress + "/getPlaceUri?";
+			String placeStatementRequestString = FormulisSettings.getServerAdress() + "/getPlaceUri?";
 			placeStatementRequestString += "userKey=" + userKey;
 			placeStatementRequestString += "&storeName=" + currentStore.getName();
 			placeStatementRequestString += "&uri=" + URL.encodeQueryString(uri.getUri());
@@ -1159,7 +1104,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	private void sewelisRunStatement(final String statString, String userKeyString, String storeName) {
 		ControlUtils.debugMessage("sewelisRunStatement store:"+ storeName +" (" + statString + ") ");
-		String runStatementRequestString = serverAdress + "/runStatement?userKey=" + userKeyString ;
+		String runStatementRequestString = FormulisSettings.getServerAdress() + "/runStatement?userKey=" + userKeyString ;
 		runStatementRequestString += "&storeName=" + storeName; 
 		runStatementRequestString += "&statement=" + URL.encodeQueryString(statString);
 		navBar.setServerStatusMessage("Waiting...");
@@ -1198,7 +1143,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	public void sewelisGetCompletions(final String match, final AbstractFormEvent event) {
 		//		ControlUtils.debugMessage("Controller sewelisGetCompletions match:" + match + " statement:" + this.getPlace().getStatement().getString());
-		String getCompletionsRequestString = serverAdress + "/getCompletions?userKey=" + userKey ;
+		String getCompletionsRequestString = FormulisSettings.getServerAdress() + "/getCompletions?userKey=" + userKey ;
 		getCompletionsRequestString += "&storeName=" + currentStore.getName(); 
 		getCompletionsRequestString += "&placeId=" + place.getId(); 
 		getCompletionsRequestString += "&matchingKey=" + match;
@@ -1285,7 +1230,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whose callback will be run in case of success
 	 */
 	public void sewelisShowMost(final AbstractFormEvent event) {
-		String showMostRequestString = serverAdress + "/showMost?userKey=" + userKey ;
+		String showMostRequestString = FormulisSettings.getServerAdress() + "/showMost?userKey=" + userKey ;
 		showMostRequestString += "&storeName=" + currentStore.getName(); 
 		showMostRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
@@ -1336,7 +1281,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whose callback will be run in case of success
 	 */
 	public void sewelisShowMore(final AbstractFormEvent event) {
-		String showMoreRequestString = serverAdress + "/showMore?userKey=" + userKey ;
+		String showMoreRequestString = FormulisSettings.getServerAdress() + "/showMore?userKey=" + userKey ;
 		showMoreRequestString += "&storeName=" + currentStore.getName(); 
 		showMoreRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
@@ -1385,7 +1330,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whose callback will be run in case of success
 	 */
 	public void sewelisShowLess(final AbstractFormEvent event) {
-		String showLessRequestString = serverAdress + "/showLess?userKey=" + userKey ;
+		String showLessRequestString = FormulisSettings.getServerAdress() + "/showLess?userKey=" + userKey ;
 		showLessRequestString += "&storeName=" + currentStore.getName(); 
 		showLessRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
@@ -1432,7 +1377,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event whose callback will be run in case of success
 	 */
 	public void sewelisShowLeast(final AbstractFormEvent event) {
-		String showLeastRequestString = serverAdress + "/showLeast?userKey=" + userKey ;
+		String showLeastRequestString = FormulisSettings.getServerAdress() + "/showLeast?userKey=" + userKey ;
 		showLeastRequestString += "&storeName=" + currentStore.getName(); 
 		showLeastRequestString += "&placeId=" + place.getId(); 
 		navBar.setServerStatusMessage("Waiting...");
@@ -1493,7 +1438,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param adress
 	 */
 	public void sewelisDefineNamespace(String prefix, String adress) {
-		String defineNameRequestString = serverAdress + "/defineNamespace?userKey=" + userKey ;
+		String defineNameRequestString = FormulisSettings.getServerAdress() + "/defineNamespace?userKey=" + userKey ;
 		defineNameRequestString += "&storeName=" + currentStore.getName(); 
 		defineNameRequestString += "&userkey=" + this.userKey;
 		defineNameRequestString += "&prefix=" + prefix;
@@ -1573,7 +1518,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			//			Date nowDate = new Date();
 			//			ControlUtils.debugMessage(userLogin + " " + currentStore.getName() + " " + this.form.getType().getEntityUri() + " " + this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds() + " " + nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds() + " " + this.getNumberOfActions());
 			//			this.sendExperimentLog(userLogin, currentStore.getName(), this.form.getType().getElementUri(), this.startEditDate.getHours()+":"+this.startEditDate.getMinutes()+":"+this.startEditDate.getSeconds(), nowDate.getHours()+":"+nowDate.getMinutes()+":"+nowDate.getSeconds(), this.getNumberOfActions());
-			logLogStatement(finalStatement, "", "", this.numberOfActions);
+//			logLogStatement(finalStatement, "", "", this.numberOfActions);
 			numberOfActions = 0;
 		}
 		ControlUtils.debugMessage("Controller finish END");
@@ -1628,7 +1573,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param event event whose callback will be called in case of success
 	 */
 	public void sewelisChangeFocus(String focusId, final AbstractFormEvent event) {
-		String changeFocusRequestString = serverAdress + "/changeFocus?userKey=" + userKey ;
+		String changeFocusRequestString = FormulisSettings.getServerAdress() + "/changeFocus?userKey=" + userKey ;
 		changeFocusRequestString += "&storeName=" + currentStore.getName(); 
 		changeFocusRequestString += "&placeId=" + place.getId(); 
 		changeFocusRequestString += "&focusId=" + focusId;
@@ -1749,7 +1694,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String uriBaseString = appSettings.get("uriBaseAdress");
 			String logStoreNameString = appSettings.get("logStoreName");
 			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
-			serverAdress = serverAdressString;
+			FormulisSettings.setServerAdress(serverAdressString);
 			uriBaseAdress = uriBaseString;
 			logStoreName = logStoreNameString;
 		} catch(MissingResourceException e) {
@@ -1759,9 +1704,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		Parser.setControl(this);
 		//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
-		ControlUtils.debugMessage("HERE DRAGONS DWELL");
 		form = new Form(null);
-		ControlUtils.debugMessage("HERE DRAGONS DWELL");
 		mainPage = new MainPage(this);
 
 		RootPanel.get().add(navBar);
@@ -1883,7 +1826,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		}
 
-		logLogin();
+//		logLogin();
 
 	}
 
@@ -2712,32 +2655,32 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return result;
 	}
 
-	/**
-	 * call sewelisLogin and update logUserKey with the current userKey
-	 */
-	public void logLogin() {
-		sewelisLogin(new LoginToken(logLogin, logPasswd), new AbstractStringCallback() {
-			@Override
-			public void call(String userKeyString) {
-				logUserKey = userKeyString;
-			}
-		});
-	}
+//	/**
+//	 * call sewelisLogin and update logUserKey with the current userKey
+//	 */
+//	public void logLogin() {
+//		sewelisLogin(new LoginToken(logLogin, logPasswd), new AbstractStringCallback() {
+//			@Override
+//			public void call(String userKeyString) {
+//				logUserKey = userKeyString;
+//			}
+//		});
+//	}
 
 
-	/**
-	 * call sewelisRunStatement to send the statement to the log server
-	 */
-	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
-		String logUriBase = uriBaseAdress + logStoreName + "/#";
-		String logStatement = "[ <" + ControlUtils.FORBIDDEN_URIS.rdfType.getUri() + "> <" + logUriBase + "logEntry> ; ";
-		logStatement +="<" + logUriBase + "by> \""+ this.userLogin + "\"@en ; ";
-		logStatement +="<" + logUriBase + "store> \""+ this.currentStore.getName() + "\"@en ; ";
-		logStatement +="<" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger.getUri() + "> ; ";
-		logStatement +="<" + logUriBase+ "creating> [ " + statement + " ] ]";
-		ControlUtils.debugMessage("Logging: " + logStatement);
-		sewelisRunStatement(logStatement, logUserKey, logStoreName);
-	}
+//	/**
+//	 * call sewelisRunStatement to send the statement to the log server
+//	 */
+//	public void logLogStatement(String statement, String startTime, String endTime, int nbActions) {
+//		String logUriBase = uriBaseAdress + logStoreName + "/#";
+//		String logStatement = "[ <" + ControlUtils.FORBIDDEN_URIS.rdfType.getUri() + "> <" + logUriBase + "logEntry> ; ";
+//		logStatement +="<" + logUriBase + "by> \""+ this.userLogin + "\"@en ; ";
+//		logStatement +="<" + logUriBase + "store> \""+ this.currentStore.getName() + "\"@en ; ";
+//		logStatement +="<" + logUriBase+ "actions> \"" + nbActions + "\"^^<"+ ControlUtils.FORBIDDEN_URIS.xsdInteger.getUri() + "> ; ";
+//		logStatement +="<" + logUriBase+ "creating> [ " + statement + " ] ]";
+//		ControlUtils.debugMessage("Logging: " + logStatement);
+//		sewelisRunStatement(logStatement, logUserKey, logStoreName);
+//	}
 
 
 
