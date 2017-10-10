@@ -1,5 +1,8 @@
 package com.irisa.formulis.view.form;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,14 +28,29 @@ import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
+import com.irisa.formulis.view.event.ModificationModeEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
+import com.irisa.formulis.view.event.interfaces.HasModificationModeHandler;
+import com.irisa.formulis.view.event.interfaces.ModificationModeHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormWidget.LAST_ACTION;
 import com.irisa.formulis.view.form.suggest.EntitySuggestionWidget;
 
-public class FormClassLineWidget extends AbstractFormLineWidget implements ValueChangeHandler<String>, ClickHandler, CompletionAskedHandler, SuggestionSelectionHandler {
+/**
+ * Type line with an uri and a field with suggestions of existing elements.
+ * Entering a name in the field sends events to the parent form and is the minimum condition to send it to the server.
+ * Selecting a suggestion makes the parent form load the description of the resource and enter modification mode.
+ * Reseting the line while on description mode makes the form quit modification mode (TBD)
+ * @author pmaillot
+ *
+ */
+public class FormClassLineWidget 
+	extends AbstractFormLineWidget 
+	implements ValueChangeHandler<String>, ClickHandler, CompletionAskedHandler, SuggestionSelectionHandler, HasModificationModeHandler {
+	
+	private LinkedList<ModificationModeHandler> _modificationModeHandlers = new LinkedList<ModificationModeHandler>();
 
 	protected HorizontalPanel elementRow = new HorizontalPanel();
 	protected Column elementCol = new Column(12, elementRow);
@@ -45,14 +63,14 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	public FormClassLineWidget(FormClassLine l, FormWidget par, String startValue) {
 		super(l, par);
 
-		ControlUtils.debugMessage("FormClassLineWidget " + l + "  " + l.getVariableElement() + "  " + l.getEntityLabel());
+//		ControlUtils.debugMessage("FormClassLineWidget " + l + "  " + l.getVariableElement() + "  " + l.getEntityLabel());
 		if(! l.isAnonymous()) {
 			try {
 				this.fixedElement = FormulisWidgetFactory.getWidget((URI)l.getFixedElement(), this, this);
 			} catch (FormElementConversionException e) {
 				ControlUtils.exceptionMessage(e);
 			} catch(ClassCastException e) {
-				ControlUtils.debugMessage("ClassLineWidget fixed:" + l.getFixedElement() + " isAno:" + l.isAnonymous());
+//				ControlUtils.debugMessage("ClassLineWidget fixed:" + l.getFixedElement() + " isAno:" + l.isAnonymous());
 				throw e;
 			}
 		}
@@ -67,15 +85,15 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		labelUriBox.addSuggestionSelectionHandler(this);
 		labelUriBox.addCompletionAskedHandler(this);
 		labelUriBox.setSuggestionOnly(true);
-		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
-				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-//					finish();
-				}
-			}
-		});
+//		labelUriBox.addKeyUpHandler(new KeyUpHandler() {
+//			@Override
+//			public void onKeyUp(KeyUpEvent event) {
+//				ValueChangeEvent.fire(labelUriBox, labelUriBox.getValue());	
+//				if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+////					finish();
+//				}
+//			}
+//		});
 		
 		if( l .getEntityUri() != null) {
 			try {
@@ -142,23 +160,23 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 	
 	public void hideLabelBox() {
-		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
+//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox");
 		labelUriBox.setVisible(false);
 		
 		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
 			labelWid = new URIWidget(this.getFormLine().getEntityUri(), this);
-			ControlUtils.debugMessage("FormClassLineWidget hideLabelBox" + labelWid);
+//			ControlUtils.debugMessage("FormClassLineWidget hideLabelBox" + labelWid);
 			elementRow.remove(labelUriBox);
 			if(labelWid != null) {
 				elementRow.add(labelWid);
 				elementRow.setCellWidth(labelWid, "100%");
 			}
 		}
-		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
+//		ControlUtils.debugMessage("FormClassLineWidget hideLabelBox END");
 	}
 	
 	public void showLabelBox() {
-		ControlUtils.debugMessage("FormClassLineWidget showLabelBox");
+//		ControlUtils.debugMessage("FormClassLineWidget showLabelBox");
 		labelUriBox.setVisible(true);
 		if(this.getData() != null) {
 			if(labelWid != null) {
@@ -167,7 +185,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 			elementRow.add(labelUriBox);
 			elementRow.setCellWidth(labelUriBox, "100%");
 		}
-		ControlUtils.debugMessage("FormClassLineWidget showLabelBox END");
+//		ControlUtils.debugMessage("FormClassLineWidget showLabelBox END");
 	}
 
 	@Override
@@ -203,6 +221,7 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 //			ControlUtils.debugMessage("FormClassLine onClick reset");
 			setLineState(LINE_STATE.SUGGESTIONS);
 			this.fireFinishableLineEvent(this.getFormLine().isFinishable());
+			this.fireModificationModeChange(false);
 		} else if(event.getSource() == this.removeLineButton) {
 //			ControlUtils.debugMessage("FormClassLine onClick remove");
 			fireRemoveLineEvent();
@@ -242,6 +261,9 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 	}
 
 	@Override
+	/**
+	 * Suggestion selection should trigger the load and edition of an existing value
+	 */
 	public void onSuggestionSelection(SuggestionSelectionEvent event) {
 //		ControlUtils.debugMessage("Entity Selected " + event.getSuggestion() + " " + event.getSuggestion().getElement().getClass().getSimpleName());
 		if(event.getSuggestion().getElement() instanceof URI) {
@@ -257,10 +279,26 @@ public class FormClassLineWidget extends AbstractFormLineWidget implements Value
 		return new AbstractFormCallback() {			
 			@Override
 			public void call(Form desc) {
+				fireModificationModeChange(true);
 				getParentWidget().setData(desc);
-				getParentWidget().setLastAction(LAST_ACTION.LOAD);
+				getParentWidget().setLastAction(LAST_ACTION.LOAD_EXISTING);
 			}
 		};
+	}
+
+	@Override
+	public void addModificationModeHandler(ModificationModeHandler handler) {
+		this._modificationModeHandlers.add(handler);
+	}
+
+	@Override
+	public void fireModificationModeChange(boolean modif) {
+		ModificationModeEvent event = new ModificationModeEvent(this, modif);
+		Iterator<ModificationModeHandler> itHandler = this._modificationModeHandlers.iterator();
+		while(itHandler.hasNext()) {
+			ModificationModeHandler handler = itHandler.next();
+			handler.onModificationModeChange(event);
+		}
 	}
 	
 }

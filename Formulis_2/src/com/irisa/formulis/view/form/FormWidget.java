@@ -36,7 +36,6 @@ import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormClassLine;
 import com.irisa.formulis.model.form.FormLineComparator;
 import com.irisa.formulis.model.form.FormRelationLine;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.ViewUtils;
 import com.irisa.formulis.view.create.fixed.ClassCreateWidget;
@@ -44,21 +43,22 @@ import com.irisa.formulis.view.create.fixed.RelationCreateWidget;
 import com.irisa.formulis.view.event.DescribeUriEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.FinishableLineEvent;
+import com.irisa.formulis.view.event.ModificationModeEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.callback.AbstractActionCallback;
-import com.irisa.formulis.view.event.callback.ActionCallback;
-import com.irisa.formulis.view.event.callback.FormEventCallback;
+import com.irisa.formulis.view.event.interfaces.ModificationModeHandler;
 import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
 
 /**
- * Widget principal pour un formulaire
+ * Widget principal pour un formulaire.
+ * Main Widget representing a Form
  * @author pmaillot
  *
  */
 public class FormWidget 
 	extends AbstractFormElementWidget 
-	implements DragEndHandler, DragStartHandler {
+	implements DragEndHandler, DragStartHandler, ModificationModeHandler {
 
 	private FluidRow element = new FluidRow();
 	private Column linesCol = new Column(12);
@@ -88,20 +88,28 @@ public class FormWidget
 	private Button moreButton = new Button("", IconType.PLUS_SIGN);
 	private Button reloadButton = new Button("", IconType.REFRESH);
 	
+	private static String finishButtonLegend_finishable = "Ready to be saved";
+	private static String finishButtonLegend_finished = "Data has been saved";
+	private static String finishButtonLegend_edit = "In edition";
+	private static String finishButtonLegend_modification = "Modification of existing elements";
+	
 	public enum FINISH_BUTTON_STATE {
 		FINISHABLE, // Peut être fini
 		FINISHED, // Fini et envoyé au serveur
-		EDIT; // Manque d'éléments pour être fini
+		EDIT, // Manque d'éléments pour être fini
+		MODIFICATION // Editing existing values
 	}
 	
 	public enum LAST_ACTION {
 		LOAD,
+		LOAD_EXISTING,
 		EDIT,
 		INTERN_EDIT,
 		SUBMIT
 	}
 	
 	private LAST_ACTION actionMemory = LAST_ACTION.EDIT;
+	private boolean modificationFlag = false; // true if we are modifying an existing value
 	
 	/**
 	 * Responsable de la gestion des evenement lorsqu'une ligne est en cours de déplacement (le début et la fin du déplacement son gérés par le form lui-même
@@ -115,14 +123,19 @@ public class FormWidget
 		element.add(contentCol);
 		element.add(finishCol);
 		element.add(controlCol);
+		
 		element.addStyleName("weblis-form-frame");
 //		contentRow.add(linesCol);
+		
 		contentRow.add(lineAndCreateCol);
 		contentRow.add(finishCol);
+		
 		lineRow.add(linesCol);
+		
 		finishCol.add(finishButton);
 		finishCol.add(moreButton);
 		finishCol.add(reloadButton);
+		
 		newRelationButton.setBlock(true);
 		newClassButton.setBlock(true);
 		forceCreationButton.setBlock(true);
@@ -166,6 +179,9 @@ public class FormWidget
 		if(getData() != null) {
 //			ControlUtils.debugMessage("FormWidget computeFinishButtonState finishable: "+ getData().isFinishable());
 			if(getData().isFinishable()) {
+				if(modificationFlag) {
+					return FINISH_BUTTON_STATE.MODIFICATION;
+				}
 				if(getData().isFinished()) {
 					return FINISH_BUTTON_STATE.FINISHED;
 				}
@@ -208,6 +224,7 @@ public class FormWidget
 			public void call() {
 				this.getSource().getData().setFinished(true);
 				this.getSource().setLastAction(LAST_ACTION.SUBMIT);
+				this.getSource().setExistingModidificationFlag(false);
 				this.getSource().reload();
 			}
 		};
@@ -237,6 +254,10 @@ public class FormWidget
 		this.reloadButton.setVisible(false);
 		
 //		ControlUtils.debugMessage("FormWidget transformToSubmittedForm END");
+	}
+	
+	public void setExistingModidificationFlag(boolean flag) {
+		this.modificationFlag = flag;
 	}
 	
 	public void putElementCreationButtons(){
@@ -296,10 +317,11 @@ public class FormWidget
 					Iterator<AbstractFormLineWidget> itFo = formLinesToWidgetLines().iterator();
 					while(itFo.hasNext()) {
 						AbstractFormLineWidget line = itFo.next();
-						ControlUtils.debugMessage("\t" + line.getData());
-						addLine(line);
+						if(line != null) {
+							addLine(line);
+						} 
 					}
-				} 
+				}
 			}
 			
 			newClassButton.setEnabled(newClassButtonCanBeEnabled());
@@ -374,14 +396,46 @@ public class FormWidget
 //		ControlUtils.debugMessage("setFinishButtonsState " + state);
 		if(state.equals(FINISH_BUTTON_STATE.FINISHED) || state.equals(FINISH_BUTTON_STATE.FINISHABLE)) {
 			finishButton.setEnabled(state.equals(FINISH_BUTTON_STATE.FINISHABLE));
-			this.finishButton.setBaseIcon(IconType.CHECK);
-			this.finishButton.setType(ButtonType.SUCCESS);
+			finishButtonStyleFinishable();
+			if(state.equals(FINISH_BUTTON_STATE.FINISHED)) {
+				finishButton.setTitle(finishButtonLegend_finished);
+			} else {
+				finishButton.setTitle(finishButtonLegend_finishable);
+			}
+		} else if(state.equals(FINISH_BUTTON_STATE.MODIFICATION)) {
+			finishButton.setEnabled(true);
+			finishButtonStyleExistingModification();
+			finishButton.setTitle(finishButtonLegend_modification);
 		} else {
 			finishButton.setEnabled(false);
-			this.finishButton.setBaseIcon(IconType.PENCIL);
-			this.finishButton.setType(ButtonType.DANGER);
+			finishButtonStyleEditable();
+			finishButton.setTitle(finishButtonLegend_edit);
 		}
 //		ControlUtils.debugMessage("setFinishButtonsState " + state + " END");
+	}
+	
+	/**
+	 * Apply the finishable style to the finish button
+	 */
+	private void finishButtonStyleFinishable() {
+		this.finishButton.setBaseIcon(IconType.CHECK);
+		this.finishButton.setType(ButtonType.SUCCESS);
+	}
+	
+	/**
+	 * Apply the editable style to the finish button
+	 */
+	private void finishButtonStyleEditable() {
+		this.finishButton.setBaseIcon(IconType.PENCIL);
+		this.finishButton.setType(ButtonType.DANGER);
+	}
+	
+	/**
+	 * Apply the editable style to the finish button
+	 */
+	private void finishButtonStyleExistingModification() {
+		this.finishButton.setBaseIcon(IconType.PENCIL);
+		this.finishButton.setType(ButtonType.INFO);
 	}
 	
 	protected LinkedList<AbstractFormLineWidget> formLinesToWidgetLines() {
@@ -459,22 +513,26 @@ public class FormWidget
 	}
 	
 	public void addLine(AbstractFormLineWidget line) {
-		linesCol.add(line);
-		linesWidgets.addLast(line);
-		ViewUtils.connectFormEventChain(line, this);
-		if(line instanceof FormRelationLineWidget) {
-			((FormRelationLineWidget) line).addDragEndHandler(this);
-			((FormRelationLineWidget) line).addDragEnterHandler(dragLineHand);
-			((FormRelationLineWidget) line).addDragHandler(dragLineHand);
-			((FormRelationLineWidget) line).addDragLeaveHandler(dragLineHand);
-			((FormRelationLineWidget) line).addDragOverHandler(dragLineHand);
-			((FormRelationLineWidget) line).addDragStartHandler(this);
-			((FormRelationLineWidget) line).addDropHandler(dragLineHand);
+		if(line != null) {
+			linesCol.add(line);
+			linesWidgets.addLast(line);
+			ViewUtils.connectFormEventChain(line, this);
+			if(line instanceof FormRelationLineWidget) {
+				((FormRelationLineWidget) line).addDragEndHandler(this);
+				((FormRelationLineWidget) line).addDragEnterHandler(dragLineHand);
+				((FormRelationLineWidget) line).addDragHandler(dragLineHand);
+				((FormRelationLineWidget) line).addDragLeaveHandler(dragLineHand);
+				((FormRelationLineWidget) line).addDragOverHandler(dragLineHand);
+				((FormRelationLineWidget) line).addDragStartHandler(this);
+				((FormRelationLineWidget) line).addDropHandler(dragLineHand);
+			} else if (line instanceof FormClassLineWidget) {
+				((FormClassLineWidget) line).addModificationModeHandler(this);
+			}
 		}
 	}
 	
 	public void insertRelationLine(FormRelationLineWidget line, FormRelationLineWidget after) {
-		ControlUtils.debugMessage("FormWidget insertRelationLine " + line + " AFTER " + after);
+//		ControlUtils.debugMessage("FormWidget insertRelationLine " + line + " AFTER " + after);
 		getData().insertLineAfter(line.getFormLine(), after.getFormLine());
 		reload();
 	}
@@ -699,6 +757,11 @@ public class FormWidget
 			event.getNativeEvent().preventDefault();
 		}
 		
+	}
+
+	@Override
+	public void onModificationModeChange(ModificationModeEvent event) {
+		this.setExistingModidificationFlag(event.getModificationFlag());
 	}
 	
 }
