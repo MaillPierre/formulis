@@ -4,18 +4,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.github.gwtbootstrap.client.ui.Column;
-import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileLine;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.FormElementConversionException;
@@ -27,7 +22,6 @@ import com.irisa.formulis.view.basic.URIWidget;
 import com.irisa.formulis.view.create.CreationTypeOracle;
 import com.irisa.formulis.view.event.ClickWidgetEvent;
 import com.irisa.formulis.view.event.DescribeUriEvent;
-import com.irisa.formulis.view.event.ElementCreationEvent;
 import com.irisa.formulis.view.event.ModificationModeEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.callback.AbstractFormCallback;
@@ -279,9 +273,9 @@ public class FormClassLineWidget
 		return new AbstractFormCallback() {			
 			@Override
 			public void call(Form desc) {
-				fireModificationModeChange(true);
 				getParentWidget().setData(desc);
 				getParentWidget().setLastAction(LAST_ACTION.LOAD_EXISTING);
+				fireModificationModeChange(true);
 			}
 		};
 	}

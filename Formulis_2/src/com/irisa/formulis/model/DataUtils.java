@@ -24,10 +24,10 @@ import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 
 public class DataUtils {
-	
+
 	public static Keyword theKeyword = new Keyword("the");
 	public static Keyword thingKeyword = new Keyword("thing");
-	
+
 
 	/**
 	 * Simple classe utilitaire qui faire une traversée de l'arborescence donnée pour en extraire les premiers éléments qui ne sont pas des Focus ou des Display imbriqués
@@ -36,7 +36,7 @@ public class DataUtils {
 	 */
 	public static LinkedList<BasicElement> getFirstDisplayableElements(BasicElement elem) {
 		LinkedList<BasicElement> result = new LinkedList<BasicElement>();
-	
+
 		if(elem instanceof Display || elem instanceof Focus ) {
 			BasicElementList listElem = (BasicElementList) elem;
 			Iterator<BasicElement> itList = listElem.getContentIterator();
@@ -47,7 +47,7 @@ public class DataUtils {
 		} else {
 			result.add(elem);
 		}
-	
+
 		return result;
 	}
 
@@ -124,24 +124,24 @@ public class DataUtils {
 	}
 
 	public static FormElement extractEntityFromIncrement(Increment inc) throws FormElementConversionException {
-			FormElement result = null;
-			if(inc.getKind() == KIND.ENTITY) {
-				LinkedList<BasicElement> elements = getFirstDisplayableElements(inc.getDisplayElement());
-				if(elements.size() == 1 && elements.getFirst() instanceof URI) { // Entité URI
-					result = elements.getFirst();
-				
-				} else if(elements.size() == 1 && elements.getFirst() instanceof Pair) { // Objet anonyme, création d'un formulaire pour contenir son contenu
-					result = DataUtils.pairToForm((Pair) elements.getFirst(), null);
-				
-				} else if(elements.size() == 2 && elements.getFirst().equals(theKeyword)) {
-				} else {
-					throw new FormElementConversionException("extractEntityFromIncrement expect element to be URI or keyword or Pair " + elements);
-				}
+		FormElement result = null;
+		if(inc.getKind() == KIND.ENTITY) {
+			LinkedList<BasicElement> elements = getFirstDisplayableElements(inc.getDisplayElement());
+			if(elements.size() == 1 && elements.getFirst() instanceof URI) { // Entité URI
+				result = elements.getFirst();
+
+			} else if(elements.size() == 1 && elements.getFirst() instanceof Pair) { // Objet anonyme, création d'un formulaire pour contenir son contenu
+				result = DataUtils.pairToForm((Pair) elements.getFirst(), null);
+
+			} else if(elements.size() == 2 && elements.getFirst().equals(theKeyword)) {
 			} else {
-				throw new FormElementConversionException("extractEntityFromIncrement expect increment of kind ENTITY");
+				throw new FormElementConversionException("extractEntityFromIncrement expect element to be URI or keyword or Pair " + elements);
 			}
-			return result;
+		} else {
+			throw new FormElementConversionException("extractEntityFromIncrement expect increment of kind ENTITY");
 		}
+		return result;
+	}
 
 	public static FormElement extractClassFromIncrement(Increment inc) throws FormElementConversionException {
 		FormElement result = null;
@@ -159,15 +159,16 @@ public class DataUtils {
 	}
 
 	public static FormLine pairToLine(Pair pair, Form parent) throws FormElementConversionException {
-			FormLine result = null;
-			LinkedList<BasicElement> line1FirstPair = pair.getFirstLine();
-			if(pair.getFirstLine().size() == 1) {
-				line1FirstPair = getFirstDisplayableElements(pair.getFirstLine().getLast());
-			} 
-			if(line1FirstPair.size() == 2 && line1FirstPair.getFirst().equals(new Keyword("has"))) { // propriété
+		FormLine result = null;
+		LinkedList<BasicElement> line1FirstPair = pair.getFirstLine();
+		if(pair.getFirstLine().size() == 1) {
+			line1FirstPair = getFirstDisplayableElements(pair.getFirstLine().getLast());
+		} 
+		if(line1FirstPair.size() == 2 ) {
+			if(line1FirstPair.getFirst().equals(new Keyword("has"))) { // propriété
 				FormRelationLine newLine = new FormRelationLine(parent, line1FirstPair.getLast());
 				LinkedList<BasicElement> line2FirstPair = pair.getSecondLine();
-	//			Utils.displayDebugMessage("pairToLine potential variable element " + pair.getSecondLine());
+				//			Utils.displayDebugMessage("pairToLine potential variable element " + pair.getSecondLine());
 				if(pair.getSecondLine().size() == 1) {
 					line2FirstPair = getFirstDisplayableElements(pair.getSecondLine().getFirst());
 				}
@@ -178,15 +179,18 @@ public class DataUtils {
 					} else {
 						newLine.setVariableElement(line2FirstPair.getFirst());
 					}
+				} else if(line1FirstPair.getFirst().equals(new Keyword("is"))) {
+					throw new FormElementConversionException("pairToLine expect begins by \"is\" keyword: " + pair);
 				} else {
 					throw new FormElementConversionException("pairToLine expect form line to end by one element: " + line2FirstPair);
 				}
 				result = newLine;
-			} else { // Structure inconnue
-				throw new FormElementConversionException("pairToLine expect form line to begin by \"has\" keyword: " + pair);
 			}
-			return result;
+		} else { // Structure inconnue
+			throw new FormElementConversionException("pairToLine expect form line to begin by \"has\" keyword: " + pair);
 		}
+		return result;
+	}
 
 	public static Form pairToForm(Pair pair, FormLine parent) throws FormElementConversionException {
 		Form result = new Form(parent);
@@ -203,13 +207,13 @@ public class DataUtils {
 				}
 				result.addTypeLine(thingLine, false);
 			} else if (firstLine.getFirst() instanceof URI){
-//				ControlUtils.debugMessage("pairToForm if1 " + firstLine.getFirst());
+				//				ControlUtils.debugMessage("pairToForm if1 " + firstLine.getFirst());
 				formSubject = (URI) firstLine.getFirst();
 			}
 		} else {
 			throw new FormElementConversionException("pairToForm expect firstline to contain only one element " + pair.getFirstLine());
 		}
-		
+
 		if(pair.getSecondLine().size() == 1) {
 			LinkedList<BasicElement> secondLine = getFirstDisplayableElements(pair.getSecondLine().getFirst());
 			if(secondLine.getFirst() instanceof And) { // Liste de conjonction
@@ -232,12 +236,12 @@ public class DataUtils {
 							classLine = new FormClassLine(result, ((URI) andElem));
 							result.setMainTypeLine(classLine);
 						} else {
-//							ControlUtils.debugMessage("pairToForm if2.2 " + andElem + " " + (andElem instanceof URI && ((URI) andElem).getKind() == URI.KIND.CLASS ) );
+							//							ControlUtils.debugMessage("pairToForm if2.2 " + andElem + " " + (andElem instanceof URI && ((URI) andElem).getKind() == URI.KIND.CLASS ) );
 						}
 					} else {
-//						ControlUtils.debugMessage("pairToForm if2.1 " + andElem);
+						//						ControlUtils.debugMessage("pairToForm if2.1 " + andElem);
 					}
-					
+
 					previous = andElem;
 				}
 			} else if(secondLine.getFirst() instanceof Pair) { // Une seule ligne (NON VERIFIE)
@@ -245,17 +249,17 @@ public class DataUtils {
 				FormLine newLine = pairToLine(currentPair, result);
 				result.addLine(newLine);
 			} else {
-//				ControlUtils.debugMessage("pairToForm if2 " + pair.getSecondLine());
+				//				ControlUtils.debugMessage("pairToForm if2 " + pair.getSecondLine());
 			}
 		} else {
 			throw new FormElementConversionException("pairToForm expect secondline to contain only one element " + pair.getSecondLine());
 		}
-		
+
 		if(result.getMainType() != null && formSubject != null) {
 			result.getMainType().setEntityUri(formSubject);
 			result.getMainType().setFinished(true);
 		}
-		
+
 		return result;
 	}
 
@@ -293,20 +297,20 @@ public class DataUtils {
 		}
 		return result;
 	}
-	
+
 	public static String defaultLang() {
 		return "en";
 	}
 
 	public static Form ressourceDescStatementToForm(Statement stat) throws FormElementConversionException {
 		Form result = new Form(null);
-		
+
 		// On va partir de la structure attendue d'un statement qui décrit une ressource
 		LinkedList<BasicElement> firstElem = getFirstDisplayableElements(stat.getContent());
 		if(firstElem.size() == 1 && firstElem.getFirst() instanceof Pair) {
 			return pairToForm((Pair) firstElem.getFirst(), null);
 		}
-		
+
 		return result;
 	}
 

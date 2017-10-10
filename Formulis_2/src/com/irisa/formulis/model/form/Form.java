@@ -4,15 +4,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 
 /**
- * Base data object for a Form
- * Has relation lines, types lines and a main type line
- * can be translated to a lispql query to send a statement string to a SEWELIS server
- * Can be a type list, typed (with one main type) or anonymous
+ * Base data object for a Form.
+ * Has relation lines, types lines and a main type line.
+ * can be translated to a lispql query to send a statement string to a SEWELIS server.
+ * Can be a type list, typed (with one main type) or anonymous.
+ * When it is being in modification mode, it store its own initial state (TBD).
+ * Techically equivalent to a small RDF graph centered on a particular resource
  * @author pmaillot
  *
  */
@@ -24,6 +25,7 @@ public class Form extends FormComponent {
 	private boolean hasLessFlag = false;
 	
 	private FormClassLine mainTypeLine = null;
+	private Form initialState = null;
 
 	public Form(FormComponent par) {
 		super(par);
@@ -32,6 +34,22 @@ public class Form extends FormComponent {
 	public Form(FormComponent par, FormClassLine typeL) {
 		super(par);
 		setMainTypeLine(typeL);
+	}
+	
+	protected Form clone() {
+		Form clone = new Form(this.getParent());
+		
+		clone.relationLines = new LinkedList<FormRelationLine>(this.relationLines);
+		clone.typeLines = new LinkedList<FormClassLine>(this.typeLines);
+		clone.hasLessFlag = this.hasLessFlag;
+		clone.hasMoreFlag = this.hasMoreFlag;
+		clone.mainTypeLine = null;
+		clone.initialState = null;
+		if(this.mainTypeLine != null) {
+			clone.mainTypeLine = new FormClassLine(this.mainTypeLine);
+		}
+		
+		return clone;
 	}
 	
 	/**
@@ -486,6 +504,22 @@ public class Form extends FormComponent {
 
 	public void setHasLess(boolean hasLessFlag) {
 		this.hasLessFlag = hasLessFlag;
+	}
+	
+	public Form getInitialState() {
+		return this.initialState;
+	}
+	
+	public void setBeingModified(boolean modif) {
+		if(modif && ! this.isBeingModified()) { // If it was not already flagged as being modified
+			this.initialState = this.clone();
+		} else {
+			this.initialState = null;
+		}
+	}
+	
+	public boolean isBeingModified() {
+		return this.initialState != null;
 	}
 
 }

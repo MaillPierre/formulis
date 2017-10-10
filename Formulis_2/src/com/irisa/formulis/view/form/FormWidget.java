@@ -762,6 +762,7 @@ public class FormWidget
 	@Override
 	public void onModificationModeChange(ModificationModeEvent event) {
 		this.setExistingModidificationFlag(event.getModificationFlag());
+		this.getData().setBeingModified(event.getModificationFlag());
 	}
 	
 }
