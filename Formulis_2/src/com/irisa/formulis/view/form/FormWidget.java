@@ -193,7 +193,7 @@ public class FormWidget
 	
 	/**
 	 * 
-	 * @return un callback qui charge un nouveau contenu de formulaire 
+	 * @return callback loading new form content
 	 */
 	public FormCallback getLoadCallback() {
 		return new FormCallback(this) {
@@ -214,6 +214,15 @@ public class FormWidget
 			@Override
 			public void call() {
 				Controller.instance().appendFormContent(this.getSource());
+			}
+		};
+	}
+	
+	public FormCallback getModificationCallback() {
+		return new FormCallback(this) {
+			@Override
+			public void call() {
+				Controller.instance().applyModification(this.getSource().getData());
 			}
 		};
 	}

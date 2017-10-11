@@ -17,6 +17,7 @@ import com.irisa.formulis.view.event.FinishableLineEvent;
 import com.irisa.formulis.view.event.HistoryEvent;
 import com.irisa.formulis.view.event.LessCompletionsEvent;
 import com.irisa.formulis.view.event.LineSelectionEvent;
+import com.irisa.formulis.view.event.ModificationSubmissionEvent;
 import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.MoreFormLinesEvent;
 import com.irisa.formulis.view.event.RelationCreationEvent;
@@ -35,6 +36,7 @@ import com.irisa.formulis.view.event.interfaces.HasFormEventChainHandlers;
 import com.irisa.formulis.view.event.interfaces.HistoryHandler;
 import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.LineSelectionHandler;
+import com.irisa.formulis.view.event.interfaces.ModificationSubmissionHandler;
 import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.MoreFormLinesHandler;
 import com.irisa.formulis.view.event.interfaces.RelationCreationHandler;
@@ -62,6 +64,7 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	protected LinkedList<LineSelectionHandler> lineSelectionHandlers = new LinkedList<LineSelectionHandler>();
 	protected LinkedList<MoreCompletionsHandler> moreCompletionsHandlers = new LinkedList<MoreCompletionsHandler>();
 	protected LinkedList<MoreFormLinesHandler> moreFormLinesHandlers = new LinkedList<MoreFormLinesHandler>();
+	protected LinkedList<ModificationSubmissionHandler> modificationSubmissionHandlers = new LinkedList<ModificationSubmissionHandler>();
 	protected LinkedList<RelationCreationHandler> relationCreationHandlers = new LinkedList<RelationCreationHandler>();
 	protected LinkedList<ReloadHandler> reloadHandlers = new LinkedList<ReloadHandler>();
 	protected LinkedList<RemoveLineHandler> removeLineHandlers = new LinkedList<RemoveLineHandler>();
@@ -414,6 +417,30 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	@Override
 	public void onMoreFormLines(MoreFormLinesEvent event) {
 		fireMoreFormLinesEvent(event);
+	}
+	
+	@Override
+	public void addModificationSubmissionHandler(ModificationSubmissionHandler handler) {
+		this.modificationSubmissionHandlers.add(handler);
+	}
+	
+	@Override
+	public void fireModificationSubmission(ModificationSubmissionEvent event) {
+		Iterator<ModificationSubmissionHandler> itHand = this.modificationSubmissionHandlers.iterator();
+		while(itHand.hasNext()) {
+			ModificationSubmissionHandler hand = itHand.next();
+			hand.onModificationSubmission(event);
+		}
+	}
+	
+	@Override
+	public void fireModificationSubmission() {
+		this.fireModificationSubmission(new ModificationSubmissionEvent(this));
+	}
+
+	@Override
+	public void onModificationSubmission(ModificationSubmissionEvent event) {
+		fireModificationSubmission(event);
 	}
 
 	@Override

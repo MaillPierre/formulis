@@ -179,15 +179,19 @@ public class DataUtils {
 					} else {
 						newLine.setVariableElement(line2FirstPair.getFirst());
 					}
-				} else if(line1FirstPair.getFirst().equals(new Keyword("is"))) {
-					throw new FormElementConversionException("pairToLine expect begins by \"is\" keyword: " + pair);
-				} else {
+				} else  {
 					throw new FormElementConversionException("pairToLine expect form line to end by one element: " + line2FirstPair);
 				}
 				result = newLine;
+			} else { // Structure inconnue
+				throw new FormElementConversionException("pairToLine expect form line to begin by \"has\" or \"is\" keyword: " + line1FirstPair);
 			}
-		} else { // Structure inconnue
-			throw new FormElementConversionException("pairToLine expect form line to begin by \"has\" keyword: " + pair);
+		} else { // Line is in going
+			if(line1FirstPair.getFirst().equals(new Keyword("is"))) {
+//				throw new FormElementConversionException("pairToLine is only outgoing link begining with \"has\" keyword: " + line1FirstPair);
+			} else {
+				throw new FormElementConversionException("pairToLine expect 2 elements, got "+ line1FirstPair.size() + ": " + line1FirstPair);
+			}
 		}
 		return result;
 	}
@@ -226,7 +230,9 @@ public class DataUtils {
 						if(andElem instanceof Pair) {
 							Pair currentPair = (Pair) andElem;
 							FormLine newLine = pairToLine(currentPair, result);
-							result.addLine(newLine);
+							if(newLine != null) {
+								result.addLine(newLine);
+							}
 						} else if(andElem instanceof URI 
 								&& (((URI) andElem).getKind() == URI.KIND.CLASS) 
 								&& previous != null 
@@ -247,7 +253,9 @@ public class DataUtils {
 			} else if(secondLine.getFirst() instanceof Pair) { // Une seule ligne (NON VERIFIE)
 				Pair currentPair = (Pair) secondLine.getFirst();
 				FormLine newLine = pairToLine(currentPair, result);
-				result.addLine(newLine);
+				if(newLine != null) {
+					result.addLine(newLine);
+				}
 			} else {
 				//				ControlUtils.debugMessage("pairToForm if2 " + pair.getSecondLine());
 			}

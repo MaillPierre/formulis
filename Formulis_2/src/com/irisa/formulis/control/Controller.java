@@ -1507,10 +1507,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private void finish(FormWidget f) {
 		ControlUtils.debugMessage("Controller finish");
 		String finalStatement = f.getData().toLispql(true);
-		sewelisRunStatement(/*"get " +*/ finalStatement + "");
+		sewelisRunStatement( finalStatement + "");
 		if(f.getData() == this.rootForm()) {
 			// Retour au formulaire de départ
-			//			sewelisGetPlaceRoot();
 			this.toRootForm();
 
 			// Logging des actions
@@ -2200,7 +2199,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			sewelisShowMost(event);
 		} else {
 			if(event.getSource() instanceof AbstractFormulisWidget) {
-				String queryString = lispqlStatementQuery(((AbstractFormulisWidget) event.getSource()).getParentWidget().getData(), true);
+				String queryString = lispqlStatementQueryGET(((AbstractFormulisWidget) event.getSource()).getParentWidget().getData(), true);
 				sewelisGetPlaceStatement(queryString, event);		
 			}
 		}
@@ -2208,6 +2207,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		incrementNumberOfActions();
 	}
 
+	@Override
+	public void onModificationSubmission(ModificationSubmissionEvent event) {
+		if(event.getSource() instanceof FormWidget && ((AbstractDataWidget) event.getSource()).getData() != null) {
+			((ActionCallback) event.getCallback()).call();
+		}
+	}
 
 	/**
 	 * If the place can be specialized, call directly showMost, other with, return to the statement's place
@@ -2605,17 +2610,37 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param e
 	 * @return the corresponding statement to interrogate the base from e
 	 */
-	public String lispqlStatementQuery(FormElement e) {
-		return lispqlStatementQuery(e, false);
+	public static String lispqlStatementQuery(FormElement e) {
+		return lispqlStatementQueryGET(e, false);
 	}
 
 	/**
-	 * 
+	 * Return a get (retrieval) LISPQL query
 	 * @param eleme element à the start of the query
 	 * @param root element  is the root of the form
 	 * @return
 	 */
-	public String lispqlStatementQuery(FormElement eleme, boolean root) {
+	public static String lispqlStatementQueryGET(FormElement eleme, boolean root) {
+		return lispqlStatementQuery(eleme, "get", root);
+	}
+
+	/**
+	 * Return a delete (removal) LISPQL query
+	 * @param eleme element à the start of the query
+	 * @param root element  is the root of the form
+	 * @return
+	 */
+	public static String lispqlStatementQueryDELETE(FormElement eleme, boolean root) {
+		return lispqlStatementQuery(eleme, "delete", root);
+	}
+
+	/**
+	 * 
+	 * @param eleme element at the start of the query
+	 * @param root element  is the root of the form
+	 * @return
+	 */
+	public static String lispqlStatementQuery(FormElement eleme, String procedure, boolean root) {
 		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
 		String result = "";
 		if(eleme instanceof FormLine) {
@@ -2626,23 +2651,23 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				if(root) {
 					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine Root");
 					FormRelationLine relLine = (FormRelationLine) eleme;
-					result = "get [ " + relLine.toRootLispql() + " ]";
+					result = procedure +" [ " + relLine.toRootLispql() + " ]";
 				} else {
 					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine not Root");
 					try{
-						result = "get [ " + line.toLispql(true, false) + " ]";
+						result = procedure +" [ " + line.toLispql(true, false) + " ]";
 					}catch(Exception e) {
-						ControlUtils.debugMessage("lispqlStatementQuery EXCEPTION " + eleme );
+						ControlUtils.debugMessage("lispqlStatementQuery EXCEPTION " + procedure + " " + eleme );
 						throw e;
 					}
 				}
 			} else if(eleme instanceof FormClassLine) {
 				//				ControlUtils.debugMessage("lispqlStatementQuery FormClassLine");
-				result = "get [ " + line.toLispql() + " ]";
+				result = procedure +" [ " + line.toLispql() + " ]";
 			}
 		} else {
 			//			ControlUtils.debugMessage("lispqlStatementQuery not FormLine");
-			result = "get " + eleme.toLispql() + "";
+			result = procedure +" " + eleme.toLispql() + "";
 		}
 		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
 		return result;
@@ -2653,6 +2678,18 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		result += uri.toLispql() + " [ a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ; "; 
 		result += " <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> " + (new Plain(uri.getLabel()).toLispql()) + " ] . " ;
 		return result;
+	}
+
+	/**
+	 * Apply a modification to the current store by removing the old form and replacing it by the new one
+	 * @param data
+	 */
+	public void applyModification(Form data) {
+		assert(data.getInitialState() != null);
+		String deleteOldDataQuery = lispqlStatementQueryDELETE(data.getInitialState(), true);
+		String createNewDataQuery = data.toLispql(true);
+		sewelisRunStatement(deleteOldDataQuery);
+		sewelisRunStatement(createNewDataQuery);
 	}
 
 //	/**
