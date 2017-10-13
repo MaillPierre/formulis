@@ -222,7 +222,8 @@ public class FormWidget
 		return new FormCallback(this) {
 			@Override
 			public void call() {
-				Controller.instance().applyModification(this.getSource().getData());
+				this.getSource().getData().setBeingModified(false);
+				finish();
 			}
 		};
 	}
@@ -554,7 +555,9 @@ public class FormWidget
 	@Override
 	public void finish() {
 		if(getData().isFinishable() && ! getData().isFinished()) {
-			fireFinishFormEvent(true, this.getSubmittedCallback());
+			if(getData().isBeingModified()) {
+				fireFinishFormEvent(true, this.getSubmittedCallback());
+			}
 		}
 	}
 

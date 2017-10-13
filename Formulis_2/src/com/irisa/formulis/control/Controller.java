@@ -1097,12 +1097,19 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		sewelisRunStatement(statString, userKey, currentStore.getName());
 	}
 
+	public void sewelisRunStatement(String statString, final FormEventCallback callback) {
+		sewelisRunStatement(statString, callback, userKey, currentStore.getName());
+	}
 
 	/**
 	 * Run the given statement, eg. used to create entities
 	 * @param statString statement LispQL
 	 */
 	private void sewelisRunStatement(final String statString, String userKeyString, String storeName) {
+		sewelisRunStatement(statString, null, userKeyString, storeName);
+	}
+	
+	private void sewelisRunStatement(final String statString, final FormEventCallback callback, String userKeyString, String storeName) {
 		ControlUtils.debugMessage("sewelisRunStatement store:"+ storeName +" (" + statString + ") ");
 		String runStatementRequestString = FormulisSettings.getServerAdress() + "/runStatement?userKey=" + userKeyString ;
 		runStatementRequestString += "&storeName=" + storeName; 
@@ -1119,6 +1126,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					String status = docElement.getAttribute("status");
 					navBar.setServerStatusMessage(status);
 					if(status == "ok") {
+						if(callback != null) {
+							if(callback instanceof ActionCallback) {
+								((ActionCallback) callback).call();
+							}
+						}
 					} else {
 						navBar.setServerStatusMessage(docElement.getAttribute("status"));
 						if(docElement.getFirstChild().getNodeName() == "message") {
@@ -2210,7 +2222,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	@Override
 	public void onModificationSubmission(ModificationSubmissionEvent event) {
 		if(event.getSource() instanceof FormWidget && ((AbstractDataWidget) event.getSource()).getData() != null) {
-			((ActionCallback) event.getCallback()).call();
+			applyModification(((FormWidget) event.getSource()).getData(), event.getCallback());
 		}
 	}
 
@@ -2684,12 +2696,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * Apply a modification to the current store by removing the old form and replacing it by the new one
 	 * @param data
 	 */
-	public void applyModification(Form data) {
+	public void applyModification(Form data, FormEventCallback call) {
 		assert(data.getInitialState() != null);
 		String deleteOldDataQuery = lispqlStatementQueryDELETE(data.getInitialState(), true);
-		String createNewDataQuery = data.toLispql(true);
-		sewelisRunStatement(deleteOldDataQuery);
-		sewelisRunStatement(createNewDataQuery);
+		sewelisRunStatement(deleteOldDataQuery, call);
 	}
 
 //	/**
