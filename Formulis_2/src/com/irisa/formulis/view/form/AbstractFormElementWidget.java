@@ -25,6 +25,7 @@ import com.irisa.formulis.view.event.ReloadEvent;
 import com.irisa.formulis.view.event.RemoveLineEvent;
 import com.irisa.formulis.view.event.StatementChangedEvent;
 import com.irisa.formulis.view.event.callback.ActionCallback;
+import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.interfaces.ClassCreationHandler;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.DescribeUriHandler;
@@ -434,8 +435,9 @@ public abstract class AbstractFormElementWidget extends AbstractFormulisWidget
 	}
 	
 	@Override
-	public void fireModificationSubmission() {
-		this.fireModificationSubmission(new ModificationSubmissionEvent(this));
+	public void fireModificationSubmission(FormEventCallback cb) {
+			ModificationSubmissionEvent event = new ModificationSubmissionEvent(this, cb);
+			this.fireModificationSubmission(event);
 	}
 
 	@Override

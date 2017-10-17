@@ -1089,11 +1089,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 
 	/**
-	 * Run the given statement, eg. used to create entities
+	 * Run the given statement, eg. used to create or delete entities
 	 * @param statString statement LispQL
 	 */
 	public void sewelisRunStatement(String statString) {
-		//		ControlUtils.debugMessage("runStatement (" + statString + ") ");
 		sewelisRunStatement(statString, userKey, currentStore.getName());
 	}
 
@@ -2223,6 +2222,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public void onModificationSubmission(ModificationSubmissionEvent event) {
 		if(event.getSource() instanceof FormWidget && ((AbstractDataWidget) event.getSource()).getData() != null) {
 			applyModification(((FormWidget) event.getSource()).getData(), event.getCallback());
+		} else {
+			ControlUtils.debugMessage("Modification Submission received from another widget than a FormWidget");
 		}
 	}
 
@@ -2633,7 +2634,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public static String lispqlStatementQueryGET(FormElement eleme, boolean root) {
-		return lispqlStatementQuery(eleme, "get", root);
+		return lispqlStatementQuery(eleme, "get", "", root);
 	}
 
 	/**
@@ -2643,7 +2644,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return
 	 */
 	public static String lispqlStatementQueryDELETE(FormElement eleme, boolean root) {
-		return lispqlStatementQuery(eleme, "delete", root);
+		return lispqlStatementQuery(eleme, "remove", "", root);
 	}
 
 	/**
@@ -2652,7 +2653,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param root element  is the root of the form
 	 * @return
 	 */
-	public static String lispqlStatementQuery(FormElement eleme, String procedure, boolean root) {
+	public static String lispqlStatementQuery(FormElement eleme, String procedureStart, String procedureEnd, boolean root) {
 		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " )");
 		String result = "";
 		if(eleme instanceof FormLine) {
@@ -2663,25 +2664,28 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				if(root) {
 					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine Root");
 					FormRelationLine relLine = (FormRelationLine) eleme;
-					result = procedure +" [ " + relLine.toRootLispql() + " ]";
+					result = " [ " + relLine.toRootLispql() + " ]";
 				} else {
 					//					ControlUtils.debugMessage("lispqlStatementQuery FormRelationLine not Root");
-					try{
-						result = procedure +" [ " + line.toLispql(true, false) + " ]";
-					}catch(Exception e) {
-						ControlUtils.debugMessage("lispqlStatementQuery EXCEPTION " + procedure + " " + eleme );
-						throw e;
-					}
+						result = " [ " + line.toLispql(true, false) + " ]";
 				}
 			} else if(eleme instanceof FormClassLine) {
 				//				ControlUtils.debugMessage("lispqlStatementQuery FormClassLine");
-				result = procedure +" [ " + line.toLispql() + " ]";
+				result = " [ " + line.toLispql() + " ]";
 			}
+		} else if(eleme instanceof Form) {
+			result = eleme.toLispql(root);
 		} else {
 			//			ControlUtils.debugMessage("lispqlStatementQuery not FormLine");
-			result = procedure +" " + eleme.toLispql() + "";
+			result = eleme.toLispql() + "";
 		}
 		//		ControlUtils.debugMessage("lispqlStatementQuery( " + eleme + " ) result:" + result);
+		if(! procedureStart.equals("")) {
+			result = procedureStart + " " + result;
+		}
+		if(! procedureEnd.equals("") ) {
+			result = result + " " + procedureEnd;
+		}
 		return result;
 	}
 	
@@ -2697,6 +2701,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param data
 	 */
 	public void applyModification(Form data, FormEventCallback call) {
+		ControlUtils.debugMessage("applyModification( " + data + " )");
 		assert(data.getInitialState() != null);
 		String deleteOldDataQuery = lispqlStatementQueryDELETE(data.getInitialState(), true);
 		sewelisRunStatement(deleteOldDataQuery, call);

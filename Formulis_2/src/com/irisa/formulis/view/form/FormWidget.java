@@ -222,8 +222,9 @@ public class FormWidget
 		return new FormCallback(this) {
 			@Override
 			public void call() {
+				ControlUtils.debugMessage("ModificationCallback call");
 				this.getSource().getData().setBeingModified(false);
-				finish();
+				fireFinishFormEvent(true, this.getSource().getSubmittedCallback());
 			}
 		};
 	}
@@ -554,11 +555,22 @@ public class FormWidget
 
 	@Override
 	public void finish() {
-		if(getData().isFinishable() && ! getData().isFinished()) {
-			if(getData().isBeingModified()) {
-				fireFinishFormEvent(true, this.getSubmittedCallback());
+		ControlUtils.debugMessage("FormWidget finish()"); 
+		try {
+			if(getData().isFinishable() && ! getData().isFinished()) {
+				if(getData().isBeingModified()) {
+					ControlUtils.debugMessage("FormWidget finish() modification"); 
+					fireModificationSubmission(getModificationCallback());
+				} else {
+					ControlUtils.debugMessage("FormWidget finish() finishing"); 
+					fireFinishFormEvent(true, this.getSubmittedCallback());
+				}
 			}
+		} catch(Exception e) {
+			ControlUtils.debugMessage("FormWidget finish() EXCEPTION ", e);
+			throw e;
 		}
+		ControlUtils.debugMessage("FormWidget finish() END"); 
 	}
 
 	@Override

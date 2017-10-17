@@ -206,12 +206,28 @@ public class ControlUtils {
 		ControlUtils.logMessage(mess, LOG_LEVEL.TRACE);
 	}
 
+	public static void debugMessage(String mess, Throwable except) {
+		ControlUtils.logMessage(mess, except, LOG_LEVEL.DEBUG);
+	}
+
+	public static void traceMessage(String mess, Throwable except) {
+		ControlUtils.logMessage(mess, except, LOG_LEVEL.TRACE);
+	}
+	
 	public static void logMessage(String message, LOG_LEVEL level) {
+		logMessage(message, null, level);
+	}
+
+	public static void logMessage(String message, Throwable except, LOG_LEVEL level) {
+		String finalMessage = message;
+		if(except != null) {
+			finalMessage += " " + expandExceptionMessage(except);
+		}
 		if(level == logLevel) {
-			GWT.log(message);
+			GWT.log(finalMessage);
 		} else {
 			if(logLevel == LOG_LEVEL.TRACE) {
-				GWT.log(message);
+				GWT.log(finalMessage);
 			} else if(logLevel == LOG_LEVEL.NOPE) {
 			}
 		}

@@ -395,6 +395,7 @@ public class ViewUtils {
 		emitter.addLineSelectionHandler(handler);
 		emitter.addMoreCompletionsHandler(handler);
 		emitter.addMoreFormLinesHandler(handler);
+		emitter.addModificationSubmissionHandler(handler);
 		emitter.addRelationCreationHandler(handler);
 		emitter.addReloadHandler(handler);
 		emitter.addRemoveLineHandler(handler);

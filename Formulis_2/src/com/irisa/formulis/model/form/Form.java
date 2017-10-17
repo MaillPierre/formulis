@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 
@@ -48,7 +49,7 @@ public class Form extends FormComponent {
 		if(this.mainTypeLine != null) {
 			clone.mainTypeLine = new FormClassLine(this.mainTypeLine);
 		}
-		
+
 		return clone;
 	}
 	
