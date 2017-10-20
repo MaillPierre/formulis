@@ -5,7 +5,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Grid;
 import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
 public class TextCreateWidget extends AbstractCreateWidget {

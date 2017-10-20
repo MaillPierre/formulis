@@ -1,7 +1,6 @@
 package com.irisa.formulis.view.form.suggest;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;

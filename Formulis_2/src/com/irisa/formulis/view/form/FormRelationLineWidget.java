@@ -176,6 +176,8 @@ public class FormRelationLineWidget
 			fireFinishableLineEvent(true);
 			this.getData().setFinished(true);
 			break;
+		default:
+			break;
 		}
 		if(currentState != state) {
 			fireHistoryEvent();

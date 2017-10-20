@@ -17,35 +17,22 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.form.FormElement;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.CompletionAskedEvent;
 import com.irisa.formulis.view.event.ElementCreationEvent;
-import com.irisa.formulis.view.event.LessCompletionsEvent;
-import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
 import com.irisa.formulis.view.event.callback.AbstractActionCallback;
-import com.irisa.formulis.view.event.callback.ActionCallback;
-import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
 import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
 import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasLessCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
-import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
 import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
-import com.irisa.formulis.view.form.AbstractFormElementWidget;
 import com.irisa.formulis.view.form.AbstractFormLineWidget;
-import com.irisa.formulis.view.form.FormRelationLineWidget;
-import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
 
 /**
  * Abstract class for all suggestion fields, handles basic behaviour, the subclasses have to specify which kind of suggestions to send to the oracle

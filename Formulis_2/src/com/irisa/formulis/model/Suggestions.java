@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Transformation;
-import com.irisa.formulis.view.ViewUtils;
 
 public class Suggestions {
 
@@ -23,11 +21,8 @@ public class Suggestions {
 	private HashMap<String, Increment> entityIdIncrementMap;
 	private HashMap<String, Transformation> transformNameMap;
 	
-	private Controller control;
 	
-	public Suggestions(Controller c) {
-		control = c;
-		
+	public Suggestions() {		
 		canInsertEntity = true;
 		canInsertRelation = true;
 		currentRelationIncrement = null;

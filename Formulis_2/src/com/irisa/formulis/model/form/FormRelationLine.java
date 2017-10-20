@@ -3,7 +3,6 @@ package com.irisa.formulis.model.form;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileRelationLine;
-import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.basic.URI;
 
 /**

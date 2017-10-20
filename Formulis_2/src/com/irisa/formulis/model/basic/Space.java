@@ -9,6 +9,7 @@ public class Space extends BasicLeafElement {
 		return " ";
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Space.class) {

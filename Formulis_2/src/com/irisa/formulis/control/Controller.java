@@ -23,14 +23,11 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.Dictionary;
 import java.util.MissingResourceException;
-
-import org.eclipse.jdt.internal.core.NameLookup.Answer;
 
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
@@ -1635,7 +1632,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 						ControlUtils.debugMessage(request.toString() + " " + response.getStatusCode() + " " + response.getStatusText());
 					}
 
-					//					ControlUtils.debugMessage("Controller sewelisChangeFocus END");
 				};
 			};
 			request.send();
@@ -1681,7 +1677,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		Form result = new Form(l);
 
 		if(l != null) {
-			sewelisGetPlaceStatement(this.lispqlStatementQuery(l));
+			sewelisGetPlaceStatement(lispqlStatementQuery(l));
 		}
 
 		return result;
@@ -1712,7 +1708,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			ControlUtils.exceptionMessage(e);
 		}
 
-		Parser.setControl(this);
 		//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
 		form = new Form(null);
 		mainPage = new MainPage(this);
@@ -1720,7 +1715,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		RootPanel.get().add(navBar);
 		RootPanel.get().add(mainPage);
 		RootPanel.get().add(new FooterWidget());
-		//		RootPanel.get().setStyleName("root");
 
 		if((Cookies.getCookie(cookiesUserLogin) != null && Cookies.getCookie(cookiesUserLogin) != "") 
 				&& (Cookies.getCookie(cookiesUserkey) != null && Cookies.getCookie(cookiesUserkey) != "")) {
@@ -1747,16 +1741,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			}
 		});
 
-
-		//		// handlers attribution
-		//		mainPage.getSettingsWidget().profileModeButton.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileCreateButton.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileClearButton.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileGoButton.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileDeleteButton.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileEditSave.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileEditClear.addClickHandler(this);
-		//		mainPage.getSettingsWidget().profileEditReload.addClickHandler(this);
 		mainPage.getSettingsWidget().getNamespaceDefineButton().addClickHandler(this);
 
 
@@ -2121,7 +2105,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				FormRelationLineWidget widSource = (FormRelationLineWidget) event.getSource();
 				if(widSource.getData().isFinishable()) {
 					//					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A FINISHED LINE");
-					sewelisGetPlaceStatement(this.lispqlStatementQuery(widSource.getData().getParent()));
+					sewelisGetPlaceStatement(lispqlStatementQuery(widSource.getData().getParent()));
 				} else if(event.getCallback() != null && event.getCallback() instanceof SuggestionCallback) {
 					//					ControlUtils.debugMessage("Controller onStatementChange CHANGE BY A LINE");
 					SuggestionCallback callback = (SuggestionCallback) event.getCallback();
@@ -2337,7 +2321,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onReload(ReloadEvent event) {
-		String queryString = this.lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
+		String queryString = lispqlStatementQuery(((AbstractDataWidget) event.getSource()).getData());
 		sewelisGetPlaceStatement(queryString, event);
 	}
 
@@ -2360,9 +2344,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				mainPage.getSettingsWidget().setStatePermalink(HistoryUtils.getPermalink(currentProfile));
 			}
 		} catch (SerializingException | InvalidHistoryState e) {
-			// TODO Auto-generated catch block
 			ControlUtils.exceptionMessage(e);
-			//			e.printStackTrace();
 		}
 
 	}
@@ -2384,7 +2366,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param f
 	 */
 	public void setCurrentForm(Form f) {
-//		ControlUtils.debugMessage("setCurrentForm( " + f + " )");
 		this.form = f;
 		mainPage.formWidget.setData(this.form);
 		mainPage.formWidget.reload();
@@ -2403,10 +2384,11 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param widSource
 	 */
 	public void loadFormContent(FormWidget widSource) {
-		//		ControlUtils.debugMessage("loadFormContent " + widSource + " : " + widSource.getData());
 
 		if( widSource.getData() != null) {
 			if(this.isFormContentLoadable(widSource)) {
+				
+				widSource.clear();
 
 				LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 				LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
@@ -2415,7 +2397,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 				// Si il n'y a qu'un seul type proposé, alors il faut qu'il soit selectionné et placé dans le statement 
 				// pour que les relations proposées soient les bonnes
-				//			if(! widSource.getData().getTypeLines().equals(classLines)) { // Ne fonctionne pas, pas d'appel à equals
 				if(! (widSource.getData().getTypeLines().size() == classLines.size() 
 						&& widSource.getData().getTypeLines().containsAll(classLines) ) ) {
 
@@ -2429,7 +2410,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 					// Si il n'y a qu'un type proposé, on change le statement vers ce type
 					if(widSource.getData().getTypeLines().size() == 1) {
-						//						ControlUtils.debugMessage("Controller loadFormContent typé" );
 						widSource.getData().setMainTypeLine(widSource.getData().getTypeLines().getFirst());
 						String queryString = lispqlStatementQuery(widSource.getData());
 						relationLines.clear();
@@ -2440,7 +2420,6 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				} 
 
 				if(widSource.getData().isTyped() || widSource.getData().isAnonymous()) {
-					//				ControlUtils.debugMessage("Controller loadFormContent relations " + relationLines.size() + " relations" );
 					int nbLines = relationLines.size();
 					Iterator<FormRelationLine> itRelLines = relationLines.iterator();
 					while(itRelLines.hasNext()) {
@@ -2466,12 +2445,10 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @param widSource
 	 */
 	public void appendFormContent(FormWidget widSource) {
-		//		ControlUtils.debugMessage("appendFormContent " + widSource);
 
 		if(this.isFormContentLoadable(widSource)) {
 			LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 			LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
-			//			ControlUtils.debugMessage("appendFormContent content: " + classLines + relationLines);
 			if(widSource.getData().getTypeLines().isEmpty()) {
 				widSource.getData().appendAllLines(classLines);
 			} else {
@@ -2490,20 +2467,9 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 * @return true if the mentioned necessary component are present
 	 */
 	public boolean isFormContentLoadable(FormWidget widSource) {
-		//		ControlUtils.debugMessage("isFormContentLoadable " + widSource.getData());
 		LinkedList<FormClassLine> classLines = getPlaceClassLines(widSource.getData());
 		LinkedList<FormRelationLine> relationLines = getPlaceRelationLines(widSource.getData());
 
-		//		return (widSource.getData().isAnonymous()
-		//				&& ! classLines.isEmpty()
-		//				&& (classLines.size() == 1 
-		//				&& classLines.getFirst() instanceof FormClassLine)
-		//				|| (! classLines.isEmpty())) 
-		//				|| ! relationLines.isEmpty();
-		//		return (widSource.getData().isAnonymous()
-		//				|| widSource.getData().isTyped()
-		//				|| widSource.getData().isTypeList() )
-		//				&& ! widSource.getData().isEmpty();
 		return ! classLines.isEmpty() || ! relationLines.isEmpty();
 	}
 

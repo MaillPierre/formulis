@@ -10,6 +10,7 @@ public class Tuple extends BasicElementList {
 		super(par);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Tuple.class) {

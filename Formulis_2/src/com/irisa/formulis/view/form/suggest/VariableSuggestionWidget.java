@@ -4,38 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
-import com.irisa.formulis.view.AbstractFormulisWidget;
-import com.irisa.formulis.view.event.CompletionAskedEvent;
-import com.irisa.formulis.view.event.ElementCreationEvent;
-import com.irisa.formulis.view.event.LessCompletionsEvent;
-import com.irisa.formulis.view.event.MoreCompletionsEvent;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
-import com.irisa.formulis.view.event.callback.ActionCallback;
-import com.irisa.formulis.view.event.interfaces.CompletionAskedHandler;
-import com.irisa.formulis.view.event.interfaces.ElementCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasCompletionAskedHandler;
-import com.irisa.formulis.view.event.interfaces.HasElementCreationHandler;
-import com.irisa.formulis.view.event.interfaces.HasLessCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.HasMoreCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.HasSuggestionSelectionHandler;
-import com.irisa.formulis.view.event.interfaces.LessCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.MoreCompletionsHandler;
-import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormRelationLineWidget;
 
 public class VariableSuggestionWidget extends AbstractSuggestionWidget {

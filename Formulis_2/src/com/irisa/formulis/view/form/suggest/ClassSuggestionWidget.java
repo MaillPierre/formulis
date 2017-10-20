@@ -11,7 +11,6 @@ import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 import com.irisa.formulis.view.AbstractFormulisWidget;
 import com.irisa.formulis.view.event.SuggestionSelectionEvent;
-import com.irisa.formulis.view.form.AbstractFormLineWidget;
 
 public class ClassSuggestionWidget extends AbstractSuggestionWidget {
 

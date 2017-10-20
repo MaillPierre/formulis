@@ -19,6 +19,7 @@ public class Keyword extends BasicLeafElement {
 		return "Keyword: " + keyword;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Keyword.class) {

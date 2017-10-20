@@ -70,7 +70,7 @@ public class CustomTable extends FlexTable {
 		}
 	}
 
-	private native void addCells(Element table, int row, int num)/*-{ 
+	public native void addCells(Element table, int row, int num)/*-{ 
 	     var rowElem = table.rows[row]; 
 	     for(var i = 0; i < num; i++){ 
 	       var cell = $doc.createElement("td"); 

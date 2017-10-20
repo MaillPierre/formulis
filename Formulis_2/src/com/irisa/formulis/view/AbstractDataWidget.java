@@ -1,7 +1,6 @@
 package com.irisa.formulis.view;
 
 import com.google.gwt.user.client.ui.Composite;
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.form.FormElement;
 
 /**

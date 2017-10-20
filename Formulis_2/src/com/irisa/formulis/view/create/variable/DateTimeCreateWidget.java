@@ -8,7 +8,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
 public class DateTimeCreateWidget extends AbstractCreateWidget {

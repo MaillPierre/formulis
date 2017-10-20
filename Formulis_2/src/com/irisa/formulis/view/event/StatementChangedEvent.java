@@ -1,7 +1,6 @@
 package com.irisa.formulis.view.event;
 
 import com.irisa.formulis.view.AbstractFormulisWidget;
-import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.callback.FormEventCallback;
 
 /**

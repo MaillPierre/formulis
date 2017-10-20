@@ -7,7 +7,6 @@ import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.basic.URI.KIND;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
 public class EntityCreateWidget extends AbstractCreateWidget {

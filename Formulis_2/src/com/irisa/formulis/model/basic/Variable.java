@@ -19,6 +19,7 @@ public class Variable extends BasicLeafElement {
 		return "Var: " + var;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Variable.class) {

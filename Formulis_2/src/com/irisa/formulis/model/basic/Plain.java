@@ -34,6 +34,7 @@ public class Plain extends BasicLeafElement {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Plain.class) {

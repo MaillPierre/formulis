@@ -15,6 +15,7 @@ public class List extends BasicElementList implements BasicElement {
 		super(parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != List.class) {

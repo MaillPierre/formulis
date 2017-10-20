@@ -2,14 +2,12 @@ package com.irisa.formulis.view.create.variable;
 
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.DoubleBox;
-import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.IntegerBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.base.ValueBoxBase;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;

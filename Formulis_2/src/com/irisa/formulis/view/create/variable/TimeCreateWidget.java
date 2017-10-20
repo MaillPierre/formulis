@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.Grid;
 import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.form.FormElement;
-import com.irisa.formulis.view.AbstractDataWidget;
 import com.irisa.formulis.view.create.AbstractCreateWidget;
 
 public class TimeCreateWidget extends AbstractCreateWidget {

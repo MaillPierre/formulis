@@ -21,12 +21,6 @@ import com.irisa.formulis.model.suggestions.*;
 
 public class Parser {
 
-	private static Controller control;
-
-	public static void setControl(Controller c) {
-		control = c;
-	}
-
 	public static Place parsePlace(Node node) throws XMLParsingException {
 		Place result = new Place();
 		String placeId = node.getAttributes().getNamedItem("placeId").getNodeValue();
@@ -75,7 +69,7 @@ public class Parser {
 	}
 
 	public static Suggestions parseSuggestions(Node node) throws XMLParsingException {
-		Suggestions result = new Suggestions(control);
+		Suggestions result = new Suggestions();
 
 		if(node.getNodeName().equals("suggestions")) {
 			NamedNodeMap attrList = node.getAttributes();
@@ -324,7 +318,7 @@ public class Parser {
 	}
 
 	public static Statement parseStatement(Node node) throws XMLParsingException {
-		Statement result = new Statement(control);
+		Statement result = new Statement();
 		String displayedFocus = null;
 		BasicElement content = null;
 		if(node.getNodeName().equals("statement")) {

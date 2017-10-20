@@ -2,7 +2,6 @@ package com.irisa.formulis.model;
 
 import java.util.HashMap;
 
-import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.model.basic.BasicElement;
 import com.irisa.formulis.model.basic.Focus;
 
@@ -12,13 +11,11 @@ public class Statement {
 	private HashMap<String, Focus> focusMap;
 	private BasicElement content;
 	private String statString;
-	private Controller control;
 	
-	public Statement(Controller c) {
+	public Statement() {
 		focusedDisplay = null;
 		focusMap = new HashMap<String, Focus>();
 		content = null;
-		control = c;
 		statString = "";
 	}
 	

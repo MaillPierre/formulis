@@ -1,8 +1,6 @@
 package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.view.event.callback.ActionCallback;
 import com.irisa.formulis.view.event.callback.FormEventCallback;
 import com.irisa.formulis.view.event.interfaces.FormEvent;
 

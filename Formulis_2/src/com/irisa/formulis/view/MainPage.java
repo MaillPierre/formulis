@@ -6,7 +6,6 @@ import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.view.form.FormWidget;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
-import com.github.gwtbootstrap.client.ui.Footer;
 
 /**
  * Root widget off all root widgets

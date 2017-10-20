@@ -20,6 +20,7 @@ public class Prim extends BasicLeafElement {
 		return "Prim: " + prim;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Prim.class) {

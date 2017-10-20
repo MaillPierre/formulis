@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 

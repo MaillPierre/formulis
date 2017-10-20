@@ -167,6 +167,8 @@ public class Increment implements Comparable<Increment>{
 		case LITERAL:
 			result = "literal";
 		break;
+		default:
+			break;
 		}
 		return result;
 	}

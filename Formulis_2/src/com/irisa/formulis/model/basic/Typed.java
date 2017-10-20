@@ -25,6 +25,7 @@ public class Typed extends BasicLeafElement {
 		return "Typed: " + value + "^^<" + uri.toString() + ">";
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BasicElement> T as(Class<T> c) throws FormElementConversionException {
 		if(c != Typed.class) {

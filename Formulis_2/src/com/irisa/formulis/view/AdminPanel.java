@@ -10,7 +10,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.irisa.formulis.control.ControlUtils;
 
 /**
  * Settings panel
@@ -30,8 +29,8 @@ public class AdminPanel extends Composite  {
 	private Column nsCreateCol = new Column(6, nsCreateRow);
 	
 	private FluidRow permalinkRow = new FluidRow();
-	private FluidRow permalinkBoxRow = new FluidRow();
-	private Column permalinkCol = new Column(12, permalinkBoxRow);
+//	private FluidRow permalinkBoxRow = new FluidRow();
+//	private Column permalinkCol = new Column(12, permalinkBoxRow);
 	private TextBox permalinkBox = new TextBox();
 	
 	private TextBox namespacePrefixBox = new TextBox();

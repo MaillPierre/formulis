@@ -3,7 +3,6 @@ package com.irisa.formulis.view;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Label;

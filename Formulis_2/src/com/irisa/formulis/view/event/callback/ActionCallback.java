@@ -1,8 +1,5 @@
 package com.irisa.formulis.view.event.callback;
 
-import com.irisa.formulis.control.Controller;
-import com.irisa.formulis.view.event.AbstractFormEvent;
-
 public interface ActionCallback extends FormEventCallback {
 
 	/**

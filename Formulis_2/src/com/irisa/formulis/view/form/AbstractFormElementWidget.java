@@ -3,7 +3,6 @@ package com.irisa.formulis.view.form;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.form.FormElement;

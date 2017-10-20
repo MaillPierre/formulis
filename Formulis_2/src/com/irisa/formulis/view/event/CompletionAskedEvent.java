@@ -2,7 +2,6 @@ package com.irisa.formulis.view.event;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.irisa.formulis.view.form.suggest.AbstractSuggestionWidget.SuggestionCallback;
-import com.irisa.formulis.view.form.suggest.VariableSuggestionWidget;
 
 /**
  * Demande de complétions
