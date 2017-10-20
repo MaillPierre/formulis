@@ -121,6 +121,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	public boolean isStoreSet() {
 		return this.currentStore != null;
 	}
+	
+	public String getUrlStatement() {
+		return Window.Location.getParameter("lispql");
+	}
+	
+	public String getUrlStorekey() {
+		return Window.Location.getParameter("userkey");
+	}
 
 	/**
 	 * SEWELIS work by "places", composition of a statement/query + differents suggestions + answers

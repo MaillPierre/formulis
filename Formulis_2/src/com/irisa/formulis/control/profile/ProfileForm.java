@@ -3,8 +3,6 @@ package com.irisa.formulis.control.profile;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.irisa.formulis.control.ControlUtils;
-import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.FormElementConversionException;
 import com.irisa.formulis.model.form.Form;
 import com.irisa.formulis.model.form.FormRelationLine;
