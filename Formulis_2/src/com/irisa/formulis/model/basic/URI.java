@@ -1,5 +1,7 @@
 package com.irisa.formulis.model.basic;
 
+import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.model.DataUtils;
 import com.irisa.formulis.model.exception.FormElementConversionException;
 
 public class URI extends BasicLeafElement {
@@ -106,6 +108,10 @@ public class URI extends BasicLeafElement {
 	@Override
 	public String toLispql() {
 		return "<" + this.uriString + ">";
+	}
+	
+	public String labelToLispql() {
+		return "<" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getLabel() +"\"@" + DataUtils.defaultLang();
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.irisa.formulis.control.ControlUtils;
 import com.irisa.formulis.control.profile.ProfileElement;
 import com.irisa.formulis.control.profile.ProfileForm;
 
@@ -334,11 +335,11 @@ public class Form extends FormComponent {
 		if(! this.isAnonymous() && ! this.isTypeList() && this.getMainType() != null) {
 			if(isFinalRequest ) {
 				result += this.getMainType().getEntityUri().toLispql(isFinalRequest) + " " ;
-//				result += this.getType().toLispql(isFinalRequest) + " ";
 			} 
-//			else {
-				result += "[ " + this.getMainType().toLispql(isFinalRequest) + " ";
-//			}
+			result += "[ " + this.getMainType().toLispql(isFinalRequest) + " ";
+			if(isFinalRequest && ! this.getMainType().getEntityLabel().equals("")) {
+				result += " ; " + this.getMainType().getEntityUri().labelToLispql() + " ";
+			}
 			if(! otherlines.isEmpty() || linkToParent) {
 				result += " ; ";
 			}

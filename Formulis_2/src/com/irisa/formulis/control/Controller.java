@@ -122,12 +122,23 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 		return this.currentStore != null;
 	}
 	
+	/**
+	 * 
+	 * @return the lispql attribute in the url
+	 */
 	public String getUrlStatement() {
 		return Window.Location.getParameter("lispql");
 	}
 	
-	public String getUrlStorekey() {
-		return Window.Location.getParameter("userkey");
+	public String getUrlStorename() {
+		return Window.Location.getParameter("storename");
+	}
+	
+	public String getPermalink() {
+		if(getUrlStatement() == null && getUrlStorename() == null) {
+			return Window.Location.getHref() + "?&lispql=" + this.form.toLispql() + "&storename=" + this.currentStore.getName();
+		}
+		return null;
 	}
 
 	/**
@@ -1718,7 +1729,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 
 		//		initializeProfilesFromCookie(); // FIXME  remettre la gestion des profiles
 		form = new Form(null);
-		mainPage = new MainPage(this);
+		mainPage = new MainPage();
 
 		RootPanel.get().add(navBar);
 		RootPanel.get().add(mainPage);
@@ -2124,13 +2135,12 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				//			event.getCallback().call(this);
 			}
 			refreshAnswers();
-
-			//		incrementNumberOfActions();
+			this.mainPage.setPermalink( getPermalink() );
+			
 		}
 		catch(Exception e) {
 			ControlUtils.exceptionMessage(e);
 		}
-		//		ControlUtils.debugMessage("Controller onStatementChange END");
 	}
 
 	/**

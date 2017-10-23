@@ -6,6 +6,7 @@ import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.view.form.FormWidget;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.FluidRow;
+import com.github.gwtbootstrap.client.ui.TextBox;
 
 /**
  * Root widget off all root widgets
@@ -23,18 +24,19 @@ public class MainPage extends Composite {
 	private Column formWidgetCol;
 	public AnswersWidget ansWidget = new AnswersWidget();
 	private Column ansWidgetCol;
-	private Controller control;
+	private TextBox permalinkBox = new TextBox();
+//	private Controller control;
 	private AdminPanel settings = new AdminPanel();
 	
-	public MainPage(Controller c) {
+	public MainPage() {
 		try {
 			
 			initWidget(element);
 			
-			control = c;
+//			control = c;
 			
 			// Content
-			setFormWidget(new FormWidget(c.rootForm(), null));
+			setFormWidget(new FormWidget(Controller.instance().rootForm(), null));
 			
 			// Content
 			formWidgetCol = new Column(8, formWidget);
@@ -42,10 +44,15 @@ public class MainPage extends Composite {
 			
 			ansWidget.setWidth("100%");
 			
+			permalinkBox.setWidth("100%");
+			permalinkBox.setReadOnly(true);
+			permalinkBox.setEnabled(false);
+			
 			// Contenu
 			formulisRow.add(formWidgetCol);
 			formulisRow.add(ansWidgetCol);
 			contentCol.add(formulisRow);
+			contentCol.add(permalinkBox);
 			contentCol.add(settings);
 			element.add(contentCol);
 			element.addStyleName("mainPage");
@@ -56,7 +63,7 @@ public class MainPage extends Composite {
 	
 	public void setFormWidget(FormWidget wid) {
 		formWidget = wid;
-		ViewUtils.connectFormEventChain(formWidget, control);
+		ViewUtils.connectFormEventChain(formWidget, Controller.instance());
 	}
 
 	public AdminPanel getSettingsWidget() {
@@ -65,6 +72,10 @@ public class MainPage extends Composite {
 
 	public void setSettingsWidget(AdminPanel settings) {
 		this.settings = settings;
+	}
+	
+	public void setPermalink(String link) {
+		this.permalinkBox.setText(link);
 	}
 
 }
