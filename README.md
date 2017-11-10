@@ -1,7 +1,7 @@
 # FORMULIS #
 
 This project is the prototype implementation of Formulis, a purely data-driven interface to RDF based on forms and using intelligent suggestions. 
-The Formulis Webapp is a war archive to be hosted in a web server. The Formulis application only works when interfaced with a {SEWELIS RDF server}(https://bitbucket.org/sebferre/sewelis "Bitbucket for the SEWELIS implementation").
+The Formulis Webapp is a war archive to be hosted in a web server. The Formulis application only works when interfaced with a [SEWELIS RDF server](https://bitbucket.org/sebferre/sewelis "Bitbucket for the SEWELIS implementation").
 
 ## USING FORMULIS ##
 To deploy Formulis once you have the archive, you need to edit the index.html file to write the address of your Sewelis server. The value to edit are in the js code in index.html:
@@ -58,4 +58,4 @@ FORMULIS was developped by Pierre Maillot from the SemLIS team, IRISA, Universit
 
 ## LICENCE ##
 
-This work is licensed under the GPL license (precisely by its equivalent under french law CECILL v2.1)
+This work is licensed under the GPL license (precisely, by its equivalent under french law CECILL v2.1)
