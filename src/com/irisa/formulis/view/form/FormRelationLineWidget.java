@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.irisa.formulis.control.ControlUtils;
+import com.irisa.formulis.control.Controller;
 import com.irisa.formulis.control.profile.ProfileLine;
 import com.irisa.formulis.model.basic.BasicElement;
 import com.irisa.formulis.model.exception.FormElementConversionException;
@@ -63,7 +64,9 @@ public class FormRelationLineWidget
 	public FormRelationLineWidget(FormRelationLine l, FormWidget par) {
 		super(l, par);
 		
-		getElement().setDraggable(Element.DRAGGABLE_TRUE);
+		if(Controller.areLinesDraggable()) {
+			getElement().setDraggable(Element.DRAGGABLE_TRUE);
+		}
 
 		try {
 			this.fixedElement = FormulisWidgetFactory.getWidget(l.getFixedElement(), this, this);

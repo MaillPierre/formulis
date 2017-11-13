@@ -84,6 +84,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	private MainNavigationBar navBar = new MainNavigationBar();
 
 	private static String uriBaseAdress = "http://www.irisa.fr/LIS/sewelis/";
+	private static boolean draggableLines = false;
 
 	//	private static String logServerAdress = "http://servolis.irisa.fr:3941";
 //	private static String logLogin = "expeDEXA";
@@ -1699,6 +1700,8 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String serverAdressString = appSettings.get("serverAdress");
 			String uriBaseString = appSettings.get("uriBaseAdress");
 			String logStoreNameString = appSettings.get("logStoreName");
+			String draggableLinesString = appSettings.get("draggableLines");
+			setDraggableLines(draggableLinesString.equals("true"));
 			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
 			FormulisSettings.setServerAdress(serverAdressString);
 			uriBaseAdress = uriBaseString;
@@ -1825,6 +1828,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	}
 
 	// PROFILES
+
+	public static boolean areLinesDraggable() {
+		return draggableLines;
+	}
+
+	public static void setDraggableLines(boolean draggableLines) {
+		Controller.draggableLines = draggableLines;
+	}
 
 	/**
 	 * Interroge la base, crée un profile de base pour la classe, hors rdfs/owl, qui a le plus d'élements
