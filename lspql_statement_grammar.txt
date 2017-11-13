@@ -1,0 +1,116 @@
+### Internal syntax for Sewelis statements ###
+
+### Note: structs/args are ignored (not stable)
+### Note: the entry points for statements used in Sewelis server is (stat)
+
+### grammar notations
+### - [ ] represents an optional part
+### - { } represents 0-n repetitions
+### - ( | ) represents alternatives
+### - 'kwd' represents a keyword or separator
+### - "regexp" represents a regexp
+### lowercase idents for non-terminals (blanks are significant in rules)
+### UPPERCASE idents for terminals (blanks are not significant in rules)
+
+
+## syntactic rules ##
+
+# lines of .log files
+command : '@base' URI_REL   # set base URI
+	| '@prefix' PREFIX URI_REL     # define prefix
+	| '@import' URI_REL filepath   # import with some base URI, some RDF file
+	| '@lod' URI_REL    # import LOD data for URI
+	| '@rm' TERM	    # remove all triples related to some RDF node (deletion)
+	| '@cp' TERM TERM   # copy all triple from some node to another node (duplication)
+	| '@mv' TERM TERM   # move all triple from some node to another (renaming)
+
+filepath : STRING
+
+# statements
+stat : 'nope'	# do nothing
+     | '(' stat { ';' stat } ')'	# sequence of statements
+     | 'if' s 'then' stat 'else' stat	# conditional statement
+     | 'for' np ',' stat  # iteration on all instances of (np)
+     | 'get' np	    # retrieving all instances of (np)
+     | call  	    # procedure call
+     | s [ '.' ]    # declarative statement: both query and update
+
+# procedure calls: implicit iteration on all instances of each (np)
+call : 'remove' np	# remove instance triples
+     | 'copy' np 'to' np  # copy instance triples
+     | 'move' np 'to' np  # move instance triples
+     | PROC '(' [ np { ',' np } ] ')'	  # call procedure PROC
+
+# sentences: denote truth values
+s : np [ vp { ';' vp } ]	# subject and optional verb phrase conjunction
+  | 'true'	       		# truth
+  | '(' s { 'and' s } ')'	# conjunction
+  | '(' s { 'or' s } ')'	# disjunction
+  | 'not' s 	     		# negation
+  | 'maybe' s			# optional
+
+# noun phrases: denote sets of RDF nodes as instances
+np : det [ block ]     # determiner and qualifying block
+   | block #anonymous node qualified by (block)
+   | '(' np { 'and' np } ')'	     # factorized conjunction
+   | '(' np { 'or' np } ')'	     # factorized disjunction
+   | 'not' np 	      		     # factorized negation
+   | 'maybe' np			     # factorized optional
+
+# determiners: denote an RDF node
+det : TERM     # specific RDF node
+    | '{' stat '}'	  # reified statement
+    | VAR      # variable (existentially quantified)
+    | quantif [ VAR ]	# quantified variable
+    | 'which' # interrogative binder
+
+# quantifiers
+quantif : 'some'	# existential
+	| 'the'		# existential in queries, universal in updates
+	| 'every'	# universal
+	| 'only'	# opposite of universals ("likes every cat" vs "likes only cats")
+	| 'no'		# negated existential
+	| 'each'	# universal, used in commands
+
+# block to qualify a node inside a (np) by a conjunction of verb phrases
+block : '[' [ vp { ';' vp } ] ']'
+
+# verb phrases: denote properties to be applied to RDF nodes
+vp : '=' np	# equality
+   | 'a' ( 'thing' | URI )	# has type, instance of
+   | PRED np	   # in relation to (np) via binary predicate PRED
+   | role np	   # in relation to (np) via (role)
+   | '(' vp { 'and' vp } ')'	 # conjunction
+   | '(' vp { 'or' vp } ')'	 # disjunction
+   | 'not' vp 	      		 # negation
+   | 'maybe' vp			 # optional
+   | VAR 'such' 'that' s	 # sentence abstraction over VAR
+
+# roles: denote binary relationships between RDF nodes
+role : 'has' prop      # forward relationship via (prop)
+     | 'is' prop 'of'  # backward relationship via (prop)
+
+# properties: denote RDF properties, with optional modifiers
+# opt -> reflexive, trans -> transitive, direct -> no inference, sym -> symmetric
+prop : [ 'opt' ] [ 'trans' ] [ 'direct' ] [ 'sym' ] URI
+
+
+## lexical rules ##
+
+PROC : 'delete' | 'copy' | 'move' | '$' NAME	# procedure names
+PRED : '<=' | '>=' | '<' | '>' | 'matches' | 'matched' 'by' | 'contains' | 'contained' 'by'	# binary predicates
+
+VAR : '?' ( NAME | STRING )    # variables
+TERM : URI | BLANK | LITERAL   # term, aka. RDF nodes
+URI : URI_REL | QNAME	       # URIs
+URI_REL : '<' "[^>]*" '>'      # relative URIs
+QNAME : PREFIX [ NAME ]	       # qualified names
+PREFIX : [ NAME ] ':' 	       # prefixes
+BLANK : '_:' NAME 	       # blank nodes
+# literals
+LITERAL : STRING [ '@' LANG ]		# plain literals with an optional language tag
+	| STRING '^^' URI   		# typed literals
+        | DECIMAL | INTEGER | DURATION | DATETIME | DATE | TIME | GYEAR | GYEARMONTH | GMONTHDAY | GMONTH | GDAY	# bare typed literals, XSD notations
+STRING : '"' "[^"]* '"'	    # quoted strings
+LANG : "[a-z]+\\(-[a-z0-9]+\\)*"     # language tags
+NAME : "[A-Z_a-z][-0-9A-Z_a-z]+"     # local names

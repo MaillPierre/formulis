@@ -158,7 +158,12 @@ public class FormClassLineWidget
 		labelUriBox.setVisible(false);
 		
 		if(this.getData() != null && this.getFormLine().getEntityUri() != null) {
-			labelWid = new URIWidget(this.getFormLine().getEntityUri(), this);
+			if(labelWid != null) {
+				elementRow.remove(labelWid); // There can be only one label
+			}
+			if(this.getFormLine().getEntityLabel().equals("")) {
+				labelWid = new URIWidget(this.getFormLine().getEntityUri(), this);
+			}
 //			ControlUtils.debugMessage("FormClassLineWidget hideLabelBox" + labelWid);
 			elementRow.remove(labelUriBox);
 			if(labelWid != null) {

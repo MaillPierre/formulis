@@ -51,7 +51,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public String toLispql(boolean selected, boolean isFinalRequest) {
-//		Utils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" )");
+		ControlUtils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" )");
 		String result = "";
 
 		if(getParent() != null && this.getParent() instanceof Form && selected ) {
@@ -73,10 +73,6 @@ public class FormClassLine extends FormLine {
 	}
 
 	public URI getEntityUri() {
-//		elementUri = Controller.newElementUri(elementLabel);
-		if( this.elementUri == null && ! this.getEntityLabel().isEmpty()) {
-			setEntityUri(new URI(Controller.newElementUri(elementLabel), KIND.ENTITY, elementLabel));
-		}
 		return this.elementUri;
 	}
 
@@ -92,6 +88,8 @@ public class FormClassLine extends FormLine {
 	public void setEntityLabel(String label) {
 		if(label.equals("")) {
 			setEntityUri(null);
+		} else {
+			setEntityUri(new URI(Controller.newElementUri(label), KIND.ENTITY, label));
 		}
 		this.elementLabel = label;
 	}
