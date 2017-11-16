@@ -36,6 +36,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.xml.client.XMLParser;
 import com.google.gwt.xml.client.impl.DOMParseException;
+import com.irisa.formulis.control.ControlUtils.LOG_LEVEL;
 import com.irisa.formulis.control.access.LoginToken;
 import com.irisa.formulis.control.access.NewUserToken;
 import com.irisa.formulis.control.profile.Profile;
@@ -1701,6 +1702,14 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			String uriBaseString = appSettings.get("uriBaseAdress");
 			String logStoreNameString = appSettings.get("logStoreName");
 			String draggableLinesString = appSettings.get("draggableLines");
+			String loggerLevel = appSettings.get("formulisLogging");
+			if(loggerLevel.equals("TRACE")) {
+				ControlUtils.setLogLevel(LOG_LEVEL.TRACE);
+			} else if(loggerLevel.equals("DEBUG")) {
+				ControlUtils.setLogLevel(LOG_LEVEL.DEBUG);
+			} else {
+				ControlUtils.setLogLevel(LOG_LEVEL.NOPE);
+			}
 			setDraggableLines(draggableLinesString.equals("true"));
 			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
 			FormulisSettings.setServerAdress(serverAdressString);
