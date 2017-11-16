@@ -2088,7 +2088,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 	 */
 	@Override
 	public void onCompletionAsked(CompletionAskedEvent event) {
-		ControlUtils.debugMessage("Controller onCompletionAsked " + event.getSearch() + " from " + event.getSource().getClass().getSimpleName());
+//		ControlUtils.debugMessage("Controller onCompletionAsked " + event.getSearch() + " from " + event.getSource().getClass().getSimpleName());
 		// COMPLETIONS DEMANDEES
 		// Les completions doivent être rechargée pour correspondre au statement
 		sewelisGetCompletions(event.getSearch(), event);

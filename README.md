@@ -30,7 +30,7 @@ The `model` package content is separated into three categories:
 The `Place`, `Answers`, `Statement`, `Suggestions` and the content of the ̀̀`answers` and `suggestions` packages reflect the data structure of the responses of a SEWELIS server to a query. These elements are converted to `form` and `basic` elements using functions from the `DataUtils` class.
 
 #### BASIC ELEMENTS ####
-TBD
+Basic element are the terminal elements and the logical operators appearing in the SEWELIS statements.
 
 #### FORM ELEMENTS ####
 TBD
@@ -39,10 +39,9 @@ TBD
 TBD
 
 #### CREATION ####
-TBD
 
 #### EVENTS ####
-TBD
+The user events are triggered in the view following a chain of responsibility pattern rooted into the controller. All elements of a Form graph (Forms and lines) are connected by the FormEventChain using `view.ViewUtils.connectFormEventChain(...)`. The FormEventChain event object all contain a callback object which will be called by the final event manager once the treatment of the event has been done.
 
 #### FORMS ####
 TBD
@@ -50,7 +49,7 @@ TBD
 
 ## DEPLOYMENT ##
 
-To obtain an usable .war, compile the GWT project and compress in a .zip all the elements of the `war/` folder. You must not compile the code using the debug mode of your IDE.
+To obtain an usable .war, compile the GWT project and compress in a .zip all the elements of the `war/` folder before renaming the archive as a .war. You must not compile the code using the debug mode of your IDE.
 
 ## ACKNOWLEGDMENT ##
 

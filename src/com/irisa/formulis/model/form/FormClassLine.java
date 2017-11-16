@@ -51,7 +51,7 @@ public class FormClassLine extends FormLine {
 
 	@Override
 	public String toLispql(boolean selected, boolean isFinalRequest) {
-		ControlUtils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" )");
+//		ControlUtils.debugMessage("ClassFormLine toLispql( selected=" + selected + ", isFinalRequest=" + isFinalRequest +" )");
 		String result = "";
 
 		if(getParent() != null && this.getParent() instanceof Form && selected ) {
@@ -63,8 +63,8 @@ public class FormClassLine extends FormLine {
 			if(! this.anonymous) {
 				result += "a " + this.fixedElement.toLispql();
 			}
-			if(! this.anonymous && this.elementLabel != "" && isFinalRequest) {
-				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getEntityLabel() + "\"@"+ DataUtils.defaultLang(); 
+			if(! this.anonymous && isNamed() && isFinalRequest) {
+				result += "; <" + ControlUtils.FORBIDDEN_URIS.rdfsLabel.getUri() + "> \"" + this.getEntityUri().getLabel() + "\"@"+ DataUtils.defaultLang(); 
 			}
 		}
 
