@@ -45,6 +45,11 @@ import com.irisa.formulis.view.event.interfaces.SuggestionSelectionHandler;
 import com.irisa.formulis.view.form.FormWidget.LAST_ACTION;
 import com.irisa.formulis.view.form.suggest.VariableSuggestionWidget;
 
+/**
+ * Most common Form line, its fixed element is a relation URI, the variable element can be either leaf element or another Form
+ * @author pmaillot
+ *
+ */
 public class FormRelationLineWidget 
 	extends AbstractFormLineWidget 
 	implements SuggestionSelectionHandler, HasAllDragAndDropHandlers  {

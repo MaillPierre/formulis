@@ -19,6 +19,11 @@ import com.irisa.formulis.model.basic.*;
 import com.irisa.formulis.model.exception.XMLParsingException;
 import com.irisa.formulis.model.suggestions.*;
 
+/**
+ * Functions to handle the parsing of the XML responses from SEWELIS
+ * @author pmaillot
+ *
+ */
 public class Parser {
 
 	public static Place parsePlace(Node node) throws XMLParsingException {
@@ -491,6 +496,7 @@ public class Parser {
 		return null;
 	}
 
+	@Deprecated
 	public static LinkedList<Profile> parseProfiles(Node node) throws XMLParsingException {
 		LinkedList<Profile> result = new LinkedList<Profile>();
 		if(node.getNodeName() == "profiles") {
@@ -506,6 +512,7 @@ public class Parser {
 		return result;
 	}
 
+	@Deprecated
 	public static Profile parseProfile(Node node) throws XMLParsingException {
 		//		Utils.debugMessage("parseProfile( " + node + " )");
 		if(node.getNodeName().equals("profile")) {
@@ -534,6 +541,7 @@ public class Parser {
 		}
 	}
 
+	@Deprecated
 	public static ProfileLine parseProfileLine(Node node) throws XMLParsingException {
 		if(node.getNodeName() == "RelationLine") {
 			return parseProfileRelationLine(node);
@@ -544,6 +552,7 @@ public class Parser {
 		}
 	}
 
+	@Deprecated
 	public static ProfileClassLine parseProfileClassLine(Node node) throws XMLParsingException, XMLParsingException {
 		//		Utils.debugMessage("parseProfileClassLine( " + node + " )");
 		if(node.getNodeName() == "ClassLine") {
@@ -564,6 +573,7 @@ public class Parser {
 		}
 	}
 
+	@Deprecated
 	public static ProfileRelationLine parseProfileRelationLine(Node node) throws XMLParsingException {
 		//		Utils.debugMessage("parseProfileRelationLine( " + node + " )");
 		if(node.getNodeName() == "RelationLine") {
@@ -607,6 +617,7 @@ public class Parser {
 		}
 	}
 
+	@Deprecated
 	public static ProfileLeafElement parseProfileForm(Node node) throws XMLParsingException {
 		if(node.getNodeName() == "form") {
 			ProfileForm result = new ProfileForm();

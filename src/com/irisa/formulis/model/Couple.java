@@ -1,5 +1,12 @@
 package com.irisa.formulis.model;
 
+/**
+ * Pure utility function to store a couple of elements
+ * @author pmaillot
+ *
+ * @param <A>
+ * @param <B>
+ */
 public class Couple<A, B> {
 	private A _first;
 	private B _second;

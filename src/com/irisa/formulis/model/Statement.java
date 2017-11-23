@@ -4,7 +4,11 @@ import java.util.HashMap;
 
 import com.irisa.formulis.model.basic.BasicElement;
 import com.irisa.formulis.model.basic.Focus;
-
+/**
+ * Data representation of the Place part of SEWELIS XML responses
+ * @author pmaillot
+ *
+ */
 public class Statement {
 	
 	private String focusedDisplay;

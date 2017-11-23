@@ -26,7 +26,7 @@ public class DateTimeCreateWidget extends AbstractCreateWidget {
 	public FormElement getData() {
 		Date selectedDatetime = datetimeBox.getValue();
 		String value = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.ISO_8601).format(selectedDatetime);
-		return new Typed(ControlUtils.LITTERAL_URIS.xsdDatetime.getUri(), value);
+		return new Typed(ControlUtils.DATATYPE_URIS.xsdDatetime.getUri(), value);
 	}
 
 	@Override

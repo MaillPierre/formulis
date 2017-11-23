@@ -2,6 +2,11 @@ package com.irisa.formulis.model.suggestions;
 
 import com.irisa.formulis.model.basic.BasicElement;
 
+/**
+ * Data representation of a SEWELIS Increment element
+ * @author pmaillot
+ *
+ */
 public class Increment implements Comparable<Increment>{
 
 	public enum KIND {

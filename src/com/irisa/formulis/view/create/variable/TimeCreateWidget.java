@@ -34,7 +34,7 @@ public class TimeCreateWidget extends AbstractCreateWidget {
 		int hours = timeBox.getValue().getHours();
 		int minutes = timeBox.getValue().getMinutes();
 		int seconds = timeBox.getValue().getSeconds();
-		return new Typed(ControlUtils.LITTERAL_URIS.xsdTime.getUri(), String.valueOf(hours) + ":" + String.valueOf(minutes) + ":" + String.valueOf(seconds));
+		return new Typed(ControlUtils.DATATYPE_URIS.xsdTime.getUri(), String.valueOf(hours) + ":" + String.valueOf(minutes) + ":" + String.valueOf(seconds));
 	}
 
 	@SuppressWarnings("deprecation")

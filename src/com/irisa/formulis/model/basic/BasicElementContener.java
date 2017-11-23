@@ -1,7 +1,7 @@
 package com.irisa.formulis.model.basic;
 
 /**
- * Class abstraite pour la gestion de l'indentation dans les conteners
+ * Abstract class for the management of indentation in conteners
  * @author pmaillot
  *
  */

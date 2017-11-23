@@ -5,6 +5,11 @@ import java.util.LinkedList;
 
 import com.irisa.formulis.model.suggestions.Increment;
 
+/**
+ * Data representation of the Place part of XML elements
+ * @author pmaillot
+ *
+ */
 public class Place {
 	
 	private String id;

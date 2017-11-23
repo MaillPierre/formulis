@@ -7,6 +7,11 @@ import java.util.LinkedList;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Transformation;
 
+/**
+ * Data representation of the Suggestions part of SEWELIS XML responses
+ * @author pmaillot
+ *
+ */
 public class Suggestions {
 
 	private boolean canInsertEntity;

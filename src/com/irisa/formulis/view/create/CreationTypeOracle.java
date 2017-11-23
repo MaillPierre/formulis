@@ -13,7 +13,7 @@ import com.irisa.formulis.model.basic.Plain;
 import com.irisa.formulis.model.basic.Typed;
 
 /**
- * View utility class which try to dtermine the kind od creation widget needed according to the types suggested
+ * View utility class which try to determine the kind of creation widget needed according to the class suggested
  * @author pmaillot
  *
  */

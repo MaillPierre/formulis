@@ -25,7 +25,7 @@ public class DateCreateWidget extends AbstractCreateWidget implements ChangeHand
 	
 	private String dateFormat = "yyyy-MM-dd";
 	private HashMap<String, Integer> typeIndexMap = new HashMap<String, Integer>();
-	private ControlUtils.LITTERAL_URIS datatype = ControlUtils.LITTERAL_URIS.xsdDate;
+	private ControlUtils.DATATYPE_URIS datatype = ControlUtils.DATATYPE_URIS.xsdDate;
 	
 	public DateCreateWidget(FormElement d) {
 		super(d);
@@ -33,18 +33,18 @@ public class DateCreateWidget extends AbstractCreateWidget implements ChangeHand
 		elementRow.add(elementCol);
 
 		dateBox.setStartView("YEAR");
-		formatBox.addItem("Year-Month-Day", ControlUtils.LITTERAL_URIS.xsdDate.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdDate.getUri(), 0);
-		formatBox.addItem("Month-Day", ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri(), 1);
-		formatBox.addItem("Year-Month", ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri(), 2);
-		formatBox.addItem("Year", ControlUtils.LITTERAL_URIS.xsdYear.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdYear.getUri(), 3);
-		formatBox.addItem("Month", ControlUtils.LITTERAL_URIS.xsdMonth.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdMonth.getUri(), 4);
-		formatBox.addItem("Day", ControlUtils.LITTERAL_URIS.xsdDay.getUri());
-		typeIndexMap.put(ControlUtils.LITTERAL_URIS.xsdDay.getUri(), 5);
+		formatBox.addItem("Year-Month-Day", ControlUtils.DATATYPE_URIS.xsdDate.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdDate.getUri(), 0);
+		formatBox.addItem("Month-Day", ControlUtils.DATATYPE_URIS.xsdMonthDay.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdMonthDay.getUri(), 1);
+		formatBox.addItem("Year-Month", ControlUtils.DATATYPE_URIS.xsdYearMonth.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdYearMonth.getUri(), 2);
+		formatBox.addItem("Year", ControlUtils.DATATYPE_URIS.xsdYear.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdYear.getUri(), 3);
+		formatBox.addItem("Month", ControlUtils.DATATYPE_URIS.xsdMonth.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdMonth.getUri(), 4);
+		formatBox.addItem("Day", ControlUtils.DATATYPE_URIS.xsdDay.getUri());
+		typeIndexMap.put(ControlUtils.DATATYPE_URIS.xsdDay.getUri(), 5);
 		formatBox.addChangeHandler(this);
 		formatBox.setSelectedIndex(0);
 		
@@ -77,29 +77,29 @@ public class DateCreateWidget extends AbstractCreateWidget implements ChangeHand
 		ControlUtils.debugMessage("DateCreateWidget setFormatDatatype " + type );
 		String format = null;
 		
-		if(type.equals(ControlUtils.LITTERAL_URIS.xsdYear.getUri())) {
+		if(type.equals(ControlUtils.DATATYPE_URIS.xsdYear.getUri())) {
 			format = "yyyy";
-			datatype = ControlUtils.LITTERAL_URIS.xsdYear;
+			datatype = ControlUtils.DATATYPE_URIS.xsdYear;
 		} 
-		else if(type.equals(ControlUtils.LITTERAL_URIS.xsdMonth.getUri())) {
+		else if(type.equals(ControlUtils.DATATYPE_URIS.xsdMonth.getUri())) {
 			format = "MM";
-			datatype = ControlUtils.LITTERAL_URIS.xsdMonth;
+			datatype = ControlUtils.DATATYPE_URIS.xsdMonth;
 		} 
-		else if(type.equals(ControlUtils.LITTERAL_URIS.xsdDay.getUri())) {
+		else if(type.equals(ControlUtils.DATATYPE_URIS.xsdDay.getUri())) {
 			format = "dd";
-			datatype = ControlUtils.LITTERAL_URIS.xsdDay;
+			datatype = ControlUtils.DATATYPE_URIS.xsdDay;
 		} 
-		else if(type.equals(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri())) {
+		else if(type.equals(ControlUtils.DATATYPE_URIS.xsdYearMonth.getUri())) {
 			format = "yyyy-MM";
-			datatype = ControlUtils.LITTERAL_URIS.xsdYearMonth;
+			datatype = ControlUtils.DATATYPE_URIS.xsdYearMonth;
 		} 
-		else if(type.equals(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri())) {
+		else if(type.equals(ControlUtils.DATATYPE_URIS.xsdMonthDay.getUri())) {
 			format = "MM-dd";
-			datatype = ControlUtils.LITTERAL_URIS.xsdMonthDay;
+			datatype = ControlUtils.DATATYPE_URIS.xsdMonthDay;
 		} 
 		else {
 			format = "yyyy-MM-dd";
-			datatype = ControlUtils.LITTERAL_URIS.xsdDate;
+			datatype = ControlUtils.DATATYPE_URIS.xsdDate;
 		}
 		
 		dateFormat = format;

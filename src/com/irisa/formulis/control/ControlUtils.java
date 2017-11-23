@@ -4,14 +4,10 @@ import java.sql.Time;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
+import com.irisa.formulis.control.ControlUtils.DATATYPE_URIS;
 import com.irisa.formulis.model.basic.Keyword;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.basic.URI.KIND;
-import com.irisa.formulis.view.AbstractDataWidget;
-import com.irisa.formulis.view.create.variable.DateCreateWidget;
-import com.irisa.formulis.view.create.variable.DateTimeCreateWidget;
-import com.irisa.formulis.view.create.variable.NumericCreateWidget;
-import com.irisa.formulis.view.create.variable.TextCreateWidget;
 
 public class ControlUtils {
 	
@@ -25,7 +21,7 @@ public class ControlUtils {
 	}
 	public static LOG_LEVEL logLevel = LOG_LEVEL.DEBUG;
 
-	public enum LITTERAL_URIS {
+	public enum DATATYPE_URIS {
 		xsdString("http://www.w3.org/2001/XMLSchema#string"),
 		xsdInteger("http://www.w3.org/2001/XMLSchema#integer"),
 		xsdDouble("http://www.w3.org/2001/XMLSchema#double"),
@@ -42,7 +38,7 @@ public class ControlUtils {
 	
 		private String uri;
 	
-		private LITTERAL_URIS(String u) {
+		private DATATYPE_URIS(String u) {
 			uri = u;
 		}
 	
@@ -51,42 +47,12 @@ public class ControlUtils {
 		}
 	
 		static public boolean isLitteralType(String u) {
-			for(int i = 0; i < LITTERAL_URIS.values().length; i++) {
-				if(LITTERAL_URIS.values()[i].getUri().equals(u)) {
+			for(int i = 0; i < DATATYPE_URIS.values().length; i++) {
+				if(DATATYPE_URIS.values()[i].getUri().equals(u)) {
 					return true;
 				}
 			}
 			return false;
-		}
-	
-		static public AbstractDataWidget getCorrespondingCreateWidget(LITTERAL_URIS uri) {
-			AbstractDataWidget result = null;
-			switch(uri) {
-			case xsdString:
-				result = new TextCreateWidget(null);
-				break;
-			case xsdInteger:
-				result = new NumericCreateWidget(null);
-				break;
-			case xsdBoolean:
-				break;
-			case xsdDate:
-			case xsdYearMonth:
-			case xsdYear:
-			case xsdMonth:
-			case xsdDay:
-			case xsdMonthDay:
-				result = new DateCreateWidget(null);
-				break;
-			case xsdDatetime:
-				result = new DateTimeCreateWidget(null);
-				break;
-			case xsdTime:
-				break;
-			default:
-				break;
-			}
-			return result;
 		}
 	}
 

@@ -23,6 +23,11 @@ import com.irisa.formulis.model.form.FormRelationLine;
 import com.irisa.formulis.model.suggestions.Increment;
 import com.irisa.formulis.model.suggestions.Increment.KIND;
 
+/**
+ * Functions to convert Statement elements to Form elements
+ * @author pmaillot
+ *
+ */
 public class DataUtils {
 
 	public static Keyword theKeyword = new Keyword("the");

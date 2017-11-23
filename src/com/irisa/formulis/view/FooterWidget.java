@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.InlineHTML;
 
 /**
- * View class vor all the information element à the bottom of the page
+ * View class vor all the information element à the bottom of the page. Could be replaced by simple HTML code
  * @author pmaillot
  *
  */

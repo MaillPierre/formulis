@@ -119,23 +119,23 @@ public class SelectCreateWidget extends AbstractFormulisWidget implements Change
 		} else if(type.equals("date-year")) {
 //			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-year");
 			this.createWid = new DateCreateWidget(null);
-			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYear.getUri());
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.DATATYPE_URIS.xsdYear.getUri());
 		} else if(type.equals("date-month")) {
 //			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-month");
 			this.createWid = new DateCreateWidget(null);
-			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonth.getUri());
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.DATATYPE_URIS.xsdMonth.getUri());
 		} else if(type.equals("date-day")) {
 //			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-day");
 			this.createWid = new DateCreateWidget(null);
-			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdDay.getUri());
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.DATATYPE_URIS.xsdDay.getUri());
 		} else if(type.equals("date-monthday")) {
 //			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-monthday");
 			this.createWid = new DateCreateWidget(null);
-			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdMonthDay.getUri());
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.DATATYPE_URIS.xsdMonthDay.getUri());
 		} else if(type.equals("date-yearmonth")) {
 //			ControlUtils.debugMessage("SelectCreateWidget setCreationType(" + type + ") date-yearmonth");
 			this.createWid = new DateCreateWidget(null);
-			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.LITTERAL_URIS.xsdYearMonth.getUri());
+			((DateCreateWidget)this.createWid).setFormatDatatype(ControlUtils.DATATYPE_URIS.xsdYearMonth.getUri());
 		} else if(type.equals("time")) {
 			this.createWid = new TimeCreateWidget(null);
 		} else if(type.equals("datetime")) {

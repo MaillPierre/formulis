@@ -8,6 +8,11 @@ import com.irisa.formulis.model.answers.AnswersRow;
 import com.irisa.formulis.model.basic.BasicElement;
 import com.irisa.formulis.view.ViewUtils;
 
+/**
+ * Data representation of the Answers part of SEWELIS XML responses
+ * @author pmaillot
+ *
+ */
 public class Answers {
 
 	private int count;

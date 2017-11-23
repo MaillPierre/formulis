@@ -26,7 +26,7 @@ public class NumericCreateWidget extends AbstractCreateWidget implements ValueCh
 	private Column contentCol = new Column(6, numberBox);
 	private Column modeCol = new Column(6, integerRadio, doubleRadio);
 	
-	private ControlUtils.LITTERAL_URIS datatype = ControlUtils.LITTERAL_URIS.xsdInteger;
+	private ControlUtils.DATATYPE_URIS datatype = ControlUtils.DATATYPE_URIS.xsdInteger;
 	
 	public NumericCreateWidget(FormElement d) {
 		super(d);
@@ -86,7 +86,7 @@ public class NumericCreateWidget extends AbstractCreateWidget implements ValueCh
 		integerBox.setValue(numValue.intValue());
 		numberBox = integerBox;
 		contentCol.add(numberBox);
-		datatype = ControlUtils.LITTERAL_URIS.xsdInteger;
+		datatype = ControlUtils.DATATYPE_URIS.xsdInteger;
 	}
 	
 	protected void setDoubleMode(String textValue) {
@@ -104,7 +104,7 @@ public class NumericCreateWidget extends AbstractCreateWidget implements ValueCh
 		doubleBox.setValue(numValue.doubleValue());
 		numberBox = doubleBox;
 		contentCol.add(numberBox);
-		datatype = ControlUtils.LITTERAL_URIS.xsdDouble;
+		datatype = ControlUtils.DATATYPE_URIS.xsdDouble;
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package com.irisa.formulis.model.form;
 import com.irisa.formulis.control.profile.ProfileElement;
 
 /**
- * base data class for all form main, components (forms and lines)
+ * Base data class for all form main, components (forms and lines)
  * @author pmaillot
  *
  */

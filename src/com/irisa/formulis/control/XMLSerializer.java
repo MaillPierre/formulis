@@ -19,6 +19,14 @@ import com.irisa.formulis.model.basic.Typed;
 import com.irisa.formulis.model.basic.URI;
 import com.irisa.formulis.model.exception.SerializingException;
 
+
+
+@Deprecated
+/**
+ * Function to serialize a form. Supposed to be used with the Profiles
+ * @author pmaillot
+ *
+ */
 public class XMLSerializer {
 
 	private XMLSerializer() {

@@ -3,6 +3,11 @@ package com.irisa.formulis.model;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * Data representation of stores
+ * @author pmaillot
+ *
+ */
 public class Store {
 	
 	private String name;

@@ -7,7 +7,7 @@ import com.irisa.formulis.model.DataUtils;
 
 
 /**
- * Classe abstraite pour la gestion des contenur se résumant à une liste d'élements décorée
+ * Abstract class, basicaly a decorated list of elements
  * @author pmaillot
  *
  */

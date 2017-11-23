@@ -1711,7 +1711,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				ControlUtils.setLogLevel(LOG_LEVEL.NOPE);
 			}
 			setDraggableLines(draggableLinesString.equals("true"));
-			ControlUtils.debugMessage("Controller onModuleLoad retrieve server adress: " + serverAdressString);
+			ControlUtils.debugMessage("Server adress: " + serverAdressString);
 			FormulisSettings.setServerAdress(serverAdressString);
 			uriBaseAdress = uriBaseString;
 			logStoreName = logStoreNameString;
@@ -2045,7 +2045,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 			else if(dataSource instanceof FormClassLine) { // Selection d'une classe
 				//				ControlUtils.debugMessage("Controller onLineSelection BY A CLASS");
 				// Si c'est une classe de litteral
-				if( ControlUtils.LITTERAL_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
+				if( ControlUtils.DATATYPE_URIS.isLitteralType(((URI) dataSource.getFixedElement()).getUri())) {
 
 					// Demande de completion pour la ligne de type
 				} else if(! dataSourceParent.isAnonymous()&& ! dataSourceParent.isTypeList() && event.getCallback() != null) {
@@ -2520,7 +2520,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 				FormLine newLine = DataUtils.formLineFromIncrement(incre, source);
 				if(newLine instanceof FormClassLine && newLine.getFixedElement() instanceof URI) {
 					URI uriClass = (URI)newLine.getFixedElement();
-					if(! ControlUtils.FORBIDDEN_URIS.isForbidden(uriClass.getUri()) && ! ControlUtils.LITTERAL_URIS.isLitteralType(uriClass.getUri())) {
+					if(! ControlUtils.FORBIDDEN_URIS.isForbidden(uriClass.getUri()) && ! ControlUtils.DATATYPE_URIS.isLitteralType(uriClass.getUri())) {
 						result.add((FormClassLine) newLine);
 					}
 				}
@@ -2574,7 +2574,7 @@ public final class Controller implements EntryPoint, ClickHandler, FormEventChai
 					if( newElemList.getFirst() instanceof Typed) {
 						Typed newElem = (Typed) newElemList.getFirst();
 						//					URI uriClass = ((Typed) newElem).getUri();
-						if( ControlUtils.LITTERAL_URIS.isLitteralType(newElem.getUri())) {
+						if( ControlUtils.DATATYPE_URIS.isLitteralType(newElem.getUri())) {
 							result.add(newElem);
 						}
 					} else if(newElemList.getFirst() instanceof Plain) {
