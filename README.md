@@ -33,10 +33,10 @@ The `Place`, `Answers`, `Statement`, `Suggestions` and the content of the ̀̀`a
 Basic element are the terminal elements and the logical operators appearing in the SEWELIS statements.
 
 #### FORM ELEMENTS ####
-TBD
+There is one main Form data element at the root of the application. Lines contain one fixed element (class ou property URI) and one variable element (field or basic element or Form). Forms contain lists of lines, relation lines can contain Forms as variable component.
 
 ### VIEW ###
-TBD
+The view elements generally follow the same structure as the data elements
 
 #### CREATION ####
 
@@ -44,7 +44,7 @@ TBD
 The user events are triggered in the view following a chain of responsibility pattern rooted into the controller. All elements of a Form graph (Forms and lines) are connected by the FormEventChain using `view.ViewUtils.connectFormEventChain(...)`. The FormEventChain event object all contain a callback object which will be called by the final event manager once the treatment of the event has been done.
 
 #### FORMS ####
-TBD
+View forms follow the same structure as data forms. Forms and relation lines are interconnected to transmit most events towards the Controller. There is one main Form at the root of the Formulis application
 
 
 ## DEPLOYMENT ##
