@@ -51,7 +51,6 @@ import com.irisa.formulis.view.event.interfaces.ModificationModeHandler;
 import com.irisa.formulis.view.form.AbstractFormLineWidget.LINE_STATE;
 
 /**
- * Widget principal pour un formulaire.
  * Main Widget representing a Form
  * @author pmaillot
  *

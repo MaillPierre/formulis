@@ -7,7 +7,7 @@ import com.irisa.formulis.model.DataUtils;
 
 
 /**
- * Abstract class, basicaly a decorated list of elements
+ * Abstract class, basically a decorated list of elements
  * @author pmaillot
  *
  */
