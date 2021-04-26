@@ -40,18 +40,18 @@ The view elements generally follow the same structure as the data elements
 
 #### CREATION ####
 
-#### EVENTS ####
+#### EVENTS ####
 The user events are triggered in the view following a chain of responsibility pattern rooted into the controller. All elements of a Form graph (Forms and lines) are connected by the FormEventChain using `view.ViewUtils.connectFormEventChain(...)`. The FormEventChain event object all contain a callback object which will be called by the final event manager once the treatment of the event has been done.
 
 #### FORMS ####
 View forms follow the same structure as data forms. Forms and relation lines are interconnected to transmit most events towards the Controller. There is one main Form at the root of the Formulis application
 
 
-## DEPLOYMENT ##
+## DEPLOYMENT ##
 
 To obtain an usable .war, compile the GWT project and compress in a .zip all the elements of the `war/` folder before renaming the archive as a .war. You must not compile the code using the debug mode of your IDE.
 
-## ACKNOWLEGDMENT ##
+## ACKNOWLEGDMENT ##
 
 FORMULIS was developped by Pierre Maillot from the SemLIS team, IRISA, University of Rennes 1, Rennes, France (https://www-semlis.irisa.fr/) in the effort to make data more accessible to users. This work was partially supported by ANR project IDFRAud (ANR-14-CE28-0012).
 
